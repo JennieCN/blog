@@ -1,0 +1,8 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+---
+<BaseLayout title="关于">
+  <h1 class="text-3xl font-bold">关于</h1>
+  <p class="mt-4">这里是 {SITE.author} 的博客，记录 {SITE.description}。</p>
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { SECTIONS } from '../../config';
+import { getCollection } from 'astro:content';
+import { filterDrafts, sortByDateDesc, type PostSummary } from '../../lib/posts';
+import { collectTags } from '../../lib/tags';
+
+export async function getStaticPaths() {
+  const all: PostSummary[] = [];
+  for (const s of SECTIONS) {
+    for (const e of filterDrafts(await getCollection(s.key))) {
+      all.push({ section: s.key, slug: e.id, title: e.data.title, description: e.data.description, pubDate: e.data.pubDate, tags: e.data.tags });
+    }
+  }
+  const tagMap = collectTags(all);
+  return [...tagMap.keys()].map((tag) => ({ params: { tag }, props: { tag } }));
+}
+
+const all: PostSummary[] = [];
+for (const s of SECTIONS) {
+  for (const e of filterDrafts(await getCollection(s.key))) {
+    all.push({ section: s.key, slug: e.id, title: e.data.title, description: e.data.description, pubDate: e.data.pubDate, tags: e.data.tags });
+  }
+}
+const { tag } = Astro.props;
+const posts = sortByDateDesc(collectTags(all).get(tag) ?? []);
+---
+<BaseLayout title={`标签：${tag}`}>
+  <h1 class="text-3xl font-bold">标签：{tag}</h1>
+  <section class="mt-8"><PostList posts={posts} /></section>
+</BaseLayout>
