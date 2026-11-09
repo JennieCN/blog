@@ -18,8 +18,13 @@ const questions = sortByDateDesc(
 );
 ---
 <BaseLayout title="问答" description="提出问题，等待解答">
-  <h1 class="text-3xl font-bold">问答</h1>
-  <p class="mt-2" style="color: var(--color-muted)">提出问题，等待解答。点进问题后在页面底部回复。</p>
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">问答</h1>
+      <p class="mt-2" style="color: var(--color-muted)">精选问答归档。想要自己注册发帖提问，请进入问答社区。</p>
+    </div>
+    <a href="https://qa.mycampusmail.com" target="_blank" rel="noopener" class="rounded px-4 py-2 text-sm text-white" style="background: var(--color-accent)">进入问答社区 →</a>
+  </div>
 
   {questions.length === 0 ? (
     <p class="mt-8" style="color: var(--color-muted)">还没有问题。</p>

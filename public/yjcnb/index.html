@@ -4,8 +4,180 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>内容管理</title>
+    <style>
+      #admin-bar {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #18181b;
+        color: #fafafa;
+        padding: 8px 14px;
+        border-radius: 9999px;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 13px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      }
+      #admin-bar a, #admin-bar button {
+        color: #93c5fd;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        padding: 2px 6px;
+        font: inherit;
+      }
+      #admin-bar a:hover, #admin-bar button:hover {
+        text-decoration: underline;
+      }
+      #mgr-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 100000;
+        background: rgba(0, 0, 0, 0.55);
+        align-items: center;
+        justify-content: center;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      #mgr-box {
+        background: #18181b;
+        color: #fafafa;
+        width: 92%;
+        max-width: 440px;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+      #mgr-box h3 { margin: 0 0 12px; font-size: 16px; }
+      #mgr-box input {
+        flex: 1;
+        padding: 7px 10px;
+        border-radius: 6px;
+        border: 1px solid #3f3f46;
+        background: #09090b;
+        color: #fafafa;
+      }
+      #mgr-box button.primary {
+        padding: 7px 14px;
+        border-radius: 6px;
+        border: none;
+        background: #2563eb;
+        color: #fff;
+        cursor: pointer;
+      }
+      #mgr-list { list-style: none; padding: 0; margin: 14px 0 0; font-size: 14px; }
+      #mgr-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid #27272a;
+      }
+    </style>
   </head>
   <body>
+    <div id="admin-bar">
+      <button type="button" id="open-mgr">指定管理员</button>
+      <span>·</span>
+      <a href="https://blog-waline-snowy-psi.vercel.app/ui" target="_blank" rel="noopener">评论管理</a>
+      <span>·</span>
+      <a href="https://qa.mycampusmail.com/admin" target="_blank" rel="noopener">社区管理</a>
+      <span>·</span>
+      <a href="/" target="_blank" rel="noopener">博客首页</a>
+    </div>
+
+    <div id="mgr-modal">
+      <div id="mgr-box">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3>指定博客管理员（GitHub 协作者）</h3>
+          <button type="button" id="close-mgr" style="background:none;border:none;color:#a1a1aa;cursor:pointer;font-size:18px">×</button>
+        </div>
+        <p style="font-size:12px;color:#a1a1aa;margin:0 0 10px">添加后对方可用自己的 GitHub 账号登录本后台发文。社区管理员请在「社区管理」中设置用户组。</p>
+        <div style="display:flex;gap:8px">
+          <input id="mgr-user" placeholder="输入对方 GitHub 用户名" />
+          <button type="button" class="primary" id="add-mgr">添加</button>
+        </div>
+        <p id="mgr-msg" style="font-size:12px;color:#93c5fd;margin:8px 0 0;min-height:16px"></p>
+        <ul id="mgr-list"></ul>
+      </div>
+    </div>
+
+    <script>
+      const REPO = 'JennieCN/blog';
+      const modal = document.getElementById('mgr-modal');
+      const list = document.getElementById('mgr-list');
+      const msg = document.getElementById('mgr-msg');
+
+      function getToken() {
+        try { return JSON.parse(localStorage.getItem('sveltia-cms.user') || '{}').token; }
+        catch { return null; }
+      }
+
+      async function loadCollaborators() {
+        const tk = getToken();
+        if (!tk) { msg.textContent = '请先登录后台后再操作'; return; }
+        msg.textContent = '加载中…';
+        const r = await fetch(`https://api.github.com/repos/${REPO}/collaborators`, {
+          headers: { Authorization: `Bearer ${tk}` },
+        });
+        if (!r.ok) { msg.textContent = '读取失败'; return; }
+        const data = await r.json();
+        msg.textContent = '';
+        list.innerHTML = '';
+        for (const u of data) {
+          const li = document.createElement('li');
+          li.innerHTML = `<span>${u.login}</span>`;
+          if (u.login !== 'JennieCN') {
+            const btn = document.createElement('button');
+            btn.textContent = '移除';
+            btn.style.cssText = 'background:none;border:none;color:#f87171;cursor:pointer';
+            btn.onclick = async () => {
+              await fetch(`https://api.github.com/repos/${REPO}/collaborators/${u.login}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${tk}` },
+              });
+              loadCollaborators();
+            };
+            li.appendChild(btn);
+          } else {
+            const span = document.createElement('span');
+            span.style.color = '#a1a1aa';
+            span.textContent = '所有者';
+            li.appendChild(span);
+          }
+          list.appendChild(li);
+        }
+      }
+
+      document.getElementById('open-mgr').onclick = () => {
+        modal.style.display = 'flex';
+        loadCollaborators();
+      };
+      document.getElementById('close-mgr').onclick = () => { modal.style.display = 'none'; };
+
+      document.getElementById('add-mgr').onclick = async () => {
+        const tk = getToken();
+        const username = document.getElementById('mgr-user').value.trim();
+        if (!tk) { msg.textContent = '请先登录后台'; return; }
+        if (!username) return;
+        msg.textContent = '正在发送邀请…';
+        const r = await fetch(`https://api.github.com/repos/${REPO}/collaborators/${encodeURIComponent(username)}`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ permission: 'push' }),
+        });
+        if (r.status === 201 || r.status === 204) {
+          msg.textContent = `已邀请 ${username}，对方接受邮件后生效`;
+          document.getElementById('mgr-user').value = '';
+          loadCollaborators();
+        } else {
+          msg.textContent = '邀请失败，请检查用户名是否存在';
+        }
+      };
+    </script>
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
   </body>
 </html>

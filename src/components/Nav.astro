@@ -8,6 +8,7 @@ import { SECTIONS, SITE } from '../config';
       {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
       <a href="/qa/">问答</a>
       <a href="/search/">搜索</a>
+      <a href="/yjcnb/" class="admin-link hidden" style="color: var(--color-accent)">管理</a>
     </nav>
     <details class="md:hidden">
       <summary class="cursor-pointer text-sm">菜单</summary>
@@ -15,7 +16,18 @@ import { SECTIONS, SITE } from '../config';
         {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
         <a href="/qa/">问答</a>
         <a href="/search/">搜索</a>
+        <a href="/yjcnb/" class="admin-link hidden" style="color: var(--color-accent)">管理</a>
       </nav>
     </details>
   </div>
 </header>
+
+<script>
+  // 只有登录过 CMS 后台的浏览器才显示「管理」入口，普通访客看不到
+  try {
+    const user = localStorage.getItem('sveltia-cms.user');
+    if (user && JSON.parse(user).token) {
+      document.querySelectorAll('.admin-link').forEach((el) => el.classList.remove('hidden'));
+    }
+  } catch {}
+</script>
