@@ -19,7 +19,7 @@ export const SITE = {
   description: '记录技术、竞赛与思考',
   author: 'JennieCN',
   url: 'https://blog.mycampusmail.com',
-  walineServerURL: 'https://waline.example.vercel.app',
+  walineServerURL: 'https://blog-waline-snowy-psi.vercel.app',
 };
 
 export function getSection(key: string): Section | undefined {
