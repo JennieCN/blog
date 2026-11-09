@@ -1,0 +1,66 @@
+backend:
+  name: github
+  repo: JennieCN/blog
+  branch: main
+  base_url: https://blog.mycampusmail.com
+  auth_endpoint: api/auth
+
+media_folder: public/images
+public_folder: /images
+
+locale: zh_Hans
+
+collections:
+  - name: vps
+    label: VPS 科普
+    label_singular: VPS 文章
+    folder: src/content/vps
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: &post_fields
+      - { name: title, label: 标题, widget: string }
+      - { name: description, label: 摘要, widget: text }
+      - { name: pubDate, label: 发布日期, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { name: updatedDate, label: 更新日期, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD, required: false }
+      - { name: tags, label: 标签, widget: list, required: false, default: [] }
+      - { name: draft, label: 草稿, widget: boolean, default: false }
+      - { name: cover, label: 封面图, widget: image, required: false }
+      - { name: body, label: 正文, widget: markdown }
+  - name: fsae
+    label: 大学生方程式赛车
+    label_singular: FSAE 文章
+    folder: src/content/fsae
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *post_fields
+  - name: rm
+    label: RoboMaster
+    label_singular: RM 文章
+    folder: src/content/rm
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *post_fields
+  - name: ai
+    label: AI
+    label_singular: AI 文章
+    folder: src/content/ai
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *post_fields
+  - name: resources
+    label: 资源
+    label_singular: 资源文章
+    folder: src/content/resources
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *post_fields
