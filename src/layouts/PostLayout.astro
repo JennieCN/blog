@@ -12,7 +12,7 @@ interface Props {
 }
 const { title, description, pubDate, updatedDate, tags, sectionName } = Astro.props;
 ---
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} type="article" pubDate={pubDate}>
   <article>
     <p class="text-sm" style="color: var(--color-muted)">{sectionName}</p>
     <h1 class="mt-2 text-3xl font-bold">{title}</h1>
