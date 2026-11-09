@@ -16,17 +16,16 @@ const { path } = Astro.props;
     document.head.appendChild(link);
 
     const s = document.createElement('script');
-    s.type = 'module';
-    s.textContent = `
-      import { init } from 'https://unpkg.com/@waline/client@3/dist/waline.mjs';
-      init({
+    s.src = 'https://unpkg.com/@waline/client@3/dist/waline.umd.js';
+    s.onload = () => {
+      window.Waline.init({
         el: '#waline',
-        serverURL: ${JSON.stringify(serverURL)},
-        path: ${JSON.stringify(path)},
+        serverURL,
+        path,
         lang: 'zh-CN',
         dark: 'auto',
       });
-    `;
-    document.head.appendChild(s);
+    };
+    document.body.appendChild(s);
   }
 </script>
