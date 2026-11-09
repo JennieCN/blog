@@ -4,10 +4,11 @@ import { SECTIONS, SITE } from '../config';
 <header class="border-b" style="border-color: var(--color-border)">
   <div class="container flex items-center justify-between py-4">
     <a href="/" class="font-semibold">{SITE.title}</a>
-    <nav class="hidden md:flex gap-6 text-sm">
+    <nav class="hidden md:flex items-center gap-6 text-sm">
       {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
       <a href="/qa/">问答</a>
       <a href="/search/">搜索</a>
+      <a href="https://qa.mycampusmail.com/" class="rounded px-3 py-1 text-white" style="background: var(--color-accent)">注册 / 提问</a>
       <a href="/yjcnb/" class="admin-link hidden" style="color: var(--color-accent)">管理</a>
     </nav>
     <details class="md:hidden">
@@ -16,6 +17,7 @@ import { SECTIONS, SITE } from '../config';
         {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
         <a href="/qa/">问答</a>
         <a href="/search/">搜索</a>
+        <a href="https://qa.mycampusmail.com/" style="color: var(--color-accent)">注册 / 提问</a>
         <a href="/yjcnb/" class="admin-link hidden" style="color: var(--color-accent)">管理</a>
       </nav>
     </details>
