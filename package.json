@@ -10,7 +10,8 @@
   },
   "type": "module",
   "devDependencies": {
-    "pagefind": "^1.6.0"
+    "pagefind": "^1.6.0",
+    "vitest": "^5.1.0"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
