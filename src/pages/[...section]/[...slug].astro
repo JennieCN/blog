@@ -1,5 +1,6 @@
 ---
 import PostLayout from '../../layouts/PostLayout.astro';
+import Comments from '../../components/Comments.astro';
 import { SECTIONS, getSection } from '../../config';
 import { getCollection, render } from 'astro:content';
 import { filterDrafts } from '../../lib/posts';
@@ -28,4 +29,5 @@ const { Content } = await render(entry);
   sectionName={meta.name}
 >
   <Content />
+  <Comments slot="comments" path={`/${entry.collection}/${entry.id}/`} />
 </PostLayout>

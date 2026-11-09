@@ -1,0 +1,32 @@
+---
+import { SITE } from '../config';
+
+interface Props {
+  path: string;
+}
+const { path } = Astro.props;
+---
+<div id="waline" class="mt-16"></div>
+
+<script define:vars={{ serverURL: SITE.walineServerURL, path }}>
+  if (serverURL && !serverURL.includes('example')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = serverURL + '/client/style.css';
+    document.head.appendChild(link);
+
+    const s = document.createElement('script');
+    s.type = 'module';
+    s.src = serverURL + '/client/waline.mjs';
+    s.addEventListener('load', () => {
+      window.waline?.init({
+        el: '#waline',
+        serverURL,
+        path,
+        lang: 'zh-CN',
+        dark: 'auto',
+      });
+    });
+    document.head.appendChild(s);
+  }
+</script>
