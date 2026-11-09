@@ -12,21 +12,21 @@ const { path } = Astro.props;
   if (serverURL && !serverURL.includes('example')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = serverURL + '/client/style.css';
+    link.href = 'https://unpkg.com/@waline/client@3/dist/waline.css';
     document.head.appendChild(link);
 
     const s = document.createElement('script');
     s.type = 'module';
-    s.src = serverURL + '/client/waline.mjs';
-    s.addEventListener('load', () => {
-      window.waline?.init({
+    s.textContent = `
+      import { init } from 'https://unpkg.com/@waline/client@3/dist/waline.mjs';
+      init({
         el: '#waline',
-        serverURL,
-        path,
+        serverURL: ${JSON.stringify(serverURL)},
+        path: ${JSON.stringify(path)},
         lang: 'zh-CN',
         dark: 'auto',
       });
-    });
+    `;
     document.head.appendChild(s);
   }
 </script>
