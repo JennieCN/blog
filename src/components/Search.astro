@@ -1,0 +1,35 @@
+<div>
+  <input id="search" type="search" placeholder="搜索文章…" class="w-full rounded border px-3 py-2" style="border-color: var(--color-border)" />
+  <ul id="results" class="mt-6 flex flex-col gap-4"></ul>
+</div>
+
+<script>
+  const input = document.getElementById('search') as HTMLInputElement | null;
+  const results = document.getElementById('results');
+
+  async function run() {
+    if (!input || !results) return;
+    const q = input.value.trim();
+    results.innerHTML = '';
+    if (!q) return;
+
+    // 运行时拼接路径，避免打包器尝试解析构建后才生成的 Pagefind 文件
+    const pagefindPath = ['', 'pagefind', 'pagefind.js'].join('/');
+    const pagefind = await import(/* @vite-ignore */ pagefindPath);
+    await pagefind.init();
+    const search = await pagefind.search(q);
+
+    for (const r of search.results.slice(0, 10)) {
+      const data = await r.data();
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="${data.url}" class="font-semibold">${data.meta.title}</a><p class="text-sm" style="color: var(--color-muted)">${data.excerpt}</p>`;
+      results.appendChild(li);
+    }
+
+    if (search.results.length === 0) {
+      results.innerHTML = '<li style="color: var(--color-muted)">没有找到相关文章。</li>';
+    }
+  }
+
+  input?.addEventListener('input', run);
+</script>
