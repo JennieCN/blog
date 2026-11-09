@@ -4,10 +4,14 @@ import { formatDate } from '../lib/posts';
 interface Props {
   pubDate: Date;
   tags?: string[];
+  pageviewPath?: string;
 }
-const { pubDate, tags = [] } = Astro.props;
+const { pubDate, tags = [], pageviewPath } = Astro.props;
 ---
 <div class="flex flex-wrap items-center gap-3 text-sm" style="color: var(--color-muted)">
   <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+  {pageviewPath && (
+    <span>· 阅读 <span class="waline-pageview-count" data-path={pageviewPath}>-</span> 次</span>
+  )}
   {tags.map((t) => <a href={`/tags/${encodeURIComponent(t)}/`} class="underline">#{t}</a>)}
 </div>

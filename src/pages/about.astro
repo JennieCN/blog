@@ -1,8 +1,30 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE } from '../config';
+import { SECTIONS, SITE } from '../config';
 ---
-<BaseLayout title="关于">
-  <h1 class="text-3xl font-bold">关于</h1>
-  <p class="mt-4">这里是 {SITE.author} 的博客，记录 {SITE.description}。</p>
+<BaseLayout title="关于" description={`关于 ${SITE.title} 与站点结构说明`}>
+  <h1 class="text-3xl font-bold">关于「{SITE.title}」</h1>
+  <p class="mt-3 text-base" style="color: var(--color-muted)">
+    这里是 {SITE.author} 的长期技术与工程笔记站，聚焦服务器网络基建、大学生方程式赛车（FSAE）、RoboMaster 机器人竞赛、AI 工程实践与实用工具整理。
+  </p>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
+    <div class="card p-5">
+      <h2 class="text-lg font-semibold">站点构成</h2>
+      <ul class="mt-3 flex flex-col gap-2 text-sm" style="color: var(--color-muted)">
+        <li>· <strong>内容主站</strong>：Astro 5 静态构建 + Pagefind 离线全文检索 + Waline 评论与阅读统计</li>
+        <li>· <strong>问答社区</strong>：<a href="https://qa.mycampusmail.com/" class="underline">qa.mycampusmail.com</a>（支持注册提问、上传图片、采纳最佳解答與每日签到）</li>
+        <li>· <strong>在线工具箱</strong>：<a href="/tools/" class="underline">/tools/</a>（VPS 剩余价值计算器、FSAE/RM 锂电池包参数速算、常用脚本库）</li>
+      </ul>
+    </div>
+
+    <div class="card p-5">
+      <h2 class="text-lg font-semibold">五个核心板块</h2>
+      <ul class="mt-3 flex flex-col gap-2 text-sm" style="color: var(--color-muted)">
+        {SECTIONS.map((s) => (
+          <li>· <a href={`/${s.key}/`} class="font-medium underline">{s.name}</a>：{s.description}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
 </BaseLayout>

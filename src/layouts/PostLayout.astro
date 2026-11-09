@@ -33,7 +33,7 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
     <article class="min-w-0">
       <a href={`/${sectionKey}/`} class="text-sm font-medium" style="color: var(--color-accent)">{sectionName}</a>
       <h1 class="mt-2 text-3xl font-bold leading-tight">{title}</h1>
-      <div class="mt-3"><PostMeta pubDate={pubDate} tags={tags} /></div>
+      <div class="mt-3"><PostMeta pubDate={pubDate} tags={tags} pageviewPath={Astro.url.pathname} /></div>
       {updatedDate && <p class="mt-1 text-sm" style="color: var(--color-muted)">更新于 {updatedDate.toISOString().slice(0, 10)}</p>}
       <div class="prose mt-8"><slot /></div>
 
