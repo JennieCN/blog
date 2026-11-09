@@ -6,12 +6,14 @@ import { SECTIONS, SITE } from '../config';
     <a href="/" class="font-semibold">{SITE.title}</a>
     <nav class="hidden md:flex gap-6 text-sm">
       {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
+      <a href="/qa/">问答</a>
       <a href="/search/">搜索</a>
     </nav>
     <details class="md:hidden">
       <summary class="cursor-pointer text-sm">菜单</summary>
       <nav class="absolute right-4 mt-2 flex flex-col gap-2 rounded border bg-[var(--color-bg)] p-4 text-sm" style="border-color: var(--color-border)">
         {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
+        <a href="/qa/">问答</a>
         <a href="/search/">搜索</a>
       </nav>
     </details>

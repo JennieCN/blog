@@ -64,3 +64,18 @@ collections:
     format: frontmatter
     slug: "{{slug}}"
     fields: *post_fields
+  - name: qa
+    label: 问答
+    label_singular: 问题
+    folder: src/content/qa
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields:
+      - { name: question, label: 问题, widget: string }
+      - { name: description, label: 简述, widget: text }
+      - { name: pubDate, label: 发布日期, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { name: tags, label: 标签, widget: list, required: false, default: [] }
+      - { name: solved, label: 已解决, widget: boolean, default: false }
+      - { name: body, label: 详细描述, widget: markdown }

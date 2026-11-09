@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostMeta from '../../components/PostMeta.astro';
+import Comments from '../../components/Comments.astro';
+import { getCollection, render } from 'astro:content';
+import { filterDrafts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const entries = filterDrafts(await getCollection('qa'));
+  return entries.map((e) => ({ params: { slug: e.id }, props: { entry: e } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<BaseLayout title={entry.data.question} description={entry.data.description}>
+  <article>
+    <div class="flex items-center gap-2">
+      {entry.data.solved && <span class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-800">已解决</span>}
+      <h1 class="text-3xl font-bold">{entry.data.question}</h1>
+    </div>
+    <div class="mt-3"><PostMeta pubDate={entry.data.pubDate} tags={entry.data.tags} /></div>
+    <div class="prose mt-8"><Content /></div>
+  </article>
+
+  <h2 class="mt-16 text-xl font-bold">回答</h2>
+  <Comments path={`/qa/${entry.id}/`} />
+</BaseLayout>

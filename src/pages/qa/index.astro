@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostMeta from '../../components/PostMeta.astro';
+import { getCollection } from 'astro:content';
+import { filterDrafts, sortByDateDesc } from '../../lib/posts';
+
+const entries = filterDrafts(await getCollection('qa'));
+const questions = sortByDateDesc(
+  entries.map((e) => ({
+    section: 'qa' as const,
+    slug: e.id,
+    title: e.data.question,
+    description: e.data.description,
+    pubDate: e.data.pubDate,
+    tags: e.data.tags,
+    solved: e.data.solved,
+  })),
+);
+---
+<BaseLayout title="问答" description="提出问题，等待解答">
+  <h1 class="text-3xl font-bold">问答</h1>
+  <p class="mt-2" style="color: var(--color-muted)">提出问题，等待解答。点进问题后在页面底部回复。</p>
+
+  {questions.length === 0 ? (
+    <p class="mt-8" style="color: var(--color-muted)">还没有问题。</p>
+  ) : (
+    <ul class="mt-8 flex flex-col gap-8">
+      {questions.map((q) => (
+        <li>
+          <div class="flex items-center gap-2">
+            {q.solved && <span class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-800">已解决</span>}
+            <a href={`/qa/${q.slug}/`} class="text-xl font-semibold">{q.title}</a>
+          </div>
+          <p class="mt-1" style="color: var(--color-muted)">{q.description}</p>
+          <PostMeta pubDate={q.pubDate} tags={q.tags} />
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>
