@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>内容管理</title>
+    <title>融夕的书 · 内容与管理员后台</title>
     <style>
       #admin-bar {
         position: fixed;
@@ -47,12 +47,14 @@
         background: #18181b;
         color: #fafafa;
         width: 92%;
-        max-width: 440px;
+        max-width: 480px;
+        max-height: 85vh;
+        overflow-y: auto;
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       }
-      #mgr-box h3 { margin: 0 0 12px; font-size: 16px; }
+      #mgr-box h3 { margin: 0 0 8px; font-size: 15px; }
       #mgr-box input {
         flex: 1;
         padding: 7px 10px;
@@ -69,8 +71,8 @@
         color: #fff;
         cursor: pointer;
       }
-      #mgr-list { list-style: none; padding: 0; margin: 14px 0 0; font-size: 14px; }
-      #mgr-list li {
+      .mgr-list { list-style: none; padding: 0; margin: 10px 0 0; font-size: 13px; }
+      .mgr-list li {
         display: flex;
         justify-content: space-between;
         padding: 6px 0;
@@ -91,17 +93,32 @@
 
     <div id="mgr-modal">
       <div id="mgr-box">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3>指定博客管理员（GitHub 协作者）</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <strong style="font-size:16px">统一指定管理员</strong>
           <button type="button" id="close-mgr" style="background:none;border:none;color:#a1a1aa;cursor:pointer;font-size:18px">×</button>
         </div>
-        <p style="font-size:12px;color:#a1a1aa;margin:0 0 10px">添加后对方可用自己的 GitHub 账号登录本后台发文。社区管理员请在「社区管理」中设置用户组。</p>
+
+        <!-- 1. 博客发文管理员 -->
+        <h3>1. 博客发文管理员（GitHub 协作者）</h3>
+        <p style="font-size:12px;color:#a1a1aa;margin:0 0 8px">添加后对方可用自己的 GitHub 账号登录本后台直接发文章。</p>
         <div style="display:flex;gap:8px">
           <input id="mgr-user" placeholder="输入对方 GitHub 用户名" />
-          <button type="button" class="primary" id="add-mgr">添加</button>
+          <button type="button" class="primary" id="add-mgr">邀请</button>
         </div>
-        <p id="mgr-msg" style="font-size:12px;color:#93c5fd;margin:8px 0 0;min-height:16px"></p>
-        <ul id="mgr-list"></ul>
+        <p id="mgr-msg" style="font-size:12px;color:#93c5fd;margin:6px 0 0;min-height:16px"></p>
+        <ul id="mgr-list" class="mgr-list"></ul>
+
+        <hr style="border:none;border-top:1px solid #27272a;margin:16px 0" />
+
+        <!-- 2. 问答社区管理员 -->
+        <h3>2. 问答社区管理员（qa.mycampusmail.com）</h3>
+        <p style="font-size:12px;color:#a1a1aa;margin:0 0 8px">输入已在问答社区注册的用户名，一键提升为社区管理员（可置顶、删帖、采纳最佳解答）。</p>
+        <div style="display:flex;gap:8px">
+          <input id="qa-user" placeholder="输入社区注册用户名" />
+          <button type="button" class="primary" id="add-qa-mgr">设为管理员</button>
+        </div>
+        <p id="qa-msg" style="font-size:12px;color:#93c5fd;margin:6px 0 0;min-height:16px"></p>
+        <ul id="qa-list" class="mgr-list"></ul>
       </div>
     </div>
 
@@ -110,6 +127,8 @@
       const modal = document.getElementById('mgr-modal');
       const list = document.getElementById('mgr-list');
       const msg = document.getElementById('mgr-msg');
+      const qaList = document.getElementById('qa-list');
+      const qaMsg = document.getElementById('qa-msg');
 
       function getToken() {
         try { return JSON.parse(localStorage.getItem('sveltia-cms.user') || '{}').token; }
@@ -152,9 +171,45 @@
         }
       }
 
+      async function loadCommunityAdmins() {
+        const tk = getToken();
+        if (!tk) return;
+        const r = await fetch('/api/community-admin', {
+          headers: { Authorization: `Bearer ${tk}` },
+        });
+        if (!r.ok) return;
+        const { admins = [] } = await r.json();
+        qaList.innerHTML = '';
+        for (const u of admins) {
+          const li = document.createElement('li');
+          li.innerHTML = `<span>${u.username} (${u.email})</span>`;
+          if (u.id !== '1') {
+            const btn = document.createElement('button');
+            btn.textContent = '取消管理员';
+            btn.style.cssText = 'background:none;border:none;color:#f87171;cursor:pointer';
+            btn.onclick = async () => {
+              await fetch('/api/community-admin', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u.username, role: 'member' }),
+              });
+              loadCommunityAdmins();
+            };
+            li.appendChild(btn);
+          } else {
+            const span = document.createElement('span');
+            span.style.color = '#a1a1aa';
+            span.textContent = '主管理员';
+            li.appendChild(span);
+          }
+          qaList.appendChild(li);
+        }
+      }
+
       document.getElementById('open-mgr').onclick = () => {
         modal.style.display = 'flex';
         loadCollaborators();
+        loadCommunityAdmins();
       };
       document.getElementById('close-mgr').onclick = () => { modal.style.display = 'none'; };
 
@@ -175,6 +230,27 @@
           loadCollaborators();
         } else {
           msg.textContent = '邀请失败，请检查用户名是否存在';
+        }
+      };
+
+      document.getElementById('add-qa-mgr').onclick = async () => {
+        const tk = getToken();
+        const username = document.getElementById('qa-user').value.trim();
+        if (!tk) { qaMsg.textContent = '请先登录后台'; return; }
+        if (!username) return;
+        qaMsg.textContent = '正在设置…';
+        const r = await fetch('/api/community-admin', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, role: 'admin' }),
+        });
+        const d = await r.json();
+        if (r.ok) {
+          qaMsg.textContent = `已将 ${username} 设为社区管理员`;
+          document.getElementById('qa-user').value = '';
+          loadCommunityAdmins();
+        } else {
+          qaMsg.textContent = d.error || '设置失败';
         }
       };
     </script>

@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const milestones = [
+  {
+    date: '2026-11-10',
+    title: '上线交互工具箱、建站时间轴与阅读体验增强',
+    detail: '新增 VPS 剩余价值计算器、FSAE/RM 锂电池组参数速算、常用脚本库；文章页支持右侧目录 TOC、代码一键复制、深浅色切换；社区启用最佳答案采纳与图片上传。',
+  },
+  {
+    date: '2026-11-10',
+    title: '问答社区 qa.mycampusmail.com 正式上线',
+    detail: '在 AWS 新加坡实例部署 Flarum 论坛，完成简体中文界面、五个对应板块标签、新用户免邮件验证自动激活以及与主站双向导航互通。',
+  },
+  {
+    date: '2026-11-09',
+    title: '博客主站 blog.mycampusmail.com 上线',
+    detail: '完成域名 NS 迁移至 Cloudflare，基于 Astro 5 + Pagefind + Waline + Sveltia CMS 搭建五大内容板块与隐蔽管理后台 /yjcnb/。',
+  },
+];
+---
+<BaseLayout title="建站日志" description="融夕的书建站与功能演进时间轴">
+  <h1 class="text-3xl font-bold">建站日志</h1>
+  <p class="mt-2" style="color: var(--color-muted)">记录「融夕的书」每一次架构调整与功能更新。</p>
+
+  <ol class="mt-8 border-l-2 pl-6 flex flex-col gap-8" style="border-color: var(--color-border)">
+    {milestones.map((m) => (
+      <li class="relative">
+        <span class="absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 bg-[var(--color-bg)]" style="border-color: var(--color-accent)" />
+        <time class="text-xs font-mono" style="color: var(--color-accent)">{m.date}</time>
+        <h2 class="mt-1 text-lg font-semibold">{m.title}</h2>
+        <p class="mt-1 text-sm" style="color: var(--color-muted)">{m.detail}</p>
+      </li>
+    ))}
+  </ol>
+</BaseLayout>

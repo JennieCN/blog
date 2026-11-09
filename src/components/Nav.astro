@@ -1,31 +1,48 @@
 ---
 import { SECTIONS, SITE } from '../config';
 ---
-<header class="border-b" style="border-color: var(--color-border)">
-  <div class="container flex items-center justify-between py-4">
-    <a href="/" class="font-semibold">{SITE.title}</a>
-    <nav class="hidden md:flex items-center gap-6 text-sm">
-      {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
-      <a href="/qa/">问答</a>
-      <a href="/search/">搜索</a>
+<header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--color-border); background: color-mix(in srgb, var(--color-bg) 88%, transparent)">
+  <div class="container flex items-center justify-between py-3.5">
+    <a href="/" class="text-lg font-bold tracking-tight">{SITE.title}</a>
+    <nav class="hidden lg:flex items-center gap-5 text-sm">
+      {SECTIONS.map((s) => <a href={`/${s.key}/`} class="hover:opacity-80">{s.name}</a>)}
+      <a href="/tools/" class="hover:opacity-80">工具箱</a>
+      <a href="/timeline/" class="hover:opacity-80">日志</a>
+      <a href="/qa/" class="hover:opacity-80">问答</a>
+      <a href="/search/" class="hover:opacity-80">搜索</a>
+      <button type="button" id="theme-toggle" aria-label="切换深浅色" class="cursor-pointer rounded border px-2.5 py-1 text-xs" style="border-color: var(--color-border)">🌓 主题</button>
       <a href="https://qa.mycampusmail.com/" class="rounded px-3 py-1 text-white" style="background: var(--color-accent)">注册 / 提问</a>
-      <a href="/yjcnb/" class="admin-link hidden" style="color: var(--color-accent)">管理</a>
+      <a href="/yjcnb/" class="admin-link hidden font-semibold" style="color: var(--color-accent)">管理</a>
     </nav>
-    <details class="md:hidden">
-      <summary class="cursor-pointer text-sm">菜单</summary>
-      <nav class="absolute right-4 mt-2 flex flex-col gap-2 rounded border bg-[var(--color-bg)] p-4 text-sm" style="border-color: var(--color-border)">
-        {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
-        <a href="/qa/">问答</a>
-        <a href="/search/">搜索</a>
-        <a href="https://qa.mycampusmail.com/" style="color: var(--color-accent)">注册 / 提问</a>
-        <a href="/yjcnb/" class="admin-link hidden" style="color: var(--color-accent)">管理</a>
-      </nav>
-    </details>
+    <div class="flex items-center gap-2 lg:hidden">
+      <button type="button" id="theme-toggle-m" aria-label="切换深浅色" class="cursor-pointer rounded border px-2 py-1 text-xs" style="border-color: var(--color-border)">🌓</button>
+      <details>
+        <summary class="cursor-pointer rounded border px-2.5 py-1 text-sm" style="border-color: var(--color-border)">菜单</summary>
+        <nav class="absolute right-4 mt-2 flex w-48 flex-col gap-2.5 rounded-lg border bg-[var(--color-bg)] p-4 text-sm shadow-lg" style="border-color: var(--color-border)">
+          {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
+          <a href="/tools/">工具箱</a>
+          <a href="/timeline/">日志</a>
+          <a href="/qa/">问答</a>
+          <a href="/search/">搜索</a>
+          <a href="https://qa.mycampusmail.com/" style="color: var(--color-accent)">注册 / 提问</a>
+          <a href="/yjcnb/" class="admin-link hidden font-semibold" style="color: var(--color-accent)">管理</a>
+        </nav>
+      </details>
+    </div>
   </div>
 </header>
 
 <script>
-  // 只有登录过 CMS 后台的浏览器才显示「管理」入口，普通访客看不到
+  // 深浅色手动切换并持久化
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+  document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+  document.getElementById('theme-toggle-m')?.addEventListener('click', toggleTheme);
+
+  // 只有登录过 CMS 后台的浏览器才显示「管理」入口
   try {
     const user = localStorage.getItem('sveltia-cms.user');
     if (user && JSON.parse(user).token) {

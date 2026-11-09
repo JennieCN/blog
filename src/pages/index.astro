@@ -27,12 +27,28 @@ for (const s of SECTIONS) {
 const latest = sortByDateDesc(all).slice(0, 10);
 ---
 <BaseLayout title={SITE.title}>
-  <h1 class="text-3xl font-bold">最新文章</h1>
-  <section class="mt-8">
-    <PostList posts={latest} emptyText="还没有发布任何文章。" />
+  <!-- Hero 横幅 -->
+  <section class="card p-8 sm:p-10">
+    <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-accent)">个人知识库与问答社区</p>
+    <h1 class="mt-2 text-3xl font-bold sm:text-4xl">{SITE.title}</h1>
+    <p class="mt-3 max-w-2xl text-base" style="color: var(--color-muted)">
+      围绕 VPS 与网络基建、大学生方程式赛车（FSAE）、RoboMaster 机器人、AI 工程实践与精选资源整理的长期笔记。支持全文检索、免注册评论与注册制问答社区。
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-sm">
+      <a href="https://qa.mycampusmail.com/" class="rounded-lg px-4 py-2 font-medium text-white" style="background: var(--color-accent)">进入问答社区 →</a>
+      <a href="/tools/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">实用工具箱</a>
+      <a href="/timeline/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">建站日志</a>
+      <a href="/search/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">搜索文章</a>
+    </div>
   </section>
-  <h2 class="mt-16 text-2xl font-bold">栏目</h2>
-  <section class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+  <h2 class="mt-12 text-2xl font-bold">五个内容板块</h2>
+  <section class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     {SECTIONS.map((s) => <SectionCard section={s} count={counts[s.key]} />)}
+  </section>
+
+  <h2 class="mt-14 text-2xl font-bold">最新文章</h2>
+  <section class="mt-6">
+    <PostList posts={latest} emptyText="还没有发布任何文章。" />
   </section>
 </BaseLayout>
