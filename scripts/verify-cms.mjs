@@ -1,11 +1,11 @@
 import { readFileSync, existsSync } from 'node:fs';
 
-if (!existsSync('public/admin/index.html') || !existsSync('public/admin/config.yml')) {
+if (!existsSync('public/yjcnb/index.html') || !existsSync('public/yjcnb/config.yml')) {
   console.error('CMS 文件缺失');
   process.exit(1);
 }
 
-const yml = readFileSync('public/admin/config.yml', 'utf8');
+const yml = readFileSync('public/yjcnb/config.yml', 'utf8');
 const sections = ['vps', 'fsae', 'rm', 'ai', 'resources'];
 const missing = sections.filter((s) => !yml.includes(`src/content/${s}`));
 if (missing.length) {
