@@ -15,9 +15,9 @@ export const SECTIONS: Section[] = [
 ];
 
 export const SITE = {
-  title: 'YJCNB',
+  title: '融夕的书',
   description: 'VPS、赛车、机器人、AI 与资源笔记',
-  author: 'JennieCN',
+  author: '融夕',
   url: 'https://blog.mycampusmail.com',
   walineServerURL: 'https://blog-waline-snowy-psi.vercel.app',
 };
