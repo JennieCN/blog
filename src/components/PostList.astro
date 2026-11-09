@@ -1,0 +1,23 @@
+---
+import PostMeta from './PostMeta.astro';
+import type { PostSummary } from '../lib/posts';
+
+interface Props {
+  posts: PostSummary[];
+  emptyText?: string;
+}
+const { posts, emptyText = '这里还没有文章。' } = Astro.props;
+---
+{posts.length === 0 ? (
+  <p style="color: var(--color-muted)">{emptyText}</p>
+) : (
+  <ul class="flex flex-col gap-8">
+    {posts.map((p) => (
+      <li>
+        <a href={`/${p.section}/${p.slug}/`} class="text-xl font-semibold">{p.title}</a>
+        <p class="mt-1" style="color: var(--color-muted)">{p.description}</p>
+        <PostMeta pubDate={p.pubDate} tags={p.tags} />
+      </li>
+    ))}
+  </ul>
+)}

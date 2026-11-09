@@ -1,0 +1,13 @@
+---
+import { formatDate } from '../lib/posts';
+
+interface Props {
+  pubDate: Date;
+  tags?: string[];
+}
+const { pubDate, tags = [] } = Astro.props;
+---
+<div class="flex flex-wrap items-center gap-3 text-sm" style="color: var(--color-muted)">
+  <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+  {tags.map((t) => <a href={`/tags/${encodeURIComponent(t)}/`} class="underline">#{t}</a>)}
+</div>

@@ -1,0 +1,14 @@
+---
+import type { Section } from '../config';
+
+interface Props {
+  section: Section;
+  count: number;
+}
+const { section, count } = Astro.props;
+---
+<a href={`/${section.key}/`} class="block rounded-lg border p-5" style="border-color: var(--color-border)">
+  <h2 class="text-lg font-semibold">{section.name}</h2>
+  <p class="mt-1 text-sm" style="color: var(--color-muted)">{section.description}</p>
+  <p class="mt-3 text-sm">{count} 篇文章</p>
+</a>
