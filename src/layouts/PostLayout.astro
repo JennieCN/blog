@@ -1,0 +1,24 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import PostMeta from '../components/PostMeta.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  tags: string[];
+  sectionName: string;
+}
+const { title, description, pubDate, updatedDate, tags, sectionName } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <article>
+    <p class="text-sm" style="color: var(--color-muted)">{sectionName}</p>
+    <h1 class="mt-2 text-3xl font-bold">{title}</h1>
+    <div class="mt-3"><PostMeta pubDate={pubDate} tags={tags} /></div>
+    {updatedDate && <p class="mt-1 text-sm" style="color: var(--color-muted)">更新于 {updatedDate.toISOString().slice(0, 10)}</p>}
+    <div class="prose mt-8"><slot /></div>
+  </article>
+  <slot name="comments" />
+</BaseLayout>

@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { SECTIONS, getSection } from '../../config';
+import { getCollection } from 'astro:content';
+import { sortByDateDesc, filterDrafts, type PostSummary } from '../../lib/posts';
+
+export function getStaticPaths() {
+  return SECTIONS.map((s) => ({ params: { section: s.key } }));
+}
+
+const { section } = Astro.params;
+const meta = getSection(section!);
+if (!meta) return Astro.redirect('/404');
+
+const entries = filterDrafts(await getCollection(meta.key));
+const posts: PostSummary[] = sortByDateDesc(
+  entries.map((e) => ({
+    section: meta.key,
+    slug: e.id,
+    title: e.data.title,
+    description: e.data.description,
+    pubDate: e.data.pubDate,
+    tags: e.data.tags,
+  })),
+);
+---
+<BaseLayout title={meta.name} description={meta.description}>
+  <h1 class="text-3xl font-bold">{meta.name}</h1>
+  <p class="mt-2" style="color: var(--color-muted)">{meta.description}</p>
+  <section class="mt-8">
+    <PostList posts={posts} emptyText="这个栏目还没有文章。" />
+  </section>
+</BaseLayout>
