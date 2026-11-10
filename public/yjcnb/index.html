@@ -119,6 +119,17 @@
         </div>
         <p id="qa-msg" style="font-size:12px;color:#93c5fd;margin:6px 0 0;min-height:16px"></p>
         <ul id="qa-list" class="mgr-list"></ul>
+
+        <hr style="border:none;border-top:1px solid #27272a;margin:16px 0" />
+
+        <!-- 3. 社区发信配置（Resend API Key） -->
+        <h3>3. 社区邮件验证码与找回密码（Resend Key）</h3>
+        <p style="font-size:12px;color:#a1a1aa;margin:0 0 8px">填入 re_ 开头的 Resend API Key，一键开启社区注册邮箱验证码、找回密码与回复邮件提醒。</p>
+        <div style="display:flex;gap:8px">
+          <input id="resend-key" type="password" placeholder="re_xxxxxxxx..." />
+          <button type="button" class="primary" id="save-resend">保存</button>
+        </div>
+        <p id="resend-msg" style="font-size:12px;color:#93c5fd;margin:6px 0 0;min-height:16px"></p>
       </div>
     </div>
 
@@ -252,6 +263,22 @@
         } else {
           qaMsg.textContent = d.error || '设置失败';
         }
+      };
+
+      document.getElementById('save-resend').onclick = async () => {
+        const tk = getToken();
+        const rk = document.getElementById('resend-key').value.trim();
+        const rMsg = document.getElementById('resend-msg');
+        if (!tk) { rMsg.textContent = '请先登录后台'; return; }
+        if (!rk.startsWith('re_')) { rMsg.textContent = '请输入以 re_ 开头的有效 Resend API Key'; return; }
+        rMsg.textContent = '正在保存…';
+        const r = await fetch('/api/community-admin', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resendKey: rk }),
+        });
+        rMsg.textContent = r.ok ? '已保存并启用社区真实邮件发送！' : '保存失败';
+        if (r.ok) document.getElementById('resend-key').value = '';
       };
     </script>
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>

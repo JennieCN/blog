@@ -1,4 +1,4 @@
-// 仅允许站点所有者（JennieCN）通过后台一键指定或移除问答社区（Flarum）管理员
+// 仅允许站点所有者（JennieCN）通过后台一键指定或移除问答社区（Flarum）管理员，或配置社区 Resend API Key
 const FLARUM_BASE = 'https://qa.mycampusmail.com';
 const DEFAULT_FLARUM_KEY = 'rFMkeThmUMb1yy5v1xqlxzrCpofDXT5TZX1JjiUk';
 
@@ -42,7 +42,31 @@ export async function onRequest({ request, env }) {
   }
 
   if (request.method === 'POST') {
-    const { username, role } = await request.json();
+    const body = await request.json();
+
+    // 配置 Resend API Key
+    if (body.resendKey) {
+      const rk = String(body.resendKey).trim();
+      const sr = await fetch(`${FLARUM_BASE}/api/settings`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          mail_driver: 'smtp',
+          mail_host: 'smtp.resend.com',
+          mail_port: '465',
+          mail_encryption: 'ssl',
+          mail_username: 'resend',
+          mail_password: rk,
+          mail_from: 'noreply@mycampusmail.com',
+        }),
+      });
+      return new Response(JSON.stringify({ ok: sr.ok }), {
+        status: sr.ok ? 200 : 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { username, role } = body;
     const sr = await fetch(
       `${FLARUM_BASE}/api/users?filter%5Bq%5D=${encodeURIComponent(username)}`,
       { headers },
