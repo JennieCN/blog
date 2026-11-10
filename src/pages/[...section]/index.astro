@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PostList from '../../components/PostList.astro';
+import HybridStream from '../../components/HybridStream.astro';
 import { SECTIONS, getSection } from '../../config';
 import { getCollection } from 'astro:content';
 import { sortByDateDesc, filterDrafts, type PostSummary } from '../../lib/posts';
@@ -26,9 +26,18 @@ const posts: PostSummary[] = sortByDateDesc(
 );
 ---
 <BaseLayout title={meta.name} description={meta.description}>
-  <h1 class="text-3xl font-bold">{meta.name}</h1>
-  <p class="mt-2" style="color: var(--color-muted)">{meta.description}</p>
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <span class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-accent)">专栏与社区同区板块</span>
+      <h1 class="mt-1 text-3xl font-bold">{meta.name}</h1>
+      <p class="mt-2" style="color: var(--color-muted)">{meta.description}</p>
+    </div>
+    <a href={`https://qa.mycampusmail.com/t/${meta.key}`} class="rounded-lg px-4 py-2 text-sm font-medium text-white" style="background: var(--color-accent)">
+      进入「{meta.name}」论坛讨论区 →
+    </a>
+  </div>
+
   <section class="mt-8">
-    <PostList posts={posts} emptyText="这个栏目还没有文章。" />
+    <HybridStream posts={posts} sectionKey={meta.key} sectionName={meta.name} />
   </section>
 </BaseLayout>

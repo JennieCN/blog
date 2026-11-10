@@ -37,10 +37,18 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
       {updatedDate && <p class="mt-1 text-sm" style="color: var(--color-muted)">更新于 {updatedDate.toISOString().slice(0, 10)}</p>}
       <div class="prose mt-8"><slot /></div>
 
-      <!-- 社区联动与上下篇导航 -->
-      <div class="mt-12 flex flex-wrap items-center justify-between gap-4 rounded-lg border p-4 text-sm" style="border-color: var(--color-border); background: var(--color-surface)">
-        <span>对本文有疑问或补充？可以在下方直接留言，或在社区发起带标签的讨论帖。</span>
-        <a href={`https://qa.mycampusmail.com/t/${sectionKey}`} target="_blank" rel="noopener" class="rounded px-3.5 py-1.5 text-white" style="background: var(--color-accent)">前往「{sectionName}」社区板块 →</a>
+      <!-- 社区同板块实时讨论联动 + 上下篇导航 -->
+      <div class="mt-12 rounded-xl border p-5" style="border-color: var(--color-border); background: var(--color-surface)" id="post-forum-box" data-section={sectionKey}>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold">💬 「{sectionName}」社区板块最新讨论</h3>
+            <p class="mt-0.5 text-xs" style="color: var(--color-muted)">看完长文还有问题？可以直接在下方评论，或进入同板块论坛发帖盖楼。</p>
+          </div>
+          <a href={`https://qa.mycampusmail.com/t/${sectionKey}`} target="_blank" rel="noopener" class="rounded-lg px-3.5 py-1.5 text-xs font-medium text-white" style="background: var(--color-accent)">+ 去「{sectionName}」发帖提问 →</a>
+        </div>
+        <ul id="post-forum-list" class="mt-4 flex flex-col gap-2.5 text-sm">
+          <li class="text-xs" style="color: var(--color-muted)">正在加载本板块最新讨论帖…</li>
+        </ul>
       </div>
 
       {(prev || next) && (
@@ -94,5 +102,31 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
       });
       pre.appendChild(btn);
     });
+
+    // 加载同板块论坛最新讨论帖
+    const forumBox = document.getElementById('post-forum-box');
+    const forumList = document.getElementById('post-forum-list');
+    const secKey = forumBox?.getAttribute('data-section') || '';
+    if (secKey && forumList) {
+      fetch(`https://qa.mycampusmail.com/feed.php?tag=${encodeURIComponent(secKey)}&limit=4`)
+        .then((r) => r.json())
+        .then((d) => {
+          const items = d?.items || [];
+          if (!items.length) {
+            forumList.innerHTML = `<li class="text-xs" style="color: var(--color-muted)">该板块暂无讨论帖，欢迎抢先发帖！</li>`;
+            return;
+          }
+          forumList.innerHTML = items
+            .map(
+              (item: any) => `
+              <li class="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2" style="border-color: var(--color-border); background: var(--color-bg)">
+                <a href="${item.url}" target="_blank" rel="noopener" class="font-medium hover:underline">${item.title}</a>
+                <span class="text-xs" style="color: var(--color-muted)">👤 ${item.author} · 💬 ${item.commentCount || 1}</span>
+              </li>`,
+            )
+            .join('');
+        })
+        .catch(() => {});
+    }
   </script>
 </BaseLayout>

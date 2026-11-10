@@ -7,10 +7,16 @@ interface Props {
 }
 const { section, count } = Astro.props;
 ---
-<a href={`/${section.key}/`} class="card block p-5">
-  <div class="flex items-center justify-between">
-    <h3 class="text-lg font-semibold">{section.name}</h3>
-    <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" style="background: var(--color-accent-soft); color: var(--color-accent)">{count} 篇</span>
+<div class="card flex flex-col justify-between p-5">
+  <div>
+    <div class="flex items-center justify-between gap-2">
+      <a href={`/${section.key}/`} class="text-lg font-semibold hover:underline">{section.name}</a>
+      <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" style="background: var(--color-accent-soft); color: var(--color-accent)">{count} 篇长文</span>
+    </div>
+    <p class="mt-2 text-sm" style="color: var(--color-muted)">{section.description}</p>
   </div>
-  <p class="mt-2 text-sm" style="color: var(--color-muted)">{section.description}</p>
-</a>
+  <div class="mt-4 flex items-center justify-between border-t pt-3 text-xs" style="border-color: var(--color-border)">
+    <a href={`/${section.key}/`} style="color: var(--color-accent)" class="font-medium">看专栏与动态 →</a>
+    <a href={`https://qa.mycampusmail.com/t/${section.key}`} style="color: var(--color-muted)" class="hover:underline">💬 去本区发帖 →</a>
+  </div>
+</div>

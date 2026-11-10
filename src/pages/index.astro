@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PostList from '../components/PostList.astro';
+import HybridStream from '../components/HybridStream.astro';
 import SectionCard from '../components/SectionCard.astro';
 import { SECTIONS, SITE } from '../config';
 import { getCollection } from 'astro:content';
@@ -24,31 +24,51 @@ for (const s of SECTIONS) {
   }
 }
 
-const latest = sortByDateDesc(all).slice(0, 10);
+const latest = sortByDateDesc(all).slice(0, 12);
 ---
 <BaseLayout title={SITE.title}>
   <!-- Hero 横幅 -->
   <section class="card p-8 sm:p-10">
-    <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-accent)">个人知识库与问答社区</p>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-accent)">
+        博客专栏 × 问答论坛 · 双流集合体
+      </p>
+      <div id="hero-live-stats" class="flex flex-wrap items-center gap-3 text-xs" style="color: var(--color-muted)">
+        <span>📖 专栏文章 <strong>{all.length}</strong> 篇</span>
+        <span id="stat-forum-disc">💬 社区话题加载中…</span>
+      </div>
+    </div>
     <h1 class="mt-2 text-3xl font-bold sm:text-4xl">{SITE.title}</h1>
     <p class="mt-3 max-w-2xl text-base" style="color: var(--color-muted)">
-      围绕 VPS 与网络基建、大学生方程式赛车（FSAE）、RoboMaster 机器人、AI 工程实践与精选资源整理的长期笔记。支持全文检索、免注册评论与注册制问答社区。
+      围绕 VPS 与网络基建、大学生方程式赛车（FSAE）、RoboMaster 机器人、AI 工程实践与精选资源打造的「专栏长文 + 互动论坛」集合体。长文沉淀系统知识，论坛实时发帖盖楼与互助解答。
     </p>
     <div class="mt-6 flex flex-wrap gap-3 text-sm">
-      <a href="https://qa.mycampusmail.com/" class="rounded-lg px-4 py-2 font-medium text-white" style="background: var(--color-accent)">进入问答社区 →</a>
-      <a href="/tools/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">实用工具箱</a>
-      <a href="/timeline/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">建站日志</a>
-      <a href="/search/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">搜索文章</a>
+      <a href="https://qa.mycampusmail.com/" class="rounded-lg px-4 py-2 font-medium text-white" style="background: var(--color-accent)">+ 发起提问 / 盖楼讨论 →</a>
+      <a href="/qa/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">浏览社区大厅</a>
+      <a href="/tools/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">🛠️ 实用工具箱</a>
+      <a href="/search/" class="rounded-lg border px-4 py-2 font-medium" style="border-color: var(--color-border)">🔍 搜索全站</a>
     </div>
   </section>
 
-  <h2 class="mt-12 text-2xl font-bold">五个内容板块</h2>
+  <h2 class="mt-12 text-2xl font-bold">五大核心板块（专栏 + 论坛同区互通）</h2>
   <section class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     {SECTIONS.map((s) => <SectionCard section={s} count={counts[s.key]} />)}
   </section>
 
-  <h2 class="mt-14 text-2xl font-bold">最新文章</h2>
-  <section class="mt-6">
-    <PostList posts={latest} emptyText="还没有发布任何文章。" />
+  <h2 class="mt-14 text-2xl font-bold">全站实时动态（长文与社区帖子）</h2>
+  <section class="mt-5">
+    <HybridStream posts={latest} />
   </section>
+
+  <script>
+    fetch('https://qa.mycampusmail.com/feed.php?limit=1')
+      .then((r) => r.json())
+      .then((d) => {
+        const el = document.getElementById('stat-forum-disc');
+        if (el && d?.stats) {
+          el.innerHTML = `💬 社区话题 <strong>${d.stats.discussions}</strong> 个 · 讨论 <strong>${d.stats.posts}</strong> 条 · 成员 <strong>${d.stats.users}</strong> 人`;
+        }
+      })
+      .catch(() => {});
+  </script>
 </BaseLayout>

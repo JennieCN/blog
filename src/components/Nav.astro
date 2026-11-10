@@ -8,23 +8,27 @@ import { SECTIONS, SITE } from '../config';
       {SECTIONS.map((s) => <a href={`/${s.key}/`} class="hover:opacity-80">{s.name}</a>)}
       <a href="/tools/" class="hover:opacity-80">工具箱</a>
       <a href="/timeline/" class="hover:opacity-80">日志</a>
-      <a href="/qa/" class="hover:opacity-80">问答</a>
+      <a href="/qa/" class="hover:opacity-80 font-medium">社区大厅</a>
       <a href="/search/" class="hover:opacity-80">搜索</a>
       <button type="button" id="theme-toggle" aria-label="切换深浅色" class="cursor-pointer rounded border px-2.5 py-1 text-xs" style="border-color: var(--color-border)">🌓 主题</button>
-      <a href="https://qa.mycampusmail.com/" class="rounded px-3 py-1 text-white" style="background: var(--color-accent)">注册 / 提问</a>
+      <span id="nav-user-box" class="hidden items-center gap-2 text-xs">
+        <a href="https://qa.mycampusmail.com/" id="nav-user-badge" class="rounded border px-2.5 py-1 font-medium" style="border-color: var(--color-border); background: var(--color-surface)"></a>
+        <button type="button" id="nav-checkin-btn" class="cursor-pointer rounded px-2.5 py-1 text-white font-medium" style="background: var(--color-accent)">🎁 签到</button>
+      </span>
+      <a href="https://qa.mycampusmail.com/" id="nav-cta-btn" class="rounded px-3 py-1 text-white" style="background: var(--color-accent)">登录 / 发帖</a>
       <a href="/yjcnb/" class="admin-link hidden font-semibold" style="color: var(--color-accent)">管理</a>
     </nav>
     <div class="flex items-center gap-2 lg:hidden">
       <button type="button" id="theme-toggle-m" aria-label="切换深浅色" class="cursor-pointer rounded border px-2 py-1 text-xs" style="border-color: var(--color-border)">🌓</button>
       <details>
         <summary class="cursor-pointer rounded border px-2.5 py-1 text-sm" style="border-color: var(--color-border)">菜单</summary>
-        <nav class="absolute right-4 mt-2 flex w-48 flex-col gap-2.5 rounded-lg border bg-[var(--color-bg)] p-4 text-sm shadow-lg" style="border-color: var(--color-border)">
+        <nav class="absolute right-4 mt-2 flex w-52 flex-col gap-2.5 rounded-lg border bg-[var(--color-bg)] p-4 text-sm shadow-lg" style="border-color: var(--color-border)">
           {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
           <a href="/tools/">工具箱</a>
           <a href="/timeline/">日志</a>
-          <a href="/qa/">问答</a>
+          <a href="/qa/">社区大厅</a>
           <a href="/search/">搜索</a>
-          <a href="https://qa.mycampusmail.com/" style="color: var(--color-accent)">注册 / 提问</a>
+          <a href="https://qa.mycampusmail.com/" id="nav-cta-btn-m" style="color: var(--color-accent)">登录 / 发帖</a>
           <a href="/yjcnb/" class="admin-link hidden font-semibold" style="color: var(--color-accent)">管理</a>
         </nav>
       </details>
@@ -42,11 +46,57 @@ import { SECTIONS, SITE } from '../config';
   document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
   document.getElementById('theme-toggle-m')?.addEventListener('click', toggleTheme);
 
-  // 只有登录过 CMS 后台的浏览器才显示「管理」入口
+  // 只有登录过 CMS 后台或社区管理员才显示「管理」入口
   try {
     const user = localStorage.getItem('sveltia-cms.user');
     if (user && JSON.parse(user).token) {
       document.querySelectorAll('.admin-link').forEach((el) => el.classList.remove('hidden'));
     }
   } catch {}
+
+  // 跨站同步问答社区登录态、书币与一键签到
+  function renderCommunityState(d: any) {
+    if (!d || !d.loggedIn || !d.user) return;
+    const box = document.getElementById('nav-user-box');
+    const badge = document.getElementById('nav-user-badge');
+    const chkBtn = document.getElementById('nav-checkin-btn') as HTMLButtonElement | null;
+    const cta = document.getElementById('nav-cta-btn');
+    const ctaM = document.getElementById('nav-cta-btn-m');
+
+    if (box) {
+      box.classList.remove('hidden');
+      box.classList.add('inline-flex');
+    }
+    if (badge) {
+      badge.textContent = `👤 ${d.user.username} · 🪙 ${d.points ?? 0}`;
+    }
+    if (chkBtn) {
+      if (d.checkedToday) {
+        chkBtn.textContent = `✓ 已签(${d.streak || 1}天)`;
+        chkBtn.style.background = '#52525b';
+      } else {
+        chkBtn.textContent = '🎁 签到';
+      }
+    }
+    if (cta) cta.textContent = '+ 发帖提问';
+    if (ctaM) ctaM.textContent = `👤 ${d.user.username} (${d.points ?? 0}书币) · 去发帖`;
+    if (d.user.isAdmin) {
+      document.querySelectorAll('.admin-link').forEach((el) => el.classList.remove('hidden'));
+    }
+  }
+
+  fetch('https://qa.mycampusmail.com/me.php', { credentials: 'include' })
+    .then((r) => r.json())
+    .then(renderCommunityState)
+    .catch(() => {});
+
+  document.getElementById('nav-checkin-btn')?.addEventListener('click', () => {
+    fetch('https://qa.mycampusmail.com/me.php?action=checkin', {
+      method: 'POST',
+      credentials: 'include',
+    })
+      .then((r) => r.json())
+      .then(renderCommunityState)
+      .catch(() => {});
+  });
 </script>
