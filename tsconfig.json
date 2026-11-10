@@ -1,4 +1,4 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "exclude": ["public/admin", "functions", "dist"]
+  "exclude": ["public/yjcnb", "functions", "dist"]
 }

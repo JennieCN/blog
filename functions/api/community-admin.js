@@ -57,7 +57,7 @@ export async function onRequest({ request, env }) {
           mail_encryption: 'ssl',
           mail_username: 'resend',
           mail_password: rk,
-          mail_from: 'noreply@mycampusmail.com',
+          mail_from: 'noreply@qa.mycampusmail.com',
         }),
       });
       return new Response(JSON.stringify({ ok: sr.ok }), {
