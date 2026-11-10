@@ -3,277 +3,648 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>融夕的书 · 内容与管理员后台</title>
+    <title>融夕的书 · 全站管理后台（免 Git 版）</title>
     <style>
-      #admin-bar {
-        position: fixed;
-        bottom: 16px;
-        right: 16px;
-        z-index: 99999;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #09090b;
+        color: #fafafa;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      input, select, textarea {
         background: #18181b;
         color: #fafafa;
-        padding: 8px 14px;
-        border-radius: 9999px;
-        font-family: system-ui, -apple-system, sans-serif;
-        font-size: 13px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      }
-      #admin-bar a, #admin-bar button {
-        color: #93c5fd;
-        background: none;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        padding: 2px 6px;
+        border: 1px solid #3f3f46;
+        border-radius: 8px;
+        padding: 9px 12px;
         font: inherit;
+        font-size: 14px;
       }
-      #admin-bar a:hover, #admin-bar button:hover {
-        text-decoration: underline;
+      input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
       }
+      button {
+        font: inherit;
+        cursor: pointer;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .btn-primary { background: #2563eb; color: #fff; }
+      .btn-primary:hover { background: #1d4ed8; }
+      .btn-ghost { background: #18181b; color: #e4e4e7; border-color: #3f3f46; }
+      .btn-ghost:hover { background: #27272a; }
+      .btn-danger { background: #7f1d1d; color: #fecaca; }
+      .btn-danger:hover { background: #991b1b; }
+
+      /* 登录界面 */
+      #login-screen {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .login-card {
+        width: 100%;
+        max-width: 400px;
+        background: #18181b;
+        border: 1px solid #27272a;
+        border-radius: 14px;
+        padding: 28px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+      }
+
+      /* 后台主界面 */
+      #app-screen {
+        display: none;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+      .top-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 20px;
+        background: #18181b;
+        border-bottom: 1px solid #27272a;
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        flex: 1;
+        min-height: calc(100vh - 58px);
+      }
+      @media (max-width: 900px) {
+        .workspace { grid-template-columns: 1fr; }
+      }
+      .sidebar {
+        border-right: 1px solid #27272a;
+        padding: 16px;
+        background: #0f0f12;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .post-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: auto;
+        max-height: calc(100vh - 180px);
+      }
+      .post-item {
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #27272a;
+        background: #18181b;
+        cursor: pointer;
+      }
+      .post-item:hover, .post-item.active {
+        border-color: #3b82f6;
+        background: #1e293b;
+      }
+      .editor-area {
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-width: 980px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+      .field-label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+        color: #a1a1aa;
+      }
+      #ed-body {
+        width: 100%;
+        min-height: 380px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        line-height: 1.65;
+        resize: vertical;
+      }
+
+      /* 统一指定管理员弹窗 */
       #mgr-modal {
         display: none;
         position: fixed;
         inset: 0;
-        z-index: 100000;
-        background: rgba(0, 0, 0, 0.55);
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.65);
         align-items: center;
         justify-content: center;
-        font-family: system-ui, -apple-system, sans-serif;
+        padding: 16px;
       }
       #mgr-box {
         background: #18181b;
+        border: 1px solid #27272a;
         color: #fafafa;
-        width: 92%;
-        max-width: 480px;
-        max-height: 85vh;
+        width: 100%;
+        max-width: 500px;
+        max-height: 88vh;
         overflow-y: auto;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      }
-      #mgr-box h3 { margin: 0 0 8px; font-size: 15px; }
-      #mgr-box input {
-        flex: 1;
-        padding: 7px 10px;
-        border-radius: 6px;
-        border: 1px solid #3f3f46;
-        background: #09090b;
-        color: #fafafa;
-      }
-      #mgr-box button.primary {
-        padding: 7px 14px;
-        border-radius: 6px;
-        border: none;
-        background: #2563eb;
-        color: #fff;
-        cursor: pointer;
-        white-space: nowrap;
+        border-radius: 14px;
+        padding: 22px;
       }
       .mgr-list { list-style: none; padding: 0; margin: 10px 0 0; font-size: 13px; }
       .mgr-list li {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 7px 0;
+        padding: 8px 0;
         border-bottom: 1px solid #27272a;
       }
     </style>
   </head>
   <body>
-    <div id="admin-bar">
-      <button type="button" id="open-mgr">指定管理员</button>
-      <span>·</span>
-      <a href="https://blog-waline-snowy-psi.vercel.app/ui" target="_blank" rel="noopener">评论管理</a>
-      <span>·</span>
-      <a href="https://qa.mycampusmail.com/admin" target="_blank" rel="noopener">社区管理</a>
-      <span>·</span>
-      <a href="/" target="_blank" rel="noopener">博客首页</a>
+    <!-- 1. 网站账号直接登录界面（零 Git/GitHub） -->
+    <div id="login-screen">
+      <div class="login-card">
+        <div style="font-size:12px;color:#60a5fa;font-weight:700">融夕的书 · 免 Git 统一后台</div>
+        <h1 style="margin:6px 0 6px;font-size:22px">使用网站账号登录</h1>
+        <p style="margin:0 0 18px;font-size:13px;color:#a1a1aa">
+          直接输入你的网站用户名（或邮箱）与密码，即可发布博客专栏文章、上传配图并管理问答社区。
+        </p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input id="login-ident" placeholder="网站用户名 或 注册邮箱" autocomplete="username" />
+          <input id="login-pass" type="password" placeholder="登录密码" autocomplete="current-password" />
+          <button type="button" id="login-btn" class="btn-primary" style="padding:10px">登录后台</button>
+          <p id="login-msg" style="margin:0;font-size:12px;color:#f87171;min-height:16px"></p>
+        </div>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid #27272a;display:flex;justify-content:space-between;font-size:12px">
+          <a href="/" style="color:#93c5fd;text-decoration:none">← 返回博客首页</a>
+          <a href="https://qa.mycampusmail.com/" style="color:#93c5fd;text-decoration:none">前往问答社区 →</a>
+        </div>
+      </div>
     </div>
 
+    <!-- 2. 一体化专栏发文与全站管理界面 -->
+    <div id="app-screen">
+      <header class="top-bar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <strong style="font-size:16px">📖 融夕的书 · 全站管理后台</strong>
+          <span id="admin-user-badge" style="font-size:12px;background:#27272a;padding:4px 10px;border-radius:999px;color:#93c5fd"></span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+          <button type="button" id="btn-new-post" class="btn-primary">+ 新建专栏文章</button>
+          <button type="button" id="open-mgr" class="btn-ghost">👥 指定管理员</button>
+          <a href="https://blog-waline-snowy-psi.vercel.app/ui" target="_blank" rel="noopener" class="btn-ghost" style="text-decoration:none">💬 评论管理</a>
+          <a href="https://qa.mycampusmail.com/admin" target="_blank" rel="noopener" class="btn-ghost" style="text-decoration:none">🏛️ 社区后台</a>
+          <a href="/" target="_blank" rel="noopener" class="btn-ghost" style="text-decoration:none">🏠 查看主站</a>
+          <button type="button" id="btn-logout" class="btn-ghost">退出</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <!-- 左侧：全站专栏文章列表 -->
+        <aside class="sidebar">
+          <div style="display:flex;gap:8px">
+            <select id="filter-sec" style="flex:1">
+              <option value="">全部板块</option>
+              <option value="vps">VPS 科普</option>
+              <option value="fsae">大学生方程式赛车</option>
+              <option value="rm">RoboMaster</option>
+              <option value="ai">AI</option>
+              <option value="resources">资源</option>
+            </select>
+          </div>
+          <input id="filter-q" placeholder="搜索文章标题…" />
+          <ul id="post-list" class="post-list"></ul>
+        </aside>
+
+        <!-- 右侧：可视化文章编辑器 -->
+        <main class="editor-area">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">
+            <h2 id="editor-heading" style="margin:0;font-size:18px">✍️ 新建专栏文章</h2>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button type="button" id="btn-save-post" class="btn-primary">🚀 保存并发布上线</button>
+              <button type="button" id="btn-del-post" class="btn-danger" style="display:none">🗑️ 删除文章</button>
+            </div>
+          </div>
+          <p id="ed-status" style="margin:0;font-size:13px;color:#60a5fa;min-height:18px"></p>
+
+          <div class="form-grid">
+            <label class="field-label">
+              <span>所属板块</span>
+              <select id="ed-section">
+                <option value="vps">VPS 科普 (vps)</option>
+                <option value="fsae">大学生方程式赛车 (fsae)</option>
+                <option value="rm">RoboMaster (rm)</option>
+                <option value="ai">AI (ai)</option>
+                <option value="resources">资源 (resources)</option>
+              </select>
+            </label>
+            <label class="field-label">
+              <span>网址短名（英文/数字，留空自动生成）</span>
+              <input id="ed-slug" placeholder="例如：my-first-vps" />
+            </label>
+            <label class="field-label">
+              <span>发布日期</span>
+              <input id="ed-date" type="date" />
+            </label>
+            <label class="field-label" style="justify-content:flex-end">
+              <span style="display:flex;align-items:center;gap:8px;padding:9px 0;color:#fafafa;cursor:pointer">
+                <input id="ed-draft" type="checkbox" style="width:16px;height:16px" />
+                存为草稿（暂不公开显示）
+              </span>
+            </label>
+          </div>
+
+          <label class="field-label">
+            <span>文章标题 *</span>
+            <input id="ed-title" placeholder="输入文章标题…" style="font-size:16px;font-weight:600" />
+          </label>
+
+          <div class="form-grid">
+            <label class="field-label">
+              <span>一句话摘要（留空将自动截取正文前 60 字）</span>
+              <input id="ed-desc" placeholder="简短介绍这篇文章的核心内容…" />
+            </label>
+            <label class="field-label">
+              <span>标签（用逗号分隔）</span>
+              <input id="ed-tags" placeholder="例如：VPS, 线路测评, 教程" />
+            </label>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding-top:4px">
+            <span style="font-size:12px;color:#a1a1aa">文章正文（支持 Markdown 语法与代码块）</span>
+            <div style="display:flex;gap:6px">
+              <input type="file" id="file-upload" accept="image/*" style="display:none" />
+              <button type="button" id="btn-upload-img" class="btn-ghost" style="padding:4px 10px;font-size:12px">🖼️ 上传配图</button>
+              <button type="button" id="btn-ins-h2" class="btn-ghost" style="padding:4px 10px;font-size:12px">H2 小标题</button>
+              <button type="button" id="btn-ins-code" class="btn-ghost" style="padding:4px 10px;font-size:12px">代码块</button>
+            </div>
+          </div>
+
+          <textarea id="ed-body" placeholder="在这里开始写文章正文…&#10;&#10;## 小标题&#10;&#10;正文内容…"></textarea>
+        </main>
+      </div>
+    </div>
+
+    <!-- 3. 全站统一指定管理员弹窗（免 Git） -->
     <div id="mgr-modal">
       <div id="mgr-box">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <strong style="font-size:16px">全站统一管理员设置</strong>
-          <button type="button" id="close-mgr" style="background:none;border:none;color:#a1a1aa;cursor:pointer;font-size:18px">×</button>
+          <strong style="font-size:16px">全站统一管理员设置（免 Git 账号）</strong>
+          <button type="button" id="close-mgr" style="background:none;border:none;color:#a1a1aa;cursor:pointer;font-size:20px">×</button>
         </div>
 
-        <!-- 1. 全站管理员（博客专栏 + 问答社区合一） -->
-        <h3>1. 全站管理员（博客发文 + 社区管理合一）</h3>
-        <p style="font-size:12px;color:#a1a1aa;margin:0 0 8px">
-          输入对方的 GitHub 用户名（或社区用户名），一键同时赋予<strong>博客后台发文权限</strong>与<strong>问答社区管理员权限</strong>（置顶、删帖、采纳最佳解答）。
+        <h3 style="margin:0 0 6px;font-size:14px">1. 添加或移除全站管理员（博客发文 + 社区管理合一）</h3>
+        <p style="font-size:12px;color:#a1a1aa;margin:0 0 10px;line-height:1.5">
+          输入对方的<strong>网站用户名或邮箱</strong>，一键同时赋予<strong>本后台写文章权限</strong>与<strong>问答社区管理员权限</strong>。<br/>
+          💡 如果对方还没在网站注册过，系统会<strong>直接帮他建好账号</strong>（可填初始密码，不填默认 <code>12345678</code>），对方拿账号密码直接就能登录！
         </p>
-        <div style="display:flex;gap:8px">
-          <input id="mgr-user" placeholder="输入对方用户名" />
-          <button type="button" class="primary" id="add-mgr">一键设为管理员</button>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <input id="mgr-user" placeholder="网站用户名 或 邮箱" style="flex:1;min-width:150px" />
+          <input id="mgr-pass" placeholder="可选：设密码(默认12345678)" style="width:170px" />
+          <button type="button" class="btn-primary" id="add-mgr">一键设为管理员</button>
         </div>
         <p id="mgr-msg" style="font-size:12px;color:#93c5fd;margin:6px 0 0;min-height:16px"></p>
         <ul id="mgr-list" class="mgr-list"></ul>
 
         <hr style="border:none;border-top:1px solid #27272a;margin:16px 0" />
 
-        <!-- 2. 社区发信配置（Resend API Key） -->
-        <h3>2. 社区邮件验证码与找回密码（Resend Key）</h3>
-        <p style="font-size:12px;color:#a1a1aa;margin:0 0 8px">填入 re_ 开头的 Resend API Key，一键开启或更换社区注册邮箱验证码、找回密码与回复邮件提醒。</p>
+        <h3 style="margin:0 0 6px;font-size:14px">2. 社区邮件服务（Resend API Key）</h3>
+        <p style="font-size:12px;color:#a1a1aa;margin:0 0 8px">用于社区注册邮箱验证码、找回密码与回复邮件提醒。</p>
         <div style="display:flex;gap:8px">
-          <input id="resend-key" type="password" placeholder="re_xxxxxxxx..." />
-          <button type="button" class="primary" id="save-resend">保存</button>
+          <input id="resend-key" type="password" placeholder="re_xxxxxxxx..." style="flex:1" />
+          <button type="button" class="btn-primary" id="save-resend">保存</button>
         </div>
         <p id="resend-msg" style="font-size:12px;color:#93c5fd;margin:6px 0 0;min-height:16px"></p>
       </div>
     </div>
 
     <script>
-      const REPO = 'JennieCN/blog';
-      const modal = document.getElementById('mgr-modal');
-      const list = document.getElementById('mgr-list');
-      const msg = document.getElementById('mgr-msg');
+      const API = 'https://qa.mycampusmail.com/cms-api.php';
+      const SEC_NAMES = {
+        vps: 'VPS 科普',
+        fsae: '方程式赛车',
+        rm: 'RoboMaster',
+        ai: 'AI',
+        resources: '资源',
+      };
 
-      function getToken() {
-        try { return JSON.parse(localStorage.getItem('sveltia-cms.user') || '{}').token; }
-        catch { return null; }
+      let token = localStorage.getItem('rx_admin_token') || '';
+      let currentUser = null;
+      let allPosts = [];
+      let editingOldSec = '';
+      let editingOldSlug = '';
+
+      function apiCall(action, method = 'GET', body = null) {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        return fetch(`${API}?action=${action}`, {
+          method,
+          credentials: 'include',
+          headers,
+          body: body ? JSON.stringify(body) : null,
+        }).then(async (r) => {
+          const d = await r.json().catch(() => ({}));
+          return { ok: r.ok, status: r.status, d };
+        });
       }
 
-      async function loadUnifiedAdmins() {
-        const tk = getToken();
-        if (!tk) { msg.textContent = '请先登录后台后再操作'; return; }
-        msg.textContent = '正在同步全站管理员列表…';
-
-        const [ghRes, qaRes] = await Promise.all([
-          fetch(`https://api.github.com/repos/${REPO}/collaborators`, {
-            headers: { Authorization: `Bearer ${tk}` },
-          }).catch(() => null),
-          fetch('/api/community-admin', {
-            headers: { Authorization: `Bearer ${tk}` },
-          }).catch(() => null),
-        ]);
-
-        const map = new Map();
-        map.set('jenniecn', { name: 'JennieCN (admin)', isOwner: true, gh: true, qa: true });
-
-        if (ghRes && ghRes.ok) {
-          const ghUsers = await ghRes.json();
-          for (const u of ghUsers) {
-            const key = (u.login || '').toLowerCase();
-            if (key === 'jenniecn') continue;
-            const cur = map.get(key) || { name: u.login, isOwner: false, gh: false, qa: false };
-            cur.gh = true;
-            map.set(key, cur);
-          }
+      async function checkSession() {
+        const res = await apiCall('session');
+        if (res.ok && res.d.loggedIn) {
+          token = res.d.token || token;
+          localStorage.setItem('rx_admin_token', token);
+          localStorage.setItem('sveltia-cms.user', JSON.stringify({ token }));
+          currentUser = res.d.user;
+          enterApp();
+        } else {
+          document.getElementById('login-screen').style.display = 'flex';
+          document.getElementById('app-screen').style.display = 'none';
         }
+      }
 
-        if (qaRes && qaRes.ok) {
-          const { admins = [] } = await qaRes.json();
-          for (const u of admins) {
-            const key = (u.username || '').toLowerCase();
-            if (String(u.id) === '1' || key === 'admin' || key === 'jenniecn') continue;
-            const cur = map.get(key) || { name: u.username, isOwner: false, gh: false, qa: false };
-            cur.qa = true;
-            map.set(key, cur);
-          }
+      function enterApp() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'flex';
+        const badge = document.getElementById('admin-user-badge');
+        badge.textContent = `👤 ${currentUser.username} · ${currentUser.isOwner ? '站长（最高权限）' : '全站管理员'}`;
+        resetEditor();
+        loadPosts();
+      }
+
+      document.getElementById('login-btn').onclick = async () => {
+        const identification = document.getElementById('login-ident').value.trim();
+        const password = document.getElementById('login-pass').value;
+        const lmsg = document.getElementById('login-msg');
+        lmsg.textContent = '正在验证账号…';
+        const res = await apiCall('login', 'POST', { identification, password });
+        if (res.ok && res.d.ok) {
+          token = res.d.token;
+          localStorage.setItem('rx_admin_token', token);
+          localStorage.setItem('sveltia-cms.user', JSON.stringify({ token }));
+          currentUser = res.d.user;
+          lmsg.textContent = '';
+          enterApp();
+        } else {
+          lmsg.textContent = res.d.error || '登录失败';
         }
+      };
 
-        msg.textContent = '';
-        list.innerHTML = '';
+      document.getElementById('btn-logout').onclick = () => {
+        token = '';
+        localStorage.removeItem('rx_admin_token');
+        localStorage.removeItem('sveltia-cms.user');
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app-screen').style.display = 'none';
+      };
 
-        for (const [, item] of map) {
+      async function loadPosts() {
+        const listEl = document.getElementById('post-list');
+        listEl.innerHTML = '<li style="color:#a1a1aa;font-size:13px">正在加载文章列表…</li>';
+        const res = await apiCall('posts');
+        if (res.ok) {
+          allPosts = res.d.posts || [];
+          renderPostList();
+        }
+      }
+
+      function renderPostList() {
+        const sec = document.getElementById('filter-sec').value;
+        const q = document.getElementById('filter-q').value.trim().toLowerCase();
+        const listEl = document.getElementById('post-list');
+        listEl.innerHTML = '';
+
+        const filtered = allPosts.filter((p) => {
+          if (sec && p.section !== sec) return false;
+          if (q && !(p.title || '').toLowerCase().includes(q) && !(p.slug || '').toLowerCase().includes(q)) return false;
+          return true;
+        });
+
+        for (const p of filtered) {
           const li = document.createElement('li');
-          const badge = item.isOwner
-            ? '站长（最高权限）'
-            : '博客发文 + 社区管理';
-          li.innerHTML = `<span><strong>${item.name}</strong> <small style="color:#a1a1aa">· ${badge}</small></span>`;
+          const isCurrent = p.section === editingOldSec && p.slug === editingOldSlug;
+          li.className = 'post-item' + (isCurrent ? ' active' : '');
+          li.innerHTML = `
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#93c5fd">
+              <span>${SEC_NAMES[p.section] || p.section}</span>
+              <span>${p.pubDate}${p.draft ? ' · 草稿' : ''}</span>
+            </div>
+            <div style="font-weight:600;font-size:14px;margin-top:4px">${p.title}</div>
+          `;
+          li.onclick = () => selectPost(p);
+          listEl.appendChild(li);
+        }
+      }
 
-          if (!item.isOwner) {
+      document.getElementById('filter-sec').onchange = renderPostList;
+      document.getElementById('filter-q').oninput = renderPostList;
+
+      function resetEditor() {
+        editingOldSec = '';
+        editingOldSlug = '';
+        document.getElementById('editor-heading').textContent = '✍️ 新建专栏文章';
+        document.getElementById('ed-section').value = 'vps';
+        document.getElementById('ed-slug').value = '';
+        document.getElementById('ed-date').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('ed-draft').checked = false;
+        document.getElementById('ed-title').value = '';
+        document.getElementById('ed-desc').value = '';
+        document.getElementById('ed-tags').value = '';
+        document.getElementById('ed-body').value = '';
+        document.getElementById('btn-del-post').style.display = 'none';
+        document.getElementById('ed-status').textContent = '';
+        renderPostList();
+      }
+
+      function selectPost(p) {
+        editingOldSec = p.section;
+        editingOldSlug = p.slug;
+        document.getElementById('editor-heading').textContent = `✏️ 编辑文章：${p.title}`;
+        document.getElementById('ed-section').value = p.section;
+        document.getElementById('ed-slug').value = p.slug;
+        document.getElementById('ed-date').value = p.pubDate;
+        document.getElementById('ed-draft').checked = !!p.draft;
+        document.getElementById('ed-title').value = p.title;
+        document.getElementById('ed-desc').value = p.description || '';
+        document.getElementById('ed-tags').value = (p.tags || []).join(', ');
+        document.getElementById('ed-body').value = p.body || '';
+        document.getElementById('btn-del-post').style.display = 'inline-block';
+        document.getElementById('ed-status').textContent = '';
+        renderPostList();
+      }
+
+      document.getElementById('btn-new-post').onclick = resetEditor;
+
+      document.getElementById('btn-save-post').onclick = async () => {
+        const statusEl = document.getElementById('ed-status');
+        const payload = {
+          oldSection: editingOldSec,
+          oldSlug: editingOldSlug,
+          section: document.getElementById('ed-section').value,
+          slug: document.getElementById('ed-slug').value.trim(),
+          pubDate: document.getElementById('ed-date').value,
+          draft: document.getElementById('ed-draft').checked,
+          title: document.getElementById('ed-title').value.trim(),
+          description: document.getElementById('ed-desc').value.trim(),
+          tags: document.getElementById('ed-tags').value,
+          body: document.getElementById('ed-body').value,
+        };
+        if (!payload.title) {
+          statusEl.style.color = '#f87171';
+          statusEl.textContent = '请填写文章标题';
+          return;
+        }
+        statusEl.style.color = '#60a5fa';
+        statusEl.textContent = '正在保存并自动发布到全站…';
+        const res = await apiCall('save_post', 'POST', payload);
+        if (res.ok && res.d.ok) {
+          editingOldSec = res.d.section;
+          editingOldSlug = res.d.slug;
+          document.getElementById('ed-slug').value = res.d.slug;
+          document.getElementById('btn-del-post').style.display = 'inline-block';
+          statusEl.style.color = '#34d399';
+          statusEl.textContent = `✓ 已保存并触发上线（路径：${res.d.url}，约 30 秒内全站生效）`;
+          loadPosts();
+        } else {
+          statusEl.style.color = '#f87171';
+          statusEl.textContent = res.d.error || '保存失败';
+        }
+      };
+
+      document.getElementById('btn-del-post').onclick = async () => {
+        if (!editingOldSec || !editingOldSlug) return;
+        const statusEl = document.getElementById('ed-status');
+        statusEl.style.color = '#60a5fa';
+        statusEl.textContent = '正在删除文章…';
+        const res = await apiCall('delete_post', 'POST', {
+          section: editingOldSec,
+          slug: editingOldSlug,
+        });
+        if (res.ok) {
+          resetEditor();
+          statusEl.style.color = '#34d399';
+          statusEl.textContent = '✓ 文章已删除';
+          loadPosts();
+        }
+      };
+
+      // 快捷插入与图片上传
+      function insertAtCursor(text) {
+        const ta = document.getElementById('ed-body');
+        const start = ta.selectionStart || 0;
+        const end = ta.selectionEnd || 0;
+        ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+        ta.focus();
+      }
+      document.getElementById('btn-ins-h2').onclick = () => insertAtCursor('\n## 小标题\n\n');
+      document.getElementById('btn-ins-code').onclick = () => insertAtCursor('\n```bash\n# 在此输入代码\n```\n');
+      document.getElementById('btn-upload-img').onclick = () => document.getElementById('file-upload').click();
+      document.getElementById('file-upload').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const statusEl = document.getElementById('ed-status');
+        statusEl.style.color = '#60a5fa';
+        statusEl.textContent = '正在上传配图…';
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const res = await apiCall('upload_image', 'POST', {
+            filename: file.name,
+            base64: reader.result,
+          });
+          if (res.ok && res.d.markdown) {
+            insertAtCursor('\n' + res.d.markdown + '\n');
+            statusEl.style.color = '#34d399';
+            statusEl.textContent = '✓ 配图已上传并插入正文';
+          } else {
+            statusEl.style.color = '#f87171';
+            statusEl.textContent = res.d.error || '上传失败';
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+
+      // 全站统一管理员弹窗
+      const modal = document.getElementById('mgr-modal');
+      const mgrList = document.getElementById('mgr-list');
+      const mgrMsg = document.getElementById('mgr-msg');
+
+      async function loadAdmins() {
+        mgrMsg.textContent = '加载中…';
+        const res = await apiCall('admins');
+        mgrMsg.textContent = '';
+        mgrList.innerHTML = '';
+        if (!res.ok) return;
+        for (const u of res.d.admins || []) {
+          const li = document.createElement('li');
+          const isOwner = String(u.id) === '1';
+          li.innerHTML = `<span><strong>${u.username}</strong> <small style="color:#a1a1aa">(${u.email}) · ${isOwner ? '站长（最高权限）' : '博客发文 + 社区管理'}</small></span>`;
+          if (!isOwner && currentUser && currentUser.isOwner) {
             const btn = document.createElement('button');
             btn.textContent = '移除权限';
-            btn.style.cssText = 'background:none;border:none;color:#f87171;cursor:pointer';
+            btn.style.cssText = 'background:none;border:none;color:#f87171;cursor:pointer;padding:2px 6px';
             btn.onclick = async () => {
-              msg.textContent = `正在移除 ${item.name} 的全站管理权限…`;
-              await Promise.all([
-                fetch(`https://api.github.com/repos/${REPO}/collaborators/${encodeURIComponent(item.name)}`, {
-                  method: 'DELETE',
-                  headers: { Authorization: `Bearer ${tk}` },
-                }).catch(() => null),
-                fetch('/api/community-admin', {
-                  method: 'POST',
-                  headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ username: item.name, role: 'member' }),
-                }).catch(() => null),
-              ]);
-              loadUnifiedAdmins();
+              await apiCall('set_admin', 'POST', { username: u.username, role: 'member' });
+              loadAdmins();
             };
             li.appendChild(btn);
           } else {
             const span = document.createElement('span');
             span.style.color = '#a1a1aa';
-            span.textContent = '所有者';
+            span.textContent = isOwner ? '所有者' : '管理员';
             li.appendChild(span);
           }
-          list.appendChild(li);
+          mgrList.appendChild(li);
         }
       }
 
       document.getElementById('open-mgr').onclick = () => {
         modal.style.display = 'flex';
-        loadUnifiedAdmins();
+        loadAdmins();
       };
       document.getElementById('close-mgr').onclick = () => { modal.style.display = 'none'; };
 
       document.getElementById('add-mgr').onclick = async () => {
-        const tk = getToken();
         const username = document.getElementById('mgr-user').value.trim();
-        if (!tk) { msg.textContent = '请先登录后台'; return; }
+        const password = document.getElementById('mgr-pass').value.trim();
         if (!username) return;
-        msg.textContent = `正在为 ${username} 开通博客发文与社区管理权限…`;
-
-        const [ghRes, qaRes] = await Promise.all([
-          fetch(`https://api.github.com/repos/${REPO}/collaborators/${encodeURIComponent(username)}`, {
-            method: 'PUT',
-            headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ permission: 'push' }),
-          }).catch(() => null),
-          fetch('/api/community-admin', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, role: 'admin' }),
-          }).catch(() => null),
-        ]);
-
-        const qaOk = qaRes && qaRes.ok;
-        const ghOk = ghRes && (ghRes.status === 201 || ghRes.status === 204);
-
-        if (qaOk || ghOk) {
-          msg.textContent = `已将 ${username} 设为全站管理员（社区权限立即生效；博客发文接受 GitHub 邀请后生效）`;
+        mgrMsg.textContent = '正在设置全站管理员权限…';
+        const res = await apiCall('set_admin', 'POST', { username, password, role: 'admin' });
+        if (res.ok && res.d.ok) {
+          mgrMsg.textContent = res.d.message;
           document.getElementById('mgr-user').value = '';
-          loadUnifiedAdmins();
+          document.getElementById('mgr-pass').value = '';
+          loadAdmins();
         } else {
-          msg.textContent = '设置失败，请确认用户名无误';
+          mgrMsg.textContent = res.d.error || '操作失败';
         }
       };
 
       document.getElementById('save-resend').onclick = async () => {
-        const tk = getToken();
         const resendKey = document.getElementById('resend-key').value.trim();
         const rMsg = document.getElementById('resend-msg');
-        if (!tk) { rMsg.textContent = '请先登录后台'; return; }
         if (!resendKey) return;
         rMsg.textContent = '保存中…';
-        const r = await fetch('/api/community-admin', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${tk}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ resendKey }),
-        });
-        if (r.ok) {
-          rMsg.textContent = 'Resend API Key 已保存并激活社区真实邮件服务';
+        const res = await apiCall('save_resend', 'POST', { resendKey });
+        if (res.ok) {
+          rMsg.textContent = res.d.message;
           document.getElementById('resend-key').value = '';
         } else {
-          rMsg.textContent = '保存失败';
+          rMsg.textContent = res.d.error || '保存失败';
         }
       };
-    </script>
 
-    <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+      checkSession();
+    </script>
   </body>
 </html>
