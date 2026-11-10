@@ -1,4 +1,4 @@
-// 仅允许站点所有者（JennieCN）通过后台一键指定或移除问答社区（Flarum）管理员，或配置社区 Resend API Key
+// 仅允许站点所有者（JennieCN）通过后台一键指定或移除全站管理员（博客专栏 + 问答社区合一），或配置社区 Resend API Key
 const FLARUM_BASE = 'https://qa.mycampusmail.com';
 const DEFAULT_FLARUM_KEY = 'rFMkeThmUMb1yy5v1xqlxzrCpofDXT5TZX1JjiUk';
 
@@ -28,15 +28,9 @@ export async function onRequest({ request, env }) {
   };
 
   if (request.method === 'GET') {
-    const r = await fetch(`${FLARUM_BASE}/api/users?page%5Blimit%5D=50`, { headers });
+    const r = await fetch(`${FLARUM_BASE}/sync-admin.php`, { headers });
     const d = await r.json();
-    const admins = (d.data || [])
-      .filter((u) => {
-        const groups = u.relationships?.groups?.data || [];
-        return groups.some((g) => g.id === '1');
-      })
-      .map((u) => ({ id: u.id, username: u.attributes.username, email: u.attributes.email }));
-    return new Response(JSON.stringify({ admins }), {
+    return new Response(JSON.stringify({ admins: d.admins || [] }), {
       headers: { 'Content-Type': 'application/json' },
     });
   }
@@ -67,30 +61,14 @@ export async function onRequest({ request, env }) {
     }
 
     const { username, role } = body;
-    const sr = await fetch(
-      `${FLARUM_BASE}/api/users?filter%5Bq%5D=${encodeURIComponent(username)}`,
-      { headers },
-    );
-    const sd = await sr.json();
-    const user = (sd.data || []).find(
-      (u) => (u.attributes.username || '').toLowerCase() === username.toLowerCase(),
-    );
-    if (!user) {
-      return new Response(JSON.stringify({ error: '未找到该社区用户名，请让对方先在社区注册' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-    const groups = role === 'admin' ? [{ type: 'groups', id: '1' }] : [];
-    const pr = await fetch(`${FLARUM_BASE}/api/users/${user.id}`, {
-      method: 'PATCH',
+    const sr = await fetch(`${FLARUM_BASE}/sync-admin.php`, {
+      method: 'POST',
       headers,
-      body: JSON.stringify({
-        data: { type: 'users', id: user.id, relationships: { groups: { data: groups } } },
-      }),
+      body: JSON.stringify({ username, role }),
     });
-    return new Response(JSON.stringify({ ok: pr.ok }), {
-      status: pr.ok ? 200 : 400,
+    const sd = await sr.json();
+    return new Response(JSON.stringify(sd), {
+      status: sr.ok ? 200 : 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
