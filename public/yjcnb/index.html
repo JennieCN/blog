@@ -579,10 +579,10 @@
       const mgrList = document.getElementById('mgr-list');
       const mgrMsg = document.getElementById('mgr-msg');
 
-      async function loadAdmins() {
-        mgrMsg.textContent = '加载中…';
+      async function loadAdmins(keepMsg = false) {
+        if (!keepMsg) mgrMsg.textContent = '加载中…';
         const res = await apiCall('admins');
-        mgrMsg.textContent = '';
+        if (!keepMsg) mgrMsg.textContent = '';
         mgrList.innerHTML = '';
         if (!res.ok) return;
         for (const u of res.d.admins || []) {
@@ -594,8 +594,9 @@
             btn.textContent = '移除权限';
             btn.style.cssText = 'background:none;border:none;color:#f87171;cursor:pointer;padding:2px 6px';
             btn.onclick = async () => {
-              await apiCall('set_admin', 'POST', { username: u.username, role: 'member' });
-              loadAdmins();
+              const r = await apiCall('set_admin', 'POST', { username: u.username, role: 'member' });
+              if (r.ok && r.d.message) mgrMsg.textContent = r.d.message;
+              loadAdmins(true);
             };
             li.appendChild(btn);
           } else {
@@ -610,7 +611,7 @@
 
       document.getElementById('open-mgr').onclick = () => {
         modal.style.display = 'flex';
-        loadAdmins();
+        loadAdmins(false);
       };
       document.getElementById('close-mgr').onclick = () => { modal.style.display = 'none'; };
 
@@ -624,7 +625,7 @@
           mgrMsg.textContent = res.d.message;
           document.getElementById('mgr-user').value = '';
           document.getElementById('mgr-pass').value = '';
-          loadAdmins();
+          loadAdmins(true);
         } else {
           mgrMsg.textContent = res.d.error || '操作失败';
         }
