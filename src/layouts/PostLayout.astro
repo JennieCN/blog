@@ -1,10 +1,14 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
-import PostMeta from '../components/PostMeta.astro';
+import { getSection, SITE, type SectionKey } from '../config';
+import { filterDrafts, formatDate, sortByDateDesc, wordCount } from '../lib/posts';
+import { svgIcon } from '../lib/icons';
 
 interface NavPost {
   title: string;
   href: string;
+  date?: Date;
 }
 
 interface Heading {
@@ -20,113 +24,417 @@ interface Props {
   updatedDate?: Date;
   tags: string[];
   sectionName: string;
-  sectionKey: string;
+  sectionKey: SectionKey;
+  cover?: string;
+  words?: number;
+  minutes?: number;
   headings?: Heading[];
   prev?: NavPost;
   next?: NavPost;
 }
-const { title, description, pubDate, updatedDate, tags, sectionName, sectionKey, headings = [], prev, next } = Astro.props;
-const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  tags,
+  sectionName,
+  sectionKey,
+  cover,
+  words,
+  minutes,
+  headings = [],
+  prev,
+  next,
+} = Astro.props;
+
+const sec = getSection(sectionKey);
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+const hasToc = tocHeadings.length >= 2;
+const currentPath = Astro.url.pathname;
+
+const sameSection = sortByDateDesc(
+  filterDrafts(await getCollection(sectionKey)).map((e) => ({
+    slug: e.id,
+    title: e.data.title,
+    pubDate: e.data.pubDate,
+    words: wordCount(e.body ?? ''),
+    href: `/${sectionKey}/${e.id}/`,
+  })),
+)
+  .filter((x) => x.href !== currentPath)
+  .slice(0, 4);
 ---
 <BaseLayout title={title} description={description} type="article" pubDate={pubDate}>
-  <div class="grid gap-10 lg:grid-cols-[1fr_15rem]">
-    <article class="min-w-0">
-      <a href={`/${sectionKey}/`} class="text-sm font-medium" style="color: var(--color-accent)">{sectionName}</a>
-      <h1 class="mt-2 text-3xl font-bold leading-tight">{title}</h1>
-      <div class="mt-3"><PostMeta pubDate={pubDate} tags={tags} pageviewPath={Astro.url.pathname} /></div>
-      {updatedDate && <p class="mt-1 text-sm" style="color: var(--color-muted)">更新于 {updatedDate.toISOString().slice(0, 10)}</p>}
-      <div class="prose mt-8"><slot /></div>
+  <nav class="crumbs" aria-label="位置">
+    <a href="/">首页</a>
+    <span aria-hidden="true">/</span>
+    <a href="/blog/">专栏</a>
+    <span aria-hidden="true">/</span>
+    <a href={`/${sectionKey}/`}>{sectionName}</a>
+  </nav>
 
-      <!-- 社区同板块实时讨论联动 + 上下篇导航 -->
-      <div class="mt-12 rounded-xl border p-5" style="border-color: var(--color-border); background: var(--color-surface)" id="post-forum-box" data-section={sectionKey}>
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h3 class="text-base font-bold">💬 「{sectionName}」社区板块最新讨论</h3>
-            <p class="mt-0.5 text-xs" style="color: var(--color-muted)">看完长文还有问题？可以直接在下方评论，或进入同板块论坛发帖盖楼。</p>
-          </div>
-          <a href={`https://qa.mycampusmail.com/t/${sectionKey}`} target="_blank" rel="noopener" class="rounded-lg px-3.5 py-1.5 text-xs font-medium text-white" style="background: var(--color-accent)">+ 去「{sectionName}」发帖提问 →</a>
+  <article class="thread thread-article post" id="thread-article" data-post-title={title} data-post-path={currentPath}>
+    <header class="thread-head post-head">
+      <div class="item-top">
+        <a class="cat-badge" href={`/${sectionKey}/`} style={`--c: ${sec?.color ?? 'var(--accent)'}`}>
+          <span class="cat-dot" aria-hidden="true"></span>
+          {sectionName}
+        </a>
+      </div>
+      <h1 class="thread-title" tabindex="-1">{title}</h1>
+      <p class="post-lede">{description}</p>
+
+      <div class="thread-meta">
+        <span class="avatar avatar-md" style="--h: 22" aria-hidden="true">{SITE.author.charAt(0)}</span>
+        <div>
+          <span class="reply-name">{SITE.author}</span>
+          <span class="thread-sub">
+            {formatDate(pubDate)}
+            {updatedDate && `（更新于 ${formatDate(updatedDate)}）`}
+            {words != null && minutes != null && ` · ${words} 字，约 ${minutes} 分钟读完`}
+            {' · '}
+            <span class="waline-pageview-count" data-path={currentPath}>-</span> 次阅读
+          </span>
         </div>
-        <ul id="post-forum-list" class="mt-4 flex flex-col gap-2.5 text-sm">
-          <li class="text-xs" style="color: var(--color-muted)">正在加载本板块最新讨论帖…</li>
-        </ul>
       </div>
 
-      {(prev || next) && (
-        <nav class="mt-8 grid gap-4 sm:grid-cols-2">
-          {prev ? (
-            <a href={prev.href} class="card block p-4">
-              <span class="text-xs" style="color: var(--color-muted)">← 上一篇</span>
-              <p class="mt-1 font-semibold">{prev.title}</p>
-            </a>
-          ) : <div />}
-          {next && (
-            <a href={next.href} class="card block p-4 text-right">
-              <span class="text-xs" style="color: var(--color-muted)">下一篇 →</span>
-              <p class="mt-1 font-semibold">{next.title}</p>
-            </a>
-          )}
-        </nav>
+      {tags.length > 0 && (
+        <div class="thread-tags">
+          {tags.map((t) => (
+            <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>#{t}</a>
+          ))}
+        </div>
       )}
+    </header>
 
-      <slot name="comments" />
-    </article>
+    {cover && (
+      <div class="mt-6">
+        <img src={cover} alt={title} class="w-full rounded-xl object-cover max-h-96" />
+      </div>
+    )}
 
-    {tocHeadings.length > 0 && (
-      <aside class="hidden lg:block">
-        <div class="sticky top-20 rounded-lg border p-4 text-sm" style="border-color: var(--color-border); background: var(--color-surface)">
-          <p class="font-semibold">本文目录</p>
-          <ul class="mt-3 flex flex-col gap-2" style="color: var(--color-muted)">
+    {hasToc && (
+      <details class="toc-inline only-narrow-toc">
+        <summary>
+          <Fragment set:html={svgIcon('list')} />
+          <span>目录（{tocHeadings.length} 节）</span>
+        </summary>
+        <nav class="toc" aria-label="本文目录">
+          <ol>
             {tocHeadings.map((h) => (
-              <li class={h.depth === 3 ? 'pl-3 text-xs' : ''}>
-                <a href={`#${h.slug}`} class="hover:underline">{h.text}</a>
+              <li class={`toc-l${h.depth}`}>
+                <a href={`#${h.slug}`}>{h.text}</a>
               </li>
             ))}
-          </ul>
-        </div>
-      </aside>
+          </ol>
+        </nav>
+      </details>
     )}
-  </div>
+
+    <div class="prose prose-article">
+      <slot />
+    </div>
+
+    <footer class="post-foot">
+      <div class="post-discuss">
+        <p>
+          <strong>有问题或不同看法？</strong>
+          到社区的「{sectionName}」板块里聊，回复会通知作者。
+        </p>
+        <a
+          class="btn btn-primary btn-sm"
+          href={`${SITE.forumUrl}/t/${sectionKey}`}
+          target="_blank"
+          rel="noopener"
+        >
+          <Fragment set:html={svgIcon('chat')} />
+          <span>发起讨论</span>
+        </a>
+      </div>
+      <button type="button" id="copy-post-link" class="link-btn">
+        <Fragment set:html={svgIcon('link')} />
+        <span>复制本文链接</span>
+      </button>
+    </footer>
+  </article>
+
+  {(prev || next) && (
+    <nav class="post-nav" aria-label="上一篇和下一篇">
+      {prev ? (
+        <a class="post-nav-prev" href={prev.href} rel="prev">
+          <span class="post-nav-label">
+            <Fragment set:html={svgIcon('back')} />
+            <span>上一篇</span>
+          </span>
+          <strong>{prev.title}</strong>
+          {prev.date && <span class="post-nav-date">{formatDate(prev.date)}</span>}
+        </a>
+      ) : (
+        <span class="post-nav-prev is-empty" aria-hidden="true" />
+      )}
+      {next ? (
+        <a class="post-nav-next" href={next.href} rel="next">
+          <span class="post-nav-label">
+            <span>下一篇</span>
+            <Fragment set:html={svgIcon('back', 'ic-flip')} />
+          </span>
+          <strong>{next.title}</strong>
+          {next.date && <span class="post-nav-date">{formatDate(next.date)}</span>}
+        </a>
+      ) : (
+        <span class="post-nav-next is-empty" aria-hidden="true" />
+      )}
+    </nav>
+  )}
+
+  <section class="related" id="post-forum-box" data-section={sectionKey} aria-labelledby="pf-h">
+    <h2 id="pf-h">
+      <span>「{sectionName}」社区板块最新讨论</span>
+      <span class="forum-count-badge">加载中…</span>
+    </h2>
+    <ul id="post-forum-list" class="related-list">
+      <li class="muted text-xs">正在加载本板块最新讨论帖…</li>
+    </ul>
+    <a class="card-more" href={`${SITE.forumUrl}/t/${sectionKey}`} target="_blank" rel="noopener">
+      去「{sectionName}」板块发帖提问 →
+    </a>
+  </section>
+
+  <section class="comments" aria-labelledby="cm-h">
+    <h2 id="cm-h">评论与反馈</h2>
+    <slot name="comments" />
+  </section>
+
+  <Fragment slot="aside">
+    {hasToc && (
+      <div class="card toc-card">
+        <nav class="toc" aria-labelledby="toc-h">
+          <h2 id="toc-h" class="card-title">
+            <Fragment set:html={svgIcon('list')} />
+            <span>本文目录</span>
+          </h2>
+          <ol>
+            {tocHeadings.map((h) => (
+              <li class={`toc-l${h.depth}`}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </div>
+    )}
+
+    <section class="card author-card" aria-labelledby="post-author-h">
+      <div class="author-row">
+        <span class="avatar avatar-md" style="--h: 22" aria-hidden="true">{SITE.author.charAt(0)}</span>
+        <div>
+          <h2 id="post-author-h" class="card-title">{SITE.author}</h2>
+          <p class="text-xs muted">{SITE.title}</p>
+        </div>
+      </div>
+      <p class="text-sm" style="color: var(--text-2); line-height: 1.65;">{SITE.authorBio}</p>
+      <a class="card-more" href={`${SITE.forumUrl}/t/${sectionKey}`} target="_blank" rel="noopener">在「{sectionName}」板块提问 →</a>
+    </section>
+
+    {sameSection.length > 0 && (
+      <section class="card" aria-labelledby="same-h">
+        <h2 id="same-h" class="card-title">
+          <Fragment set:html={svgIcon(sec?.icon ?? 'book')} />
+          <span>{sectionName} 的其他文章</span>
+        </h2>
+        <ol class="mini-list">
+          {sameSection.map((x) => (
+            <li>
+              <a href={x.href}>{x.title}</a>
+              <span class="mini-meta">{formatDate(x.pubDate)} · {x.words} 字</span>
+            </li>
+          ))}
+        </ol>
+        <a class="card-more" href={`/${sectionKey}/`}>本板块全部文章 →</a>
+      </section>
+    )}
+  </Fragment>
 
   <script>
-    // 为正文所有代码块注入右上角「复制」按钮
+    import { rankRelatedForumItems } from '../lib/posts';
+
+    function esc(s: unknown): string {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function safeUrl(u: unknown): string {
+      const s = String(u ?? '').trim();
+      if (/^https?:\/\//i.test(s) || s.startsWith('/')) return esc(s);
+      return '#';
+    }
+
+    async function copyText(text: string): Promise<boolean> {
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch {}
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+
+    // 正文代码块语言标记与复制按钮
     document.querySelectorAll('.prose pre').forEach((pre) => {
+      const el = pre as HTMLElement;
+      if (!el.dataset.lang && el.dataset.language) {
+        el.dataset.lang = el.dataset.language;
+      }
       const btn = document.createElement('button');
       btn.type = 'button';
+      btn.className = 'code-copy-btn';
       btn.textContent = '复制';
-      btn.style.cssText = 'position:absolute;top:8px;right:8px;padding:2px 8px;font-size:12px;border-radius:4px;background:#27272a;color:#e4e4e7;border:1px solid #3f3f46;cursor:pointer';
+      btn.setAttribute('aria-label', '复制代码');
       btn.addEventListener('click', async () => {
-        const code = pre.querySelector('code')?.innerText ?? (pre as HTMLElement).innerText;
-        await navigator.clipboard.writeText(code);
-        btn.textContent = '已复制';
-        setTimeout(() => { btn.textContent = '复制'; }, 1500);
+        const code = el.querySelector('code')?.innerText ?? el.innerText;
+        const ok = await copyText(code);
+        const w = window as any;
+        if (ok) {
+          btn.textContent = '已复制';
+          if (w.RXFX && typeof w.RXFX.toast === 'function') w.RXFX.toast('代码已复制到剪贴板');
+          setTimeout(() => { btn.textContent = '复制'; }, 1500);
+        } else if (w.RXFX && typeof w.RXFX.toast === 'function') {
+          w.RXFX.toast('复制失败，请手动选中代码复制');
+        }
       });
-      pre.appendChild(btn);
+      el.appendChild(btn);
     });
 
-    // 加载同板块论坛最新讨论帖
+    // 复制文章链接
+    const copyLinkBtn = document.getElementById('copy-post-link');
+    copyLinkBtn?.addEventListener('click', async () => {
+      const ok = await copyText(location.href);
+      const w = window as any;
+      const label = copyLinkBtn.querySelector('span');
+      if (ok) {
+        if (label) {
+          const old = label.textContent;
+          label.textContent = '已复制 ✓';
+          setTimeout(() => { label.textContent = old; }, 1600);
+        }
+        if (w.RXFX && typeof w.RXFX.toast === 'function') w.RXFX.toast('文章链接已复制');
+      } else if (w.RXFX && typeof w.RXFX.toast === 'function') {
+        w.RXFX.toast('无法自动复制，请复制浏览器地址栏');
+      }
+    });
+
+    // 窄屏内联目录：点击跳转后自动收起折叠面板
+    document.querySelectorAll('.toc-inline a').forEach((a) => {
+      a.addEventListener('click', () => {
+        const details = a.closest('details');
+        if (details) details.open = false;
+      });
+    });
+
+    // 桌面端目录滚动高亮（保持连续激活与可视对齐）
+    const tocLinks = Array.from(document.querySelectorAll('.toc-card .toc a')) as HTMLAnchorElement[];
+    if (tocLinks.length > 0) {
+      const pairs = tocLinks
+        .map((a) => {
+          let id = '';
+          try { id = decodeURIComponent(a.hash.slice(1)); } catch { id = a.hash.slice(1); }
+          const target = id ? document.getElementById(id) : null;
+          return target ? { link: a, target } : null;
+        })
+        .filter(Boolean) as { link: HTMLAnchorElement; target: HTMLElement }[];
+
+      let activeSlug = '';
+      let tocRaf = 0;
+
+      function syncActiveToc() {
+        tocRaf = 0;
+        if (!pairs.length) return;
+        const offset = 110;
+        let current = pairs[0];
+        for (const p of pairs) {
+          if (p.target.getBoundingClientRect().top <= offset) {
+            current = p;
+          } else {
+            break;
+          }
+        }
+        const slug = '#' + current.target.id;
+        if (slug === activeSlug) return;
+        activeSlug = slug;
+        tocLinks.forEach((a) => {
+          let h = a.hash;
+          try { h = decodeURIComponent(a.hash); } catch {}
+          a.classList.toggle('is-active', h === slug);
+        });
+      }
+
+      function queueToc() {
+        if (!tocRaf) tocRaf = requestAnimationFrame(syncActiveToc);
+      }
+
+      window.addEventListener('scroll', queueToc, { passive: true });
+      window.addEventListener('resize', queueToc, { passive: true });
+      syncActiveToc();
+    }
+
+    // 加载同板块论坛最新讨论帖（边界安全匹配引用本文的讨论并置前）
     const forumBox = document.getElementById('post-forum-box');
     const forumList = document.getElementById('post-forum-list');
+    const countBadge = forumBox?.querySelector('.forum-count-badge');
+    const articleEl = document.getElementById('thread-article');
+    const postPath = articleEl?.getAttribute('data-post-path') || '';
+    const postTitle = articleEl?.getAttribute('data-post-title') || '';
     const secKey = forumBox?.getAttribute('data-section') || '';
+
     if (secKey && forumList) {
-      fetch(`https://qa.mycampusmail.com/feed.php?tag=${encodeURIComponent(secKey)}&limit=4`)
+      fetch(`https://qa.mycampusmail.com/feed.php?tag=${encodeURIComponent(secKey)}&limit=8`)
         .then((r) => r.json())
         .then((d) => {
-          const items = d?.items || [];
+          const items = Array.isArray(d?.items) ? d.items : [];
+          if (countBadge) countBadge.textContent = `${items.length} 个话题`;
           if (!items.length) {
-            forumList.innerHTML = `<li class="text-xs" style="color: var(--color-muted)">该板块暂无讨论帖，欢迎抢先发帖！</li>`;
+            forumList.innerHTML = `<li class="muted text-xs">该板块暂无讨论帖，欢迎抢先发帖！</li>`;
             return;
           }
-          forumList.innerHTML = items
-            .map(
-              (item: any) => `
-              <li class="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2" style="border-color: var(--color-border); background: var(--color-bg)">
-                <a href="${item.url}" target="_blank" rel="noopener" class="font-medium hover:underline">${item.title}</a>
-                <span class="text-xs" style="color: var(--color-muted)">👤 ${item.author} · 💬 ${item.commentCount || 1}</span>
-              </li>`,
-            )
+          const ranked = rankRelatedForumItems(items, postPath, postTitle, 5);
+          forumList.innerHTML = ranked
+            .map((item: any) => {
+              const badge = item.isSolved
+                ? `<span class="status is-solved">✓ 已解决</span>`
+                : `<span class="status is-open">讨论中</span>`;
+              return `
+                <li>
+                  <a href="${safeUrl(item.url)}" target="_blank" rel="noopener">
+                    ${badge}
+                    <span>${esc(item.title)}</span>
+                  </a>
+                </li>`;
+            })
             .join('');
         })
-        .catch(() => {});
+        .catch(() => {
+          if (countBadge) countBadge.textContent = '';
+          forumList.innerHTML = `<li class="muted text-xs">讨论列表加载失败，可点击下方按钮前往论坛查看。</li>`;
+        });
     }
   </script>
 </BaseLayout>

@@ -1,7 +1,7 @@
 ---
-import PostMeta from './PostMeta.astro';
-import { getSection } from '../config';
-import type { PostSummary } from '../lib/posts';
+import { getSection, SITE } from '../config';
+import { formatDate, type PostSummary } from '../lib/posts';
+import { svgIcon } from '../lib/icons';
 
 interface Props {
   posts: PostSummary[];
@@ -11,95 +11,159 @@ interface Props {
 
 const { posts, sectionKey = '', sectionName = '' } = Astro.props;
 const forumTargetUrl = sectionKey
-  ? `https://qa.mycampusmail.com/t/${sectionKey}`
-  : 'https://qa.mycampusmail.com/';
+  ? `${SITE.forumUrl}/t/${sectionKey}`
+  : `${SITE.forumUrl}/`;
 ---
 
 <div class="hybrid-stream" data-section={sectionKey}>
-  <!-- 双流控制栏：Tab 切换 + 快捷发布按钮 -->
-  <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3" style="border-color: var(--color-border); background: var(--color-surface)">
-    <div class="flex flex-wrap items-center gap-2 text-sm">
-      <button type="button" data-filter="all" class="stream-tab cursor-pointer rounded-lg px-3.5 py-1.5 font-semibold text-white" style="background: var(--color-accent)">
-        🔥 全部动态
+  <div class="list-filters">
+    <div class="stream-tabs" role="group" aria-label="双流筛选">
+      <button type="button" data-filter="all" class="stream-tab" aria-current="true">
+        <Fragment set:html={svgIcon('grid')} />
+        <span>全部动态</span>
       </button>
-      <button type="button" data-filter="post" class="stream-tab cursor-pointer rounded-lg border px-3.5 py-1.5 font-medium" style="border-color: var(--color-border); background: var(--color-bg)">
-        📖 专栏长文 ({posts.length})
+      <button type="button" data-filter="post" class="stream-tab kind-article">
+        <Fragment set:html={svgIcon('book')} />
+        <span>专栏长文</span>
+        <span class="stream-tab-count">({posts.length})</span>
       </button>
-      <button type="button" data-filter="forum" class="stream-tab cursor-pointer rounded-lg border px-3.5 py-1.5 font-medium" style="border-color: var(--color-border); background: var(--color-bg)">
-        💬 社区讨论 <span class="forum-count-badge">…</span>
+      <button type="button" data-filter="forum" class="stream-tab kind-discuss">
+        <Fragment set:html={svgIcon('chat')} />
+        <span>社区讨论</span>
+        <span class="stream-tab-count forum-count-badge">…</span>
       </button>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-      <a href={forumTargetUrl} class="rounded-lg px-3.5 py-1.5 font-medium text-white" style="background: var(--color-accent)">
-        + 发帖 / 提问{sectionName ? `（${sectionName}）` : ''}
+    <div class="list-actions">
+      <a href={forumTargetUrl} class="btn btn-primary btn-sm" target="_blank" rel="noopener">
+        <Fragment set:html={svgIcon('plus')} />
+        <span>发帖 / 提问{sectionName ? `（${sectionName}）` : ''}</span>
       </a>
-      <a href="/yjcnb/" class="admin-link hidden rounded-lg border px-3 py-1.5 font-medium" style="border-color: var(--color-border)">
-        ✍️ 写专栏长文
+      <a href="/yjcnb/" class="admin-link hidden btn btn-sm">
+        <span>写专栏长文</span>
       </a>
     </div>
   </div>
 
-  <!-- 实时混排列表 -->
-  <ul class="stream-list mt-6 flex flex-col gap-4">
+  <ul class="stream-list">
     {posts.map((p) => {
       const sec = getSection(p.section);
       return (
         <li
-          class="card stream-item p-5"
+          class="stream-item"
           data-kind="post"
           data-ts={p.pubDate.getTime()}
         >
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <span class="rounded px-2 py-0.5 font-semibold" style="background: var(--color-accent-soft); color: var(--color-accent)">
-              📖 专栏长文
-            </span>
-            {sec && (
-              <a href={`/${sec.key}/`} class="rounded border px-2 py-0.5" style="border-color: var(--color-border); color: var(--color-muted)">
-                {sec.name}
-              </a>
-            )}
+          <div class="item-body">
+            <div class="item-top">
+              <span class="kind-chip kind-article">
+                <Fragment set:html={svgIcon('book')} />
+                <span>专栏长文</span>
+              </span>
+              {sec && (
+                <a class="cat-badge" href={`/${sec.key}/`} style={`--c: ${sec.color}`}>
+                  <span class="cat-dot" aria-hidden="true"></span>
+                  {sec.name}
+                </a>
+              )}
+            </div>
+            <h3 class="item-title">
+              <a href={`/${p.section}/${p.slug}/`}>{p.title}</a>
+            </h3>
+            <p class="item-excerpt">{p.description}</p>
+            <div class="item-meta">
+              <span class="item-author">{SITE.author}</span>
+              <time datetime={p.pubDate.toISOString()}>{formatDate(p.pubDate)}</time>
+              {p.words != null && p.minutes != null && (
+                <span>· {p.words} 字 · 约 {p.minutes} 分钟</span>
+              )}
+              {p.tags.length > 0 && (
+                <span class="item-tags">
+                  {p.tags.map((t) => (
+                    <a href={`/tags/${encodeURIComponent(t)}/`} class="tag">#{t}</a>
+                  ))}
+                </span>
+              )}
+            </div>
           </div>
-          <a href={`/${p.section}/${p.slug}/`} class="mt-2 block text-xl font-bold hover:underline">
-            {p.title}
-          </a>
-          <p class="mt-1.5 text-sm" style="color: var(--color-muted)">{p.description}</p>
-          <PostMeta pubDate={p.pubDate} tags={p.tags} pageviewPath={`/${p.section}/${p.slug}/`} />
+          <div class="item-side">
+            <span class="stat" title="阅读量">
+              <Fragment set:html={svgIcon('eye')} />
+              <span class="waline-pageview-count" data-path={`/${p.section}/${p.slug}/`}>-</span>
+            </span>
+          </div>
         </li>
       );
     })}
   </ul>
+  <p class="stream-status muted text-xs mt-3" aria-live="polite" hidden></p>
 </div>
 
 <script>
+  import { formatLocalDate } from '../lib/posts';
+
+  function esc(s: unknown): string {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function safeUrl(u: unknown): string {
+    const s = String(u ?? '').trim();
+    if (/^https?:\/\//i.test(s) || s.startsWith('/')) return esc(s);
+    return '#';
+  }
+
+  const SECTION_COLORS: Record<string, string> = {
+    vps: '#2563eb',
+    fsae: '#b8461f',
+    rm: '#1d6e62',
+    ai: '#6f42c1',
+    resources: '#8a5a00',
+  };
+
   document.querySelectorAll('.hybrid-stream').forEach((container) => {
     const section = (container as HTMLElement).dataset.section || '';
     const list = container.querySelector('.stream-list') as HTMLElement | null;
     const countBadge = container.querySelector('.forum-count-badge');
+    const statusEl = container.querySelector('.stream-status') as HTMLElement | null;
     const tabs = Array.from(container.querySelectorAll('.stream-tab')) as HTMLButtonElement[];
     let currentFilter = 'all';
+    let feedOffline = false;
 
     function applyFilter(filter: string) {
       currentFilter = filter;
       tabs.forEach((btn) => {
         const active = btn.dataset.filter === filter;
-        if (active) {
-          btn.style.background = 'var(--color-accent)';
-          btn.style.color = '#ffffff';
-          btn.style.borderColor = 'transparent';
-        } else {
-          btn.style.background = 'var(--color-bg)';
-          btn.style.color = 'var(--color-fg)';
-          btn.style.borderColor = 'var(--color-border)';
-        }
+        btn.setAttribute('aria-current', active ? 'true' : 'false');
       });
 
       if (!list) return;
+      let visibleCount = 0;
       Array.from(list.children).forEach((li) => {
-        const kind = (li as HTMLElement).dataset.kind;
-        (li as HTMLElement).style.display =
-          filter === 'all' || kind === filter ? '' : 'none';
+        const el = li as HTMLElement;
+        const kind = el.dataset.kind;
+        const show = filter === 'all' || kind === filter;
+        el.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
       });
+
+      if (statusEl) {
+        if (visibleCount === 0 && filter === 'forum') {
+          statusEl.textContent = feedOffline
+            ? '社区实时接口暂时不可用，可直接访问 qa.mycampusmail.com。'
+            : '当前筛选下暂无社区帖子。';
+          statusEl.hidden = false;
+        } else if (visibleCount === 0) {
+          statusEl.textContent = '当前筛选下暂无动态内容。';
+          statusEl.hidden = false;
+        } else {
+          statusEl.hidden = true;
+        }
+      }
     }
 
     tabs.forEach((btn) => {
@@ -113,56 +177,84 @@ const forumTargetUrl = sectionKey
     fetch(api)
       .then((r) => r.json())
       .then((data) => {
-        const items = data?.items || [];
+        const items = Array.isArray(data?.items) ? data.items : [];
         if (countBadge) countBadge.textContent = `(${items.length})`;
         if (!list) return;
 
         items.forEach((d: any) => {
           const li = document.createElement('li');
-          li.className = 'card stream-item p-5';
+          li.className = 'stream-item' + (d.isSticky ? ' is-pinned' : '');
           li.dataset.kind = 'forum';
+          li.dataset.sticky = d.isSticky ? '1' : '0';
           li.dataset.ts = String(Date.parse(d.lastPostedAt || d.createdAt || '') || Date.now());
 
-          const tagsHtml = (d.tags || [])
-            .map(
-              (t: any) =>
-                `<a href="/${t.slug}/" class="rounded border px-2 py-0.5" style="border-color: var(--color-border); color: var(--color-muted)">${t.name}</a>`,
-            )
+          const tagsHtml = (Array.isArray(d.tags) ? d.tags : [])
+            .map((t: any) => {
+              const slug = String(t.slug || '');
+              const color = SECTION_COLORS[slug] || 'var(--text-3)';
+              return `<a href="/${encodeURIComponent(slug)}/" class="cat-badge" style="--c:${color}"><span class="cat-dot" aria-hidden="true"></span>${esc(t.name)}</a>`;
+            })
             .join('');
 
           const solvedHtml = d.isSolved
-            ? `<span class="rounded px-2 py-0.5 font-semibold" style="background:#dcfce7;color:#166534">✓ 已解决</span>`
-            : `<span class="rounded px-2 py-0.5" style="background:#fef3c7;color:#92400e">💬 讨论中</span>`;
+            ? `<span class="status is-solved"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>已解决</span>`
+            : `<span class="status is-open"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>讨论中</span>`;
 
           const stickyHtml = d.isSticky
-            ? `<span class="rounded px-2 py-0.5 font-semibold" style="background:#fee2e2;color:#991b1b">📌 置顶</span>`
+            ? `<span class="pin-chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16v6"/><path d="M8 3h8l-1 6 3 3v2H6v-2l3-3z"/></svg>置顶</span>`
             : '';
 
-          const dateStr = (d.lastPostedAt || d.createdAt || '').slice(0, 10);
+          const dateStr = esc(formatLocalDate(d.lastPostedAt || d.createdAt));
+          const href = safeUrl(d.url);
 
           li.innerHTML = `
-            <div class="flex flex-wrap items-center gap-2 text-xs">
-              <span class="rounded px-2 py-0.5 font-semibold" style="background:#f3e8ff;color:#6b21a8">💬 社区帖子</span>
-              ${stickyHtml}
-              ${solvedHtml}
-              ${tagsHtml}
+            <div class="item-body">
+              <div class="item-top">
+                <span class="kind-chip kind-discuss">
+                  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2-4.2A8 8 0 1 1 21 12z"/></svg>
+                  <span>社区帖子</span>
+                </span>
+                ${stickyHtml}
+                ${solvedHtml}
+                ${tagsHtml}
+              </div>
+              <h3 class="item-title"><a href="${href}" target="_blank" rel="noopener">${esc(d.title)}</a></h3>
+              <p class="item-excerpt">${esc(d.excerpt || '')}</p>
+              <div class="item-meta">
+                <span class="item-author">${esc(d.author)}</span>
+                <span>${dateStr}</span>
+                <a href="${href}" target="_blank" rel="noopener" style="color: var(--accent); font-weight: 600;">参与盖楼 →</a>
+              </div>
             </div>
-            <a href="${d.url}" class="mt-2 block text-xl font-bold hover:underline">${d.title}</a>
-            <p class="mt-1.5 text-sm" style="color: var(--color-muted)">${d.excerpt || ''}</p>
-            <div class="mt-3 flex flex-wrap items-center gap-4 text-xs" style="color: var(--color-muted)">
-              <span>👤 发帖人：${d.author}</span>
-              <span>💬 ${d.commentCount || 1} 条讨论</span>
-              <span>🕒 ${dateStr}</span>
-              <a href="${d.url}" style="color: var(--color-accent)" class="font-medium">参与盖楼 / 解答 →</a>
+            <div class="item-side">
+              <span class="stat" title="讨论回复数">
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2-4.2A8 8 0 1 1 21 12z"/></svg>
+                <span>${Number(d.commentCount || 1)}</span>
+              </span>
             </div>
           `;
           list.appendChild(li);
         });
 
+        // 真实按时间倒序混排（置顶帖置前，其余按 data-ts 倒序）
+        const nodes = Array.from(list.children) as HTMLElement[];
+        nodes.sort((a, b) => {
+          const sa = a.dataset.sticky === '1' ? 1 : 0;
+          const sb = b.dataset.sticky === '1' ? 1 : 0;
+          if (sa !== sb) return sb - sa;
+          return Number(b.dataset.ts || 0) - Number(a.dataset.ts || 0);
+        });
+        nodes.forEach((n) => list.appendChild(n));
+
         applyFilter(currentFilter);
       })
       .catch(() => {
-        if (countBadge) countBadge.textContent = '';
+        feedOffline = true;
+        if (countBadge) countBadge.textContent = '(离线)';
+        if (statusEl && currentFilter === 'forum') {
+          statusEl.textContent = '社区实时接口暂时不可用，可直接访问 qa.mycampusmail.com。';
+          statusEl.hidden = false;
+        }
       });
   });
 </script>

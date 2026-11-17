@@ -1,50 +1,115 @@
 ---
-import { SECTIONS, SITE } from '../config';
+import { SITE } from '../config';
+import { svgIcon } from '../lib/icons';
 ---
-<header class="sticky top-0 z-40 border-b backdrop-blur" style="border-color: var(--color-border); background: color-mix(in srgb, var(--color-bg) 88%, transparent)">
-  <div class="container flex items-center justify-between py-3.5">
-    <a href="/" class="text-lg font-bold tracking-tight">{SITE.title}</a>
-    <nav class="hidden lg:flex items-center gap-5 text-sm">
-      {SECTIONS.map((s) => <a href={`/${s.key}/`} class="hover:opacity-80">{s.name}</a>)}
-      <a href="/tools/" class="hover:opacity-80">工具箱</a>
-      <a href="/timeline/" class="hover:opacity-80">日志</a>
-      <a href="/qa/" class="hover:opacity-80 font-medium">社区大厅</a>
-      <a href="/search/" class="hover:opacity-80">搜索</a>
-      <button type="button" id="theme-toggle" aria-label="切换深浅色" class="cursor-pointer rounded border px-2.5 py-1 text-xs" style="border-color: var(--color-border)">🌓 主题</button>
-      <span id="nav-user-box" class="hidden items-center gap-2 text-xs">
-        <a href="https://qa.mycampusmail.com/" id="nav-user-badge" class="rounded border px-2.5 py-1 font-medium" style="border-color: var(--color-border); background: var(--color-surface)"></a>
-        <button type="button" id="nav-checkin-btn" class="cursor-pointer rounded px-2.5 py-1 text-white font-medium" style="background: var(--color-accent)">🎁 签到</button>
+<header class="topbar">
+  <div class="topbar-inner">
+    <button
+      class="icon-btn only-narrow"
+      id="drawer-btn"
+      type="button"
+      aria-label="打开导航抽屉"
+      aria-expanded="false"
+      aria-controls="sidebar"
+      set:html={svgIcon('menu')}
+    />
+
+    <a class="brand" href="/" aria-label={`${SITE.title} 首页`}>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text">{SITE.title}<small>笔记 · 社区</small></span>
+    </a>
+
+    <div class="search" role="search">
+      <label class="sr-only" for="nav-search-input">快捷搜索全站</label>
+      <input
+        id="nav-search-input"
+        type="search"
+        placeholder="搜索文章、板块或按 ⌘K…"
+        autocomplete="off"
+        readonly
+      />
+      <kbd class="search-kbd" aria-hidden="true">⌘K</kbd>
+    </div>
+
+    <div class="top-actions">
+      <button
+        type="button"
+        id="cmdk-trigger"
+        class="icon-btn only-narrow"
+        aria-label="搜索与命令面板"
+        set:html={svgIcon('search')}
+      />
+
+      <span id="nav-user-box" class="hidden items-center gap-2">
+        <a
+          href={`${SITE.forumUrl}/`}
+          id="nav-user-badge"
+          class="user-badge"
+        ></a>
+        <button
+          type="button"
+          id="nav-checkin-btn"
+          class="btn btn-ghost btn-sm"
+        >
+          <Fragment set:html={svgIcon('calendar')} />
+          <span>签到</span>
+        </button>
       </span>
-      <a href="https://qa.mycampusmail.com/" id="nav-cta-btn" class="rounded px-3 py-1 text-white" style="background: var(--color-accent)">登录 / 发帖</a>
-      <a href="/yjcnb/" class="admin-link hidden font-semibold" style="color: var(--color-accent)">管理</a>
-    </nav>
-    <div class="flex items-center gap-2 lg:hidden">
-      <button type="button" id="theme-toggle-m" aria-label="切换深浅色" class="cursor-pointer rounded border px-2 py-1 text-xs" style="border-color: var(--color-border)">🌓</button>
-      <details>
-        <summary class="cursor-pointer rounded border px-2.5 py-1 text-sm" style="border-color: var(--color-border)">菜单</summary>
-        <nav class="absolute right-4 mt-2 flex w-52 flex-col gap-2.5 rounded-lg border bg-[var(--color-bg)] p-4 text-sm shadow-lg" style="border-color: var(--color-border)">
-          {SECTIONS.map((s) => <a href={`/${s.key}/`}>{s.name}</a>)}
-          <a href="/tools/">工具箱</a>
-          <a href="/timeline/">日志</a>
-          <a href="/qa/">社区大厅</a>
-          <a href="/search/">搜索</a>
-          <a href="https://qa.mycampusmail.com/" id="nav-cta-btn-m" style="color: var(--color-accent)">登录 / 发帖</a>
-          <a href="/yjcnb/" class="admin-link hidden font-semibold" style="color: var(--color-accent)">管理</a>
-        </nav>
-      </details>
+
+      <a
+        href={`${SITE.forumUrl}/`}
+        id="nav-cta-btn"
+        class="btn btn-primary btn-sm hide-xs"
+        title="前往 qa.mycampusmail.com 登录（支持 GitHub 一键登录）或发帖"
+      >
+        <Fragment set:html={svgIcon('plus')} />
+        <span>登录 / 发帖</span>
+      </a>
+
+      <a
+        href="/yjcnb/"
+        class="admin-link hidden btn btn-ghost btn-sm hide-xs"
+        style="color: var(--accent)"
+      >
+        管理
+      </a>
+
+      <button
+        type="button"
+        id="skin-toggle"
+        class="icon-btn"
+        aria-label="切换皮肤风格"
+        set:html={svgIcon('brush')}
+      />
+
+      <button
+        type="button"
+        id="theme-toggle"
+        class="icon-btn"
+        aria-label="切换深浅色"
+        set:html={svgIcon('moon')}
+      />
     </div>
   </div>
 </header>
 
 <script>
-  // 深浅色手动切换并持久化
-  function toggleTheme() {
-    const html = document.documentElement;
-    const isDark = html.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  function esc(s: unknown): string {
+    return String(s ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
-  document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
-  document.getElementById('theme-toggle-m')?.addEventListener('click', toggleTheme);
+
+  function hueFromName(name: string): number {
+    let h = 0;
+    for (let i = 0; i < name.length; i++) {
+      h = (h * 31 + name.charCodeAt(i)) % 360;
+    }
+    return h;
+  }
 
   // 只有登录过 CMS 后台或社区管理员才显示「管理」入口
   try {
@@ -54,49 +119,116 @@ import { SECTIONS, SITE } from '../config';
     }
   } catch {}
 
-  // 跨站同步问答社区登录态、书币与一键签到
-  function renderCommunityState(d: any) {
-    if (!d || !d.loggedIn || !d.user) return;
+  function renderCommunityState(d: any, fromCheckin = false) {
+    const w = window as any;
+    if (!d || !d.loggedIn || !d.user) {
+      if (fromCheckin && w.RXFX && typeof w.RXFX.toast === 'function') {
+        w.RXFX.toast('请先前往 qa.mycampusmail.com 登录账号后再签到');
+      }
+      return;
+    }
+
     const box = document.getElementById('nav-user-box');
     const badge = document.getElementById('nav-user-badge');
     const chkBtn = document.getElementById('nav-checkin-btn') as HTMLButtonElement | null;
     const cta = document.getElementById('nav-cta-btn');
     const ctaM = document.getElementById('nav-cta-btn-m');
 
+    const uname = String(d.user.username || '书友');
+    const pts = Number(d.points ?? 0);
+    const streak = Number(d.streak || 1);
+    const hue = hueFromName(uname);
+    const initial = esc(uname.charAt(0).toUpperCase() || '友');
+
     if (box) {
       box.classList.remove('hidden');
       box.classList.add('inline-flex');
     }
     if (badge) {
-      badge.textContent = `👤 ${d.user.username} · 🪙 ${d.points ?? 0}`;
+      badge.innerHTML =
+        `<span class="avatar avatar-sm" style="--h:${hue}" aria-hidden="true">${initial}</span>` +
+        `<span class="user-badge-text">` +
+        `<span class="user-badge-name">${esc(uname)}</span>` +
+        `<span class="user-badge-coins">` +
+        `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 9.5h7M8.5 14.5h7M12 7v10"/></svg>` +
+        `<span>${pts} 书币</span>` +
+        `</span>` +
+        `</span>`;
+      badge.title = `${uname} · ${pts} 书币（点击前往社区）`;
     }
     if (chkBtn) {
       if (d.checkedToday) {
-        chkBtn.textContent = `✓ 已签(${d.streak || 1}天)`;
-        chkBtn.style.background = '#52525b';
+        chkBtn.setAttribute('aria-pressed', 'true');
+        chkBtn.innerHTML = `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span>已签 · ${streak}天</span>`;
+        chkBtn.title = `今日已签到，已连续 ${streak} 天`;
       } else {
-        chkBtn.textContent = '🎁 签到';
+        chkBtn.setAttribute('aria-pressed', 'false');
+        chkBtn.innerHTML = `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>签到</span>`;
+        chkBtn.title = '每日签到领取书币';
       }
     }
-    if (cta) cta.textContent = '+ 发帖提问';
-    if (ctaM) ctaM.textContent = `👤 ${d.user.username} (${d.points ?? 0}书币) · 去发帖`;
+    if (cta) {
+      const span = cta.querySelector('span');
+      if (span) span.textContent = '发帖提问';
+      else cta.textContent = '+ 发帖提问';
+      cta.setAttribute('title', '前往 qa.mycampusmail.com 发起讨论或提问');
+    }
+    if (ctaM) {
+      ctaM.textContent = `${uname} (${pts} 书币) · 去发帖`;
+    }
     if (d.user.isAdmin) {
       document.querySelectorAll('.admin-link').forEach((el) => el.classList.remove('hidden'));
+    }
+
+    // 同步侧边栏 / 右栏统计里的用户状态（如果存在）
+    const asideCoins = document.getElementById('aside-user-coins');
+    const asideStreak = document.getElementById('aside-user-streak');
+    if (asideCoins) asideCoins.textContent = String(pts);
+    if (asideStreak) {
+      asideStreak.textContent = d.checkedToday ? `已连续签到 ${streak} 天` : '今日尚未签到，点击右上角即可签到';
+    }
+
+    if (fromCheckin && d.checkedToday) {
+      if (d.alreadyChecked) {
+        if (w.RXFX && typeof w.RXFX.toast === 'function') {
+          w.RXFX.toast(`今日已签到，当前 ${pts} 书币（连续 ${streak} 天）`);
+        }
+      } else {
+        if (w.RXFX && typeof w.RXFX.confetti === 'function') {
+          w.RXFX.confetti(chkBtn);
+        }
+        if (w.RXFX && typeof w.RXFX.toast === 'function') {
+          w.RXFX.toast(`签到成功，当前 ${pts} 书币（连续 ${streak} 天）`);
+        }
+      }
     }
   }
 
   fetch('https://qa.mycampusmail.com/me.php', { credentials: 'include' })
     .then((r) => r.json())
-    .then(renderCommunityState)
+    .then((d) => renderCommunityState(d, false))
     .catch(() => {});
 
-  document.getElementById('nav-checkin-btn')?.addEventListener('click', () => {
+  const checkinBtn = document.getElementById('nav-checkin-btn') as HTMLButtonElement | null;
+  checkinBtn?.addEventListener('click', () => {
+    if (checkinBtn.disabled) return;
+    checkinBtn.disabled = true;
+    checkinBtn.setAttribute('aria-busy', 'true');
     fetch('https://qa.mycampusmail.com/me.php?action=checkin', {
       method: 'POST',
       credentials: 'include',
     })
       .then((r) => r.json())
-      .then(renderCommunityState)
-      .catch(() => {});
+      .then((d) => renderCommunityState(d, true))
+      .catch(() => {
+        const w = window as any;
+        if (w.RXFX && typeof w.RXFX.toast === 'function') {
+          w.RXFX.toast('签到请求失败，请检查网络连接或稍后再试');
+        }
+      })
+      .finally(() => {
+        checkinBtn.disabled = false;
+        checkinBtn.removeAttribute('aria-busy');
+      });
   });
 </script>

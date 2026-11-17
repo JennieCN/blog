@@ -1,7 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { svgIcon } from '../lib/icons';
 
 const milestones = [
+  {
+    date: '2026-11-17',
+    title: '全站视觉与交互升级：三套可切换皮肤与三栏阅读骨架',
+    detail: '上线撞色（默认）、水墨、素色三套主题皮肤与深浅色圆形视效切换；引入左侧导航栏 + 右侧辅助信息栏三栏骨架、⌘K 命令面板、专栏按月归档与文章目录滚动高亮。',
+  },
   {
     date: '2026-11-10',
     title: '升级为「博客专栏 × 问答论坛」双流集合体，打通全站登录态与真实发信',
@@ -25,16 +31,23 @@ const milestones = [
 ];
 ---
 <BaseLayout title="建站日志" description="融夕的书建站与功能演进时间轴">
-  <h1 class="text-3xl font-bold">建站日志</h1>
-  <p class="mt-2" style="color: var(--color-muted)">记录「融夕的书」每一次架构调整与功能更新。</p>
+  <header class="page-head board-head" style="--c: var(--accent)">
+    <span class="board-badge" aria-hidden="true" set:html={svgIcon('calendar')} />
+    <div>
+      <span class="eyebrow" style="margin-bottom: 6px;">演进记录</span>
+      <h1 tabindex="-1">建站日志</h1>
+      <p class="page-sub">记录「融夕的书」每一次架构调整与功能更新。</p>
+    </div>
+  </header>
 
-  <ol class="mt-8 border-l-2 pl-6 flex flex-col gap-8" style="border-color: var(--color-border)">
+  <ol class="g-timeline">
     {milestones.map((m) => (
-      <li class="relative">
-        <span class="absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 bg-[var(--color-bg)]" style="border-color: var(--color-accent)" />
-        <time class="text-xs font-mono" style="color: var(--color-accent)">{m.date}</time>
-        <h2 class="mt-1 text-lg font-semibold">{m.title}</h2>
-        <p class="mt-1 text-sm" style="color: var(--color-muted)">{m.detail}</p>
+      <li class="card g-timeline-item">
+        <div class="flex flex-wrap items-center gap-2 text-xs mono font-semibold" style="color: var(--accent)">
+          <time datetime={m.date}>{m.date}</time>
+        </div>
+        <h2 class="mt-2 text-lg font-bold">{m.title}</h2>
+        <p class="mt-2 text-sm leading-relaxed" style="color: var(--text-2)">{m.detail}</p>
       </li>
     ))}
   </ol>

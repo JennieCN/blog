@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostMeta from '../../components/PostMeta.astro';
-import { SECTIONS } from '../../config';
+import { SECTIONS, SITE } from '../../config';
 import { getCollection } from 'astro:content';
 import { filterDrafts, sortByDateDesc } from '../../lib/posts';
+import { svgIcon } from '../../lib/icons';
 
 const entries = filterDrafts(await getCollection('qa'));
 const questions = sortByDateDesc(
@@ -19,54 +20,75 @@ const questions = sortByDateDesc(
 );
 ---
 <BaseLayout title="社区大厅" description="融夕的书 · 问答与交流论坛实时大厅">
-  <div class="card p-6 sm:p-8">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-accent)">论坛 × 知识库实时互通</p>
-        <h1 class="mt-1 text-3xl font-bold">社区问答与交流大厅</h1>
-        <p class="mt-2 text-sm sm:text-base" style="color: var(--color-muted)">
-          实时同步问答论坛全部板块讨论帖。支持 GitHub 一键登录、每日签到领书币、最佳答案采纳与图片附件上传。
-        </p>
-      </div>
-      <div class="flex flex-wrap gap-2.5 text-sm">
-        <a href="https://qa.mycampusmail.com/" class="rounded-lg px-4 py-2 font-medium text-white" style="background: var(--color-accent)">+ 发帖提问 / 完整论坛视图 →</a>
-      </div>
+  <header class="page-head board-head" style="--c: var(--accent)">
+    <span class="board-badge" aria-hidden="true" set:html={svgIcon('chat')} />
+    <div>
+      <span class="eyebrow" style="margin-bottom: 6px;">论坛 × 知识库实时互通</span>
+      <h1 tabindex="-1">社区问答与交流大厅</h1>
+      <p class="page-sub">
+        实时同步问答论坛全部板块讨论帖。支持 GitHub 一键登录、每日签到领书币、最佳答案采纳与图片附件上传。
+      </p>
     </div>
+    <a href={`${SITE.forumUrl}/`} class="btn btn-primary" target="_blank" rel="noopener">
+      <Fragment set:html={svgIcon('plus')} />
+      <span>发帖提问 / 完整论坛视图</span>
+    </a>
+  </header>
 
-    <!-- 按五大板块过滤实时帖子 -->
-    <div class="mt-6 flex flex-wrap gap-2 text-xs sm:text-sm" id="qa-tag-filters">
-      <button type="button" data-tag="" class="qa-tag-btn cursor-pointer rounded-lg px-3 py-1.5 font-semibold text-white" style="background: var(--color-accent)">
-        全部板块
+  <div class="list-filters">
+    <div class="stream-tabs" id="qa-tag-filters" role="group" aria-label="按板块筛选社区帖子">
+      <button type="button" data-tag="" class="stream-tab qa-tag-btn" aria-current="true">
+        <Fragment set:html={svgIcon('grid')} />
+        <span>全部板块</span>
       </button>
       {SECTIONS.map((s) => (
-        <button type="button" data-tag={s.key} class="qa-tag-btn cursor-pointer rounded-lg border px-3 py-1.5 font-medium" style="border-color: var(--color-border); background: var(--color-bg)">
-          {s.name}
+        <button type="button" data-tag={s.key} class="stream-tab qa-tag-btn" aria-current="false">
+          <span class="cat-dot" style={`--c: ${s.color}`} aria-hidden="true"></span>
+          <span>{s.name}</span>
         </button>
       ))}
     </div>
   </div>
 
   <!-- 实时论坛帖子列表 -->
-  <section class="mt-8">
-    <h2 class="text-xl font-bold">💬 社区实时讨论帖</h2>
-    <ul id="qa-live-list" class="mt-4 flex flex-col gap-4">
-      <li class="card p-5 text-sm" style="color: var(--color-muted)">正在同步社区最新帖子…</li>
+  <section class="mt-2">
+    <h2 class="section-heading" style="margin-top: 8px;">
+      <span>💬 社区实时讨论帖</span>
+      <span id="qa-live-count" class="forum-count-badge" aria-live="polite">加载中…</span>
+    </h2>
+    <ul id="qa-live-list" class="stream-list">
+      <li class="card muted text-sm">正在同步社区最新帖子…</li>
     </ul>
   </section>
 
   <!-- 精选归档问答 -->
   {questions.length > 0 && (
-    <section class="mt-12">
-      <h2 class="text-xl font-bold">📌 站内归档精选问答</h2>
-      <ul class="mt-4 flex flex-col gap-4">
+    <section class="mt-10">
+      <h2 class="section-heading">
+        <span>📌 站内归档精选问答</span>
+      </h2>
+      <ul class="stream-list">
         {questions.map((q) => (
-          <li class="card p-5">
-            <div class="flex items-center gap-2">
-              {q.solved && <span class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-800">✓ 已解决</span>}
-              <a href={`/qa/${q.slug}/`} class="text-lg font-bold hover:underline">{q.title}</a>
+          <li class="stream-item">
+            <div class="item-body">
+              <div class="item-top">
+                <span class="kind-chip kind-question">
+                  <Fragment set:html={svgIcon('help')} />
+                  <span>归档问答</span>
+                </span>
+                {q.solved && (
+                  <span class="status is-solved">
+                    <Fragment set:html={svgIcon('check')} />
+                    <span>已解决</span>
+                  </span>
+                )}
+              </div>
+              <h3 class="item-title">
+                <a href={`/qa/${q.slug}/`}>{q.title}</a>
+              </h3>
+              <p class="item-excerpt">{q.description}</p>
+              <PostMeta pubDate={q.pubDate} tags={q.tags} />
             </div>
-            <p class="mt-1 text-sm" style="color: var(--color-muted)">{q.description}</p>
-            <PostMeta pubDate={q.pubDate} tags={q.tags} />
           </li>
         ))}
       </ul>
@@ -74,16 +96,42 @@ const questions = sortByDateDesc(
   )}
 
   <script>
+    import { formatLocalDate } from '../../lib/posts';
+
+    function esc(s: unknown): string {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function safeUrl(u: unknown): string {
+      const s = String(u ?? '').trim();
+      if (/^https?:\/\//i.test(s) || s.startsWith('/')) return esc(s);
+      return '#';
+    }
+
+    const SECTION_COLORS: Record<string, string> = {
+      vps: '#2563eb',
+      fsae: '#b8461f',
+      rm: '#1d6e62',
+      ai: '#6f42c1',
+      resources: '#8a5a00',
+    };
+
     const listEl = document.getElementById('qa-live-list');
+    const countEl = document.getElementById('qa-live-count');
     const btns = Array.from(document.querySelectorAll('.qa-tag-btn')) as HTMLButtonElement[];
 
     function loadFeed(tag: string) {
       btns.forEach((b) => {
         const active = (b.dataset.tag || '') === tag;
-        b.style.background = active ? 'var(--color-accent)' : 'var(--color-bg)';
-        b.style.color = active ? '#ffffff' : 'var(--color-fg)';
-        b.style.borderColor = active ? 'transparent' : 'var(--color-border)';
+        b.setAttribute('aria-current', active ? 'true' : 'false');
       });
+
+      if (countEl) countEl.textContent = '加载中…';
 
       const url = tag
         ? `https://qa.mycampusmail.com/feed.php?tag=${encodeURIComponent(tag)}&limit=25`
@@ -92,48 +140,84 @@ const questions = sortByDateDesc(
       fetch(url)
         .then((r) => r.json())
         .then((d) => {
-          const items = d?.items || [];
+          const items = Array.isArray(d?.items) ? d.items : [];
+          if (countEl) countEl.textContent = `${items.length} 个话题`;
           if (!listEl) return;
+
           if (!items.length) {
-            listEl.innerHTML = `<li class="card p-5 text-sm" style="color: var(--color-muted)">该板块暂时还没有帖子，<a href="https://qa.mycampusmail.com/t/${tag}" style="color: var(--color-accent)">点击抢先发第一帖 →</a></li>`;
+            const target = tag
+              ? `https://qa.mycampusmail.com/t/${encodeURIComponent(tag)}`
+              : 'https://qa.mycampusmail.com/';
+            listEl.innerHTML = `
+              <li class="empty">
+                <div class="empty-art" aria-hidden="true"></div>
+                <h2>该板块暂时还没有帖子</h2>
+                <p>成为第一个在这里发起提问或分享经验的人。</p>
+                <div class="empty-actions">
+                  <a class="btn btn-primary" href="${target}" target="_blank" rel="noopener">抢先发第一帖 →</a>
+                </div>
+              </li>`;
             return;
           }
+
           listEl.innerHTML = items
             .map((item: any) => {
-              const tags = (item.tags || [])
-                .map(
-                  (t: any) =>
-                    `<span class="rounded border px-2 py-0.5 text-xs" style="border-color: var(--color-border); color: var(--color-muted)">${t.name}</span>`,
-                )
+              const tags = (Array.isArray(item.tags) ? item.tags : [])
+                .map((t: any) => {
+                  const slug = String(t.slug || '');
+                  const color = SECTION_COLORS[slug] || 'var(--text-3)';
+                  return `<a href="/${encodeURIComponent(slug)}/" class="cat-badge" style="--c:${color}"><span class="cat-dot" aria-hidden="true"></span>${esc(t.name)}</a>`;
+                })
                 .join('');
+
               const badge = item.isSolved
-                ? `<span class="rounded px-2 py-0.5 text-xs font-semibold" style="background:#dcfce7;color:#166534">✓ 已解决</span>`
-                : `<span class="rounded px-2 py-0.5 text-xs" style="background:#fef3c7;color:#92400e">待解答 / 讨论中</span>`;
+                ? `<span class="status is-solved"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>已解决</span>`
+                : `<span class="status is-open"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>待解答 / 讨论中</span>`;
+
               const sticky = item.isSticky
-                ? `<span class="rounded px-2 py-0.5 text-xs font-semibold" style="background:#fee2e2;color:#991b1b">📌 置顶</span>`
+                ? `<span class="pin-chip"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16v6"/><path d="M8 3h8l-1 6 3 3v2H6v-2l3-3z"/></svg>置顶</span>`
                 : '';
-              const dateStr = (item.lastPostedAt || item.createdAt || '').slice(0, 10);
+
+              const dateStr = esc(formatLocalDate(item.lastPostedAt || item.createdAt));
+              const href = safeUrl(item.url);
+
               return `
-                <li class="card p-5">
-                  <div class="flex flex-wrap items-center gap-2">
-                    ${sticky}
-                    ${badge}
-                    ${tags}
+                <li class="stream-item${item.isSticky ? ' is-pinned' : ''}" data-kind="forum">
+                  <div class="item-body">
+                    <div class="item-top">
+                      <span class="kind-chip kind-discuss">
+                        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2-4.2A8 8 0 1 1 21 12z"/></svg>
+                        <span>社区帖子</span>
+                      </span>
+                      ${sticky}
+                      ${badge}
+                      ${tags}
+                    </div>
+                    <h3 class="item-title"><a href="${href}" target="_blank" rel="noopener">${esc(item.title)}</a></h3>
+                    <p class="item-excerpt">${esc(item.excerpt || '')}</p>
+                    <div class="item-meta">
+                      <span class="item-author">${esc(item.author)}</span>
+                      <span>${dateStr}</span>
+                      <a href="${href}" target="_blank" rel="noopener" style="color: var(--accent); font-weight: 600;">查看并回复 →</a>
+                    </div>
                   </div>
-                  <a href="${item.url}" class="mt-2 block text-lg font-bold hover:underline">${item.title}</a>
-                  <p class="mt-1 text-sm" style="color: var(--color-muted)">${item.excerpt || ''}</p>
-                  <div class="mt-3 flex flex-wrap items-center gap-4 text-xs" style="color: var(--color-muted)">
-                    <span>👤 ${item.author}</span>
-                    <span>💬 ${item.commentCount || 1} 条讨论</span>
-                    <span>🕒 ${dateStr}</span>
-                    <a href="${item.url}" style="color: var(--color-accent)" class="font-medium">查看并回复 →</a>
+                  <div class="item-side">
+                    <span class="stat" title="讨论回复数">
+                      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-8 8H4l2-4.2A8 8 0 1 1 21 12z"/></svg>
+                      <span>${Number(item.commentCount || 1)}</span>
+                    </span>
                   </div>
                 </li>
               `;
             })
             .join('');
         })
-        .catch(() => {});
+        .catch(() => {
+          if (countEl) countEl.textContent = '离线';
+          if (listEl) {
+            listEl.innerHTML = `<li class="card muted text-sm">社区实时接口暂时不可用，请直接访问 <a href="https://qa.mycampusmail.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">qa.mycampusmail.com</a>。</li>`;
+          }
+        });
     }
 
     btns.forEach((b) => {

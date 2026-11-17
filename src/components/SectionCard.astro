@@ -1,5 +1,6 @@
 ---
-import type { Section } from '../config';
+import { SITE, type Section } from '../config';
+import { svgIcon } from '../lib/icons';
 
 interface Props {
   section: Section;
@@ -7,16 +8,19 @@ interface Props {
 }
 const { section, count } = Astro.props;
 ---
-<div class="card flex flex-col justify-between p-5">
+<div class="card section-card" style={`--c: ${section.color}`}>
   <div>
-    <div class="flex items-center justify-between gap-2">
-      <a href={`/${section.key}/`} class="text-lg font-semibold hover:underline">{section.name}</a>
-      <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" style="background: var(--color-accent-soft); color: var(--color-accent)">{count} 篇长文</span>
+    <div class="section-card-head">
+      <a href={`/${section.key}/`} class="section-card-title">
+        <Fragment set:html={svgIcon(section.icon)} />
+        <span>{section.name}</span>
+      </a>
+      <span class="tag">{count} 篇长文</span>
     </div>
-    <p class="mt-2 text-sm" style="color: var(--color-muted)">{section.description}</p>
+    <p class="section-card-desc mt-2">{section.description}</p>
   </div>
-  <div class="mt-4 flex items-center justify-between border-t pt-3 text-xs" style="border-color: var(--color-border)">
-    <a href={`/${section.key}/`} style="color: var(--color-accent)" class="font-medium">看专栏与动态 →</a>
-    <a href={`https://qa.mycampusmail.com/t/${section.key}`} style="color: var(--color-muted)" class="hover:underline">💬 去本区发帖 →</a>
+  <div class="section-card-foot">
+    <a href={`/${section.key}/`} style="color: var(--accent); font-weight: 600;">看专栏与动态 →</a>
+    <a href={`${SITE.forumUrl}/t/${section.key}`} class="muted">💬 去本区发帖 →</a>
   </div>
 </div>

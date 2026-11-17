@@ -6,7 +6,11 @@ interface Props {
 }
 const { path } = Astro.props;
 ---
-<div id="waline" class="mt-16"></div>
+<div
+  id="waline"
+  class="mt-3"
+  style="--waline-theme-color: var(--accent); --waline-active-color: var(--accent-hover);"
+></div>
 
 <script define:vars={{ serverURL: SITE.walineServerURL, path }}>
   if (serverURL && !serverURL.includes('example')) {
@@ -18,14 +22,16 @@ const { path } = Astro.props;
     const s = document.createElement('script');
     s.src = 'https://unpkg.com/@waline/client@3/dist/waline.umd.js';
     s.onload = () => {
-      window.Waline.init({
-        el: '#waline',
-        serverURL,
-        path,
-        lang: 'zh-CN',
-        dark: 'html.dark',
-        pageview: true,
-      });
+      if (window.Waline && typeof window.Waline.init === 'function') {
+        window.Waline.init({
+          el: '#waline',
+          serverURL,
+          path,
+          lang: 'zh-CN',
+          dark: 'html.dark',
+          pageview: true,
+        });
+      }
     };
     document.body.appendChild(s);
   }

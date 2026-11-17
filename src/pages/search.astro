@@ -1,8 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Search from '../components/Search.astro';
+import { svgIcon } from '../lib/icons';
 ---
-<BaseLayout title="搜索">
-  <h1 class="text-3xl font-bold">搜索</h1>
-  <div class="mt-8"><Search /></div>
+<BaseLayout title="搜索" description="全站静态全文检索（由 Pagefind 驱动）">
+  <header class="page-head board-head" style="--c: var(--accent)">
+    <span class="board-badge" aria-hidden="true" set:html={svgIcon('search')} />
+    <div>
+      <span class="eyebrow" style="margin-bottom: 6px;">Pagefind 离线全文索引</span>
+      <h1 tabindex="-1">搜索全站</h1>
+      <p class="page-sub">在全部专栏文章与归档问答中检索正文、标题与代码块（也可在任意页面按 ⌘K 呼出快捷命令面板）。</p>
+    </div>
+  </header>
+
+  <Search />
 </BaseLayout>

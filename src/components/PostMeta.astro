@@ -5,13 +5,24 @@ interface Props {
   pubDate: Date;
   tags?: string[];
   pageviewPath?: string;
+  words?: number;
+  minutes?: number;
 }
-const { pubDate, tags = [], pageviewPath } = Astro.props;
+const { pubDate, tags = [], pageviewPath, words, minutes } = Astro.props;
 ---
-<div class="flex flex-wrap items-center gap-3 text-sm" style="color: var(--color-muted)">
+<div class="item-meta">
   <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+  {words != null && minutes != null && (
+    <span>· {words} 字 · 约 {minutes} 分钟</span>
+  )}
   {pageviewPath && (
     <span>· 阅读 <span class="waline-pageview-count" data-path={pageviewPath}>-</span> 次</span>
   )}
-  {tags.map((t) => <a href={`/tags/${encodeURIComponent(t)}/`} class="underline">#{t}</a>)}
+  {tags.length > 0 && (
+    <span class="item-tags">
+      {tags.map((t) => (
+        <a href={`/tags/${encodeURIComponent(t)}/`} class="tag">#{t}</a>
+      ))}
+    </span>
+  )}
 </div>

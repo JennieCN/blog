@@ -1,0 +1,91 @@
+---
+import { getCollection } from 'astro:content';
+import { SECTIONS, SITE } from '../config';
+import { filterDrafts, sortByDateDesc, formatDate } from '../lib/posts';
+import { collectTags } from '../lib/tags';
+import { svgIcon } from '../lib/icons';
+
+const all = [];
+for (const s of SECTIONS) {
+  for (const e of filterDrafts(await getCollection(s.key))) {
+    all.push({
+      section: s.key,
+      slug: e.id,
+      title: e.data.title,
+      description: e.data.description,
+      pubDate: e.data.pubDate,
+      tags: e.data.tags,
+    });
+  }
+}
+const latest = sortByDateDesc(all).slice(0, 4);
+const topTags = [...collectTags(all).entries()]
+  .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh'))
+  .slice(0, 14);
+---
+<section class="card author-card" aria-labelledby="aside-author-h">
+  <div class="author-row">
+    <span class="avatar avatar-md" style="--h: 22" aria-hidden="true">{SITE.author.charAt(0)}</span>
+    <div>
+      <h2 id="aside-author-h" class="card-title">{SITE.author}</h2>
+      <p class="text-xs muted">{SITE.title}</p>
+    </div>
+  </div>
+  <p class="text-sm" style="color: var(--text-2); line-height: 1.65;">{SITE.authorBio}</p>
+  <a class="card-more" href="/about/">了解站点架构 →</a>
+</section>
+
+<section class="card checkin-card" aria-labelledby="aside-stats-h">
+  <h2 id="aside-stats-h" class="card-title">
+    <Fragment set:html={svgIcon('chat')} />
+    <span>站内速览</span>
+  </h2>
+  <dl class="stats">
+    <div>
+      <dt>专栏</dt>
+      <dd>{all.length}</dd>
+    </div>
+    <div>
+      <dt>板块</dt>
+      <dd>{SECTIONS.length}</dd>
+    </div>
+    <div>
+      <dt>书币</dt>
+      <dd id="aside-user-coins">-</dd>
+    </div>
+  </dl>
+  <p class="hint" id="aside-user-streak">前往 qa.mycampusmail.com 登录（支持 GitHub 一键登录）同步书币与签到</p>
+  <a class="card-more" href={`${SITE.forumUrl}/`} target="_blank" rel="noopener">进入问答论坛 →</a>
+</section>
+
+<section class="card" aria-labelledby="aside-latest-h">
+  <h2 id="aside-latest-h" class="card-title">
+    <Fragment set:html={svgIcon('book')} />
+    <span>最新长文</span>
+  </h2>
+  <ol class="mini-list">
+    {latest.map((p) => (
+      <li>
+        <a href={`/${p.section}/${p.slug}/`}>{p.title}</a>
+        <span class="mini-meta">{formatDate(p.pubDate)}</span>
+      </li>
+    ))}
+  </ol>
+  <a class="card-more" href="/blog/">按月归档列表 →</a>
+</section>
+
+{topTags.length > 0 && (
+  <section class="card" aria-labelledby="aside-tags-h">
+    <h2 id="aside-tags-h" class="card-title">
+      <Fragment set:html={svgIcon('hash')} />
+      <span>常用标签</span>
+    </h2>
+    <div class="tag-cloud">
+      {topTags.map(([tag, items]) => (
+        <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>
+          #{tag} {items.length > 1 && <small>{items.length}</small>}
+        </a>
+      ))}
+    </div>
+  </section>
+)}

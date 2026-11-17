@@ -4,6 +4,7 @@ import PostMeta from '../../components/PostMeta.astro';
 import Comments from '../../components/Comments.astro';
 import { getCollection, render } from 'astro:content';
 import { filterDrafts } from '../../lib/posts';
+import { svgIcon } from '../../lib/icons';
 
 export async function getStaticPaths() {
   const entries = filterDrafts(await getCollection('qa'));
@@ -14,15 +15,34 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 <BaseLayout title={entry.data.question} description={entry.data.description}>
-  <article>
-    <div class="flex items-center gap-2">
-      {entry.data.solved && <span class="rounded bg-green-100 px-2 py-0.5 text-xs text-green-800">已解决</span>}
-      <h1 class="text-3xl font-bold">{entry.data.question}</h1>
-    </div>
-    <div class="mt-3"><PostMeta pubDate={entry.data.pubDate} tags={entry.data.tags} /></div>
-    <div class="prose mt-8"><Content /></div>
+  <nav class="crumbs" aria-label="位置">
+    <a href="/">首页</a>
+    <span aria-hidden="true">/</span>
+    <a href="/qa/">社区大厅</a>
+  </nav>
+
+  <article class="thread">
+    <header class="thread-head">
+      <div class="item-top">
+        <span class="kind-chip kind-question">
+          <Fragment set:html={svgIcon('help')} />
+          <span>归档问答</span>
+        </span>
+        {entry.data.solved && (
+          <span class="status is-solved">
+            <Fragment set:html={svgIcon('check')} />
+            <span>已解决</span>
+          </span>
+        )}
+      </div>
+      <h1 class="thread-title" tabindex="-1">{entry.data.question}</h1>
+      <PostMeta pubDate={entry.data.pubDate} tags={entry.data.tags} />
+    </header>
+    <div class="prose"><Content /></div>
   </article>
 
-  <h2 class="mt-16 text-xl font-bold">回答</h2>
-  <Comments path={`/qa/${entry.id}/`} />
+  <section class="comments" aria-labelledby="qa-cm-h">
+    <h2 id="qa-cm-h">回答与讨论</h2>
+    <Comments path={`/qa/${entry.id}/`} />
+  </section>
 </BaseLayout>

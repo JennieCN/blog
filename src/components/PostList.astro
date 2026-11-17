@@ -1,23 +1,84 @@
 ---
-import PostMeta from './PostMeta.astro';
-import type { PostSummary } from '../lib/posts';
+import { getSection, SITE } from '../config';
+import { byMonth, formatDate, type PostSummary } from '../lib/posts';
+import { svgIcon } from '../lib/icons';
 
 interface Props {
   posts: PostSummary[];
   emptyText?: string;
+  grouped?: boolean;
 }
-const { posts, emptyText = '这里还没有文章。' } = Astro.props;
+const { posts, emptyText = '这里还没有文章。', grouped = false } = Astro.props;
+const groups = grouped ? byMonth(posts) : [{ key: 'all', label: '', posts }];
 ---
 {posts.length === 0 ? (
-  <p style="color: var(--color-muted)">{emptyText}</p>
+  <div class="empty">
+    <div class="empty-art" aria-hidden="true"></div>
+    <h2>暂无内容</h2>
+    <p>{emptyText}</p>
+    <div class="empty-actions">
+      <a class="btn btn-primary" href="/blog/">查看全部专栏</a>
+    </div>
+  </div>
 ) : (
-  <ul class="flex flex-col gap-8">
-    {posts.map((p) => (
-      <li>
-        <a href={`/${p.section}/${p.slug}/`} class="text-xl font-semibold">{p.title}</a>
-        <p class="mt-1" style="color: var(--color-muted)">{p.description}</p>
-        <PostMeta pubDate={p.pubDate} tags={p.tags} />
-      </li>
+  <div>
+    {groups.map((g) => (
+      <section class="post-month">
+        {grouped && g.label && (
+          <h2 class="post-month-title">
+            {g.label}
+            <span>{g.posts.length} 篇</span>
+          </h2>
+        )}
+        <ol class="post-list">
+          {g.posts.map((p) => {
+            const sec = getSection(p.section);
+            return (
+              <li class="post-item" style={`--c: ${sec?.color ?? 'var(--line)'}`}>
+                <article>
+                  <div class="post-item-meta">
+                    <time datetime={p.pubDate.toISOString()}>{formatDate(p.pubDate)}</time>
+                    {sec && (
+                      <a class="cat-badge" href={`/${sec.key}/`} style={`--c: ${sec.color}`}>
+                        <span class="cat-dot" aria-hidden="true"></span>
+                        {sec.name}
+                      </a>
+                    )}
+                    {p.words != null && <span>{p.words} 字</span>}
+                  </div>
+                  <h3 class="post-item-title">
+                    <a href={`/${p.section}/${p.slug}/`}>{p.title}</a>
+                  </h3>
+                  <p class="post-item-summary">{p.description}</p>
+                  <div class="post-item-foot">
+                    <span class="post-item-tags">
+                      {p.tags.map((t) => (
+                        <a class="tag" href={`/tags/${encodeURIComponent(t)}/`}>#{t}</a>
+                      ))}
+                    </span>
+                    <span class="post-item-stats">
+                      <span>
+                        <Fragment set:html={svgIcon('eye')} />
+                        <span class="waline-pageview-count" data-path={`/${p.section}/${p.slug}/`}>-</span>
+                      </span>
+                      {sec && (
+                        <a
+                          class="forum-count-badge"
+                          href={`${SITE.forumUrl}/t/${sec.key}`}
+                          title={`${sec.name} 板块的社区讨论`}
+                        >
+                          <Fragment set:html={svgIcon('chat')} />
+                          <span>{sec.name}讨论</span>
+                        </a>
+                      )}
+                    </span>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
     ))}
-  </ul>
+  </div>
 )}

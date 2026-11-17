@@ -1,11 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { svgIcon } from '../lib/icons';
 ---
 <BaseLayout title="页面不存在">
-  <div class="py-20 text-center">
-    <p class="text-6xl font-bold" style="color: var(--color-muted)">404</p>
-    <h1 class="mt-4 text-2xl font-bold">页面不存在</h1>
-    <p class="mt-2" style="color: var(--color-muted)">你访问的页面可能已被移动或删除。</p>
-    <a href="/" class="mt-8 inline-block rounded px-5 py-2 text-white" style="background: var(--color-accent)">返回首页</a>
+  <div class="empty">
+    <div class="empty-art" aria-hidden="true"></div>
+    <p class="eyebrow">404 NOT FOUND</p>
+    <h1>页面不存在</h1>
+    <p>你访问的页面可能已被移动、重命名或删除。</p>
+    <div class="empty-actions">
+      <a href="/" class="btn btn-primary">
+        <Fragment set:html={svgIcon('home')} />
+        <span>返回首页</span>
+      </a>
+      <a href="/blog/" class="btn">
+        <Fragment set:html={svgIcon('book')} />
+        <span>浏览专栏归档</span>
+      </a>
+      <a href="/search/" class="btn">
+        <Fragment set:html={svgIcon('search')} />
+        <span>搜索全站</span>
+      </a>
+    </div>
   </div>
 </BaseLayout>

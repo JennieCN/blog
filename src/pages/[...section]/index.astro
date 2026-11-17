@@ -1,9 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import HybridStream from '../../components/HybridStream.astro';
-import { SECTIONS, getSection } from '../../config';
+import { SECTIONS, SITE, getSection } from '../../config';
 import { getCollection } from 'astro:content';
-import { sortByDateDesc, filterDrafts, type PostSummary } from '../../lib/posts';
+import {
+  sortByDateDesc,
+  filterDrafts,
+  wordCount,
+  readingMinutes,
+  type PostSummary,
+} from '../../lib/posts';
+import { collectTags } from '../../lib/tags';
+import { svgIcon } from '../../lib/icons';
 
 export function getStaticPaths() {
   return SECTIONS.map((s) => ({ params: { section: s.key } }));
@@ -14,30 +22,102 @@ const meta = getSection(section!);
 if (!meta) return Astro.redirect('/404');
 
 const entries = filterDrafts(await getCollection(meta.key));
+let totalWords = 0;
 const posts: PostSummary[] = sortByDateDesc(
-  entries.map((e) => ({
-    section: meta.key,
-    slug: e.id,
-    title: e.data.title,
-    description: e.data.description,
-    pubDate: e.data.pubDate,
-    tags: e.data.tags,
-  })),
+  entries.map((e) => {
+    const raw = e.body ?? '';
+    const words = wordCount(raw);
+    totalWords += words;
+    return {
+      section: meta.key,
+      slug: e.id,
+      title: e.data.title,
+      description: e.data.description,
+      pubDate: e.data.pubDate,
+      tags: e.data.tags,
+      words,
+      minutes: readingMinutes(raw),
+    };
+  }),
 );
+
+const sectionTags = [...collectTags(posts).entries()].sort(
+  (a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh'),
+);
+
+const allSectionCounts: Record<string, number> = {};
+for (const s of SECTIONS) {
+  allSectionCounts[s.key] = filterDrafts(await getCollection(s.key)).length;
+}
 ---
 <BaseLayout title={meta.name} description={meta.description}>
-  <div class="flex flex-wrap items-center justify-between gap-4">
+  <header class="page-head board-head" style={`--c: ${meta.color}`}>
+    <span class="board-badge" aria-hidden="true" set:html={svgIcon(meta.icon)} />
     <div>
-      <span class="text-xs font-semibold uppercase tracking-wider" style="color: var(--color-accent)">专栏与社区同区板块</span>
-      <h1 class="mt-1 text-3xl font-bold">{meta.name}</h1>
-      <p class="mt-2" style="color: var(--color-muted)">{meta.description}</p>
+      <span class="eyebrow" style="margin-bottom: 6px;">专栏与社区同区板块</span>
+      <h1 tabindex="-1">{meta.name}</h1>
+      <p class="page-sub">{meta.description}</p>
+      <p class="page-stats">本区已沉淀 {posts.length} 篇长文 · 共 {totalWords.toLocaleString()} 字</p>
     </div>
-    <a href={`https://qa.mycampusmail.com/t/${meta.key}`} class="rounded-lg px-4 py-2 text-sm font-medium text-white" style="background: var(--color-accent)">
-      进入「{meta.name}」论坛讨论区 →
+    <a href={`${SITE.forumUrl}/t/${meta.key}`} class="btn btn-primary" target="_blank" rel="noopener">
+      <Fragment set:html={svgIcon('chat')} />
+      <span>进入「{meta.name}」讨论区</span>
     </a>
-  </div>
+  </header>
 
-  <section class="mt-8">
+  <section>
     <HybridStream posts={posts} sectionKey={meta.key} sectionName={meta.name} />
   </section>
+
+  <Fragment slot="aside">
+    <section class="card author-card" aria-labelledby="sec-author-h">
+      <div class="author-row">
+        <span class="avatar avatar-md" style="--h: 22" aria-hidden="true">{SITE.author.charAt(0)}</span>
+        <div>
+          <h2 id="sec-author-h" class="card-title">{SITE.author}</h2>
+          <p class="text-xs muted">{meta.name} 板块专栏</p>
+        </div>
+      </div>
+      <p class="text-sm" style="color: var(--text-2); line-height: 1.65;">{SITE.authorBio}</p>
+      <a class="card-more" href={`/blog/?s=${meta.key}`}>查看本区按月归档 →</a>
+    </section>
+
+    {sectionTags.length > 0 && (
+      <section class="card" aria-labelledby="sec-tags-h">
+        <h2 id="sec-tags-h" class="card-title">
+          <Fragment set:html={svgIcon('hash')} />
+          <span>本板块标签</span>
+        </h2>
+        <div class="tag-cloud">
+          {sectionTags.map(([tag, items]) => (
+            <a class="tag" href={`/tags/${encodeURIComponent(tag)}/`}>
+              #{tag} {items.length > 1 && <small>{items.length}</small>}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="card" aria-labelledby="sec-all-h">
+      <h2 id="sec-all-h" class="card-title">
+        <Fragment set:html={svgIcon('grid')} />
+        <span>切换其他板块</span>
+      </h2>
+      <ul class="side-list">
+        {SECTIONS.map((s) => (
+          <li>
+            <a
+              href={`/${s.key}/`}
+              class="side-link"
+              aria-current={s.key === meta.key ? 'page' : undefined}
+            >
+              <span class="cat-dot" style={`--c: ${s.color}`} aria-hidden="true"></span>
+              <span class="side-label">{s.name}</span>
+              <span class="side-count">{allSectionCounts[s.key] ?? 0}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </Fragment>
 </BaseLayout>

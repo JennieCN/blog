@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { svgIcon } from '../lib/icons';
 
 const scripts = [
   {
@@ -37,37 +38,45 @@ const glossary = [
 ];
 ---
 <BaseLayout title="实用工具箱" description="VPS 剩余价值计算器、IP 分流检测、节点延迟测速、FSAE/RM 电池组速算、术语词典与常用脚本库">
-  <h1 class="text-3xl font-bold">🛠️ 实用工具箱</h1>
-  <p class="mt-2" style="color: var(--color-muted)">对标主流测评站与技术社区，集合 VPS 剩余价值、出口 IP 检测、HTTP 延迟测速、FSAE/RM 电池包速算与术语词典。</p>
+  <header class="page-head board-head" style="--c: var(--accent)">
+    <span class="board-badge" aria-hidden="true" set:html={svgIcon('wrench')} />
+    <div>
+      <span class="eyebrow" style="margin-bottom: 6px;">即开即用的工程小工具</span>
+      <h1 tabindex="-1">实用工具箱</h1>
+      <p class="page-sub">
+        集合出口 IP 分流检测、多节点 HTTP 延迟测速、VPS 剩余价值计算器、FSAE/RM 电池包速算、术语词典与常用脚本库。
+      </p>
+    </div>
+  </header>
 
   <!-- 第一排：IP 分流检测 + 多节点 HTTP 延迟测速 -->
-  <div class="mt-8 grid gap-6 lg:grid-cols-2">
+  <div class="grid gap-6 lg:grid-cols-2">
     <!-- 工具 A：本机出口 IP 与分流检测 -->
-    <section class="card p-6">
+    <section class="card">
       <div class="flex items-center justify-between gap-2">
-        <h2 class="text-xl font-bold">🌐 本机出口 IP 与分流检测</h2>
-        <button type="button" id="btn-recheck-ip" class="cursor-pointer rounded px-3 py-1 text-xs font-medium text-white" style="background: var(--color-accent)">重新检测</button>
+        <h2 class="card-title" style="margin-bottom: 0;">🌐 本机出口 IP 与分流检测</h2>
+        <button type="button" id="btn-recheck-ip" class="btn btn-primary btn-sm">重新检测</button>
       </div>
-      <p class="mt-1 text-sm" style="color: var(--color-muted)">实时对比你访问本站边缘节点与国际 API 的出口 IP、归属地与运营商 ASN。</p>
+      <p class="mt-2 text-sm muted">实时对比你访问本站边缘节点与国际 API 的出口 IP、归属地与运营商 ASN。</p>
       <div class="mt-4 flex flex-col gap-3 text-sm">
-        <div class="rounded-lg border p-3.5" style="border-color: var(--color-border); background: var(--color-bg)">
-          <span class="text-xs font-semibold" style="color: var(--color-accent)">Cloudflare 边缘识别出口（本站直连）</span>
-          <p id="ip-cf-box" class="mt-1 font-mono text-sm">正在检测边缘出口…</p>
+        <div class="tool-box">
+          <span class="text-xs font-semibold" style="color: var(--accent)">Cloudflare 边缘识别出口（本站直连）</span>
+          <p id="ip-cf-box" class="mt-1 mono text-sm">正在检测边缘出口…</p>
         </div>
-        <div class="rounded-lg border p-3.5" style="border-color: var(--color-border); background: var(--color-bg)">
-          <span class="text-xs font-semibold" style="color: var(--color-accent)">国际通用出口 IP 与 ASN 运营商</span>
-          <p id="ip-intl-box" class="mt-1 font-mono text-sm">正在检测国际出口…</p>
+        <div class="tool-box">
+          <span class="text-xs font-semibold" style="color: var(--accent)">国际通用出口 IP 与 ASN 运营商</span>
+          <p id="ip-intl-box" class="mt-1 mono text-sm">正在检测国际出口…</p>
         </div>
       </div>
     </section>
 
     <!-- 工具 B：多节点 HTTP 延迟测速 -->
-    <section class="card p-6">
+    <section class="card">
       <div class="flex items-center justify-between gap-2">
-        <h2 class="text-xl font-bold">⚡ 多节点 HTTP 延迟测速</h2>
-        <button type="button" id="btn-run-ping" class="cursor-pointer rounded px-3 py-1 text-xs font-medium text-white" style="background: var(--color-accent)">一键测速</button>
+        <h2 class="card-title" style="margin-bottom: 0;">⚡ 多节点 HTTP 延迟测速</h2>
+        <button type="button" id="btn-run-ping" class="btn btn-primary btn-sm">一键测速</button>
       </div>
-      <p class="mt-1 text-sm" style="color: var(--color-muted)">从当前浏览器直接向各常用节点发起 HTTP 握手测速，直观检验代理或直连延迟。</p>
+      <p class="mt-2 text-sm muted">从当前浏览器直接向各常用节点发起 HTTP 握手测速，直观检验代理或直连延迟。</p>
       <ul id="ping-list" class="mt-4 flex flex-col gap-2 text-sm"></ul>
     </section>
   </div>
@@ -75,92 +84,133 @@ const glossary = [
   <!-- 第二排：VPS 剩余价值计算器 + 锂电池包速算 -->
   <div class="mt-6 grid gap-6 lg:grid-cols-2">
     <!-- 工具 1：VPS 剩余价值计算器 -->
-    <section class="card p-6">
-      <h2 class="text-xl font-bold">💰 VPS 剩余价值计算器</h2>
-      <p class="mt-1 text-sm" style="color: var(--color-muted)">根据续费金额、付款周期与到期日实时计算机器剩余价值。</p>
+    <section class="card">
+      <h2 class="card-title">💰 VPS 剩余价值计算器</h2>
+      <p class="text-sm muted">根据续费金额、付款周期与到期日实时计算机器剩余价值。</p>
       <div class="mt-4 grid gap-3 sm:grid-cols-2">
-        <label class="text-sm">
+        <label class="text-sm flex flex-col gap-1">
           <span>续费价格（元或美元）</span>
-          <input id="vps-price" type="number" step="0.01" value="100" class="mt-1 w-full rounded border px-3 py-1.5" style="border-color: var(--color-border); background: var(--color-bg)" />
+          <input id="vps-price" type="number" min="0" step="0.01" value="100" class="tool-input" />
         </label>
-        <label class="text-sm">
+        <label class="text-sm flex flex-col gap-1">
           <span>周期天数（年付=365，月付=30）</span>
-          <input id="vps-cycle" type="number" value="365" class="mt-1 w-full rounded border px-3 py-1.5" style="border-color: var(--color-border); background: var(--color-bg)" />
+          <input id="vps-cycle" type="number" min="1" value="365" class="tool-input" />
         </label>
-        <label class="text-sm sm:col-span-2">
+        <label class="text-sm sm:col-span-2 flex flex-col gap-1">
           <span>到期日期</span>
-          <input id="vps-expire" type="date" class="mt-1 w-full rounded border px-3 py-1.5" style="border-color: var(--color-border); background: var(--color-bg)" />
+          <input id="vps-expire" type="date" class="tool-input" />
         </label>
       </div>
-      <div id="vps-result" class="mt-4 rounded-lg border p-3.5 text-sm font-medium" style="border-color: var(--color-border); background: var(--color-bg)"></div>
+      <div id="vps-result" class="mt-4 tool-box text-sm font-medium" aria-live="polite"></div>
     </section>
 
     <!-- 工具 2：FSAE / RM 锂电池组参数速算 -->
-    <section class="card p-6">
-      <h2 class="text-xl font-bold">🔋 FSAE / RM 锂电池包参数速算</h2>
-      <p class="mt-1 text-sm" style="color: var(--color-muted)">根据串联数 S、并联数 P 与电芯容量计算标称电压、满电电压与总能量。</p>
-      <div class="mt-4 grid gap-3 sm:grid-cols-3">
-        <label class="text-sm">
+    <section class="card">
+      <h2 class="card-title">🔋 FSAE / RM 锂电池包参数速算</h2>
+      <p class="text-sm muted">根据串联数 S、并联数 P、电芯体系与容量计算标称电压、满电电压与总能量。</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <label class="text-sm flex flex-col gap-1">
           <span>串联数 (S)</span>
-          <input id="bat-s" type="number" value="6" min="1" class="mt-1 w-full rounded border px-3 py-1.5" style="border-color: var(--color-border); background: var(--color-bg)" />
+          <input id="bat-s" type="number" value="6" min="1" class="tool-input" />
         </label>
-        <label class="text-sm">
+        <label class="text-sm flex flex-col gap-1">
           <span>并联数 (P)</span>
-          <input id="bat-p" type="number" value="1" min="1" class="mt-1 w-full rounded border px-3 py-1.5" style="border-color: var(--color-border); background: var(--color-bg)" />
+          <input id="bat-p" type="number" value="1" min="1" class="tool-input" />
         </label>
-        <label class="text-sm">
+        <label class="text-sm flex flex-col gap-1">
           <span>单节容量 (Ah)</span>
-          <input id="bat-ah" type="number" step="0.1" value="5.0" class="mt-1 w-full rounded border px-3 py-1.5" style="border-color: var(--color-border); background: var(--color-bg)" />
+          <input id="bat-ah" type="number" min="0" step="0.1" value="5.0" class="tool-input" />
+        </label>
+        <label class="text-sm flex flex-col gap-1">
+          <span>电芯化学体系</span>
+          <select id="bat-chem" class="tool-input">
+            <option value="3.7,4.2" selected>LiPo / 三元锂 (3.7V / 4.2V)</option>
+            <option value="3.6,4.2">动力 18650 / 21700 (3.6V / 4.2V)</option>
+            <option value="3.2,3.65">磷酸铁锂 LiFePO4 (3.2V / 3.65V)</option>
+          </select>
         </label>
       </div>
-      <div id="bat-result" class="mt-4 rounded-lg border p-3.5 text-sm font-medium" style="border-color: var(--color-border); background: var(--color-bg)"></div>
+      <div id="bat-result" class="mt-4 tool-box text-sm font-medium" aria-live="polite"></div>
     </section>
   </div>
 
   <!-- 第三排：圈子黑话与技术术语速查词典 -->
-  <section class="card mt-8 p-6">
+  <section class="card mt-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-xl font-bold">📚 圈子黑话与技术术语词典（Glossary）</h2>
-        <p class="mt-1 text-sm" style="color: var(--color-muted)">收录 VPS 国际线路、FSAE 方程式电检、RoboMaster 机器人与 AI 常用术语缩写。</p>
+        <h2 class="card-title" style="margin-bottom: 4px;">
+          <span>📚 圈子黑话与技术术语词典（Glossary）</span>
+          <span id="glossary-count" class="text-xs font-normal muted" aria-live="polite">共 {glossary.length} 条</span>
+        </h2>
+        <p class="text-sm muted">收录 VPS 国际线路、FSAE 方程式电检、RoboMaster 机器人与 AI 常用术语缩写。</p>
       </div>
       <input
         id="glossary-search"
         type="search"
         placeholder="输入术语或关键词过滤（如 CN2 / BMS / CAN）…"
-        class="w-full sm:w-72 rounded-lg border px-3 py-1.5 text-sm"
-        style="border-color: var(--color-border); background: var(--color-bg)"
+        class="tool-input sm:w-72"
       />
     </div>
     <div id="glossary-grid" class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {glossary.map((g) => (
-        <div class="glossary-item rounded-lg border p-3.5" style="border-color: var(--color-border); background: var(--color-bg)" data-text={`${g.cat} ${g.term} ${g.desc}`.toLowerCase()}>
-          <span class="rounded px-2 py-0.5 text-xs font-semibold" style="background: var(--color-accent-soft); color: var(--color-accent)">{g.cat}</span>
+        <div
+          class="glossary-item tool-box"
+          data-text={`${g.cat} ${g.term} ${g.desc}`.toLowerCase()}
+        >
+          <span class="tag">{g.cat}</span>
           <h3 class="mt-2 font-bold text-sm">{g.term}</h3>
-          <p class="mt-1 text-xs leading-relaxed" style="color: var(--color-muted)">{g.desc}</p>
+          <p class="mt-1 text-xs leading-relaxed" style="color: var(--text-2)">{g.desc}</p>
         </div>
       ))}
     </div>
+    <p id="glossary-empty" class="mt-4 text-sm muted" hidden>没有匹配的术语条目，请换个关键词或按 Esc 清空搜索框。</p>
   </section>
 
   <!-- 常用脚本库 -->
-  <h2 class="mt-12 text-2xl font-bold">💻 常用 VPS 脚本速查</h2>
-  <div class="mt-5 flex flex-col gap-4">
+  <h2 class="section-heading">
+    <span>💻 常用 VPS 脚本速查</span>
+  </h2>
+  <div class="flex flex-col gap-4">
     {scripts.map((s) => (
-      <div class="card p-5">
+      <div class="card">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 class="font-semibold">{s.name}</h3>
-            <p class="text-xs" style="color: var(--color-muted)">{s.desc}</p>
+            <h3 class="font-bold">{s.name}</h3>
+            <p class="text-xs muted">{s.desc}</p>
           </div>
-          <button type="button" data-cmd={s.cmd} class="copy-cmd cursor-pointer rounded px-3 py-1 text-xs text-white" style="background: var(--color-accent)">复制命令</button>
+          <button type="button" data-cmd={s.cmd} class="copy-cmd btn btn-primary btn-sm">复制命令</button>
         </div>
-        <pre class="mt-3 overflow-x-auto rounded bg-zinc-900 p-3 text-xs text-zinc-100"><code>{s.cmd}</code></pre>
+        <div class="prose mt-3" style="margin-top: 12px;">
+          <pre data-lang="bash"><code>{s.cmd}</code></pre>
+        </div>
       </div>
     ))}
   </div>
 
   <script>
+    async function copyText(text: string): Promise<boolean> {
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch {}
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+
     // 1. 本机出口 IP 与分流检测
     function checkIp() {
       const cfEl = document.getElementById('ip-cf-box');
@@ -217,9 +267,9 @@ const glossary = [
       ul.innerHTML = pingTargets
         .map(
           (t, i) => `
-          <li class="flex items-center justify-between rounded-lg border px-3.5 py-2" style="border-color: var(--color-border); background: var(--color-bg)">
+          <li class="tool-box flex items-center justify-between gap-2">
             <span class="font-medium">${t.name}</span>
-            <span id="ping-res-${i}" class="rounded px-2 py-0.5 font-mono text-xs" style="color: var(--color-muted)">测速中…</span>
+            <span id="ping-res-${i}" class="rounded px-2 py-0.5 mono text-xs muted">测速中…</span>
           </li>`,
         )
         .join('');
@@ -231,7 +281,7 @@ const glossary = [
           try {
             const ctrl = new AbortController();
             const timer = setTimeout(() => ctrl.abort(), 5000);
-            await fetch(`${t.url}${t.url.includes('?') ? '&' : '?'} _t=${Date.now()}`, {
+            await fetch(`${t.url}${t.url.includes('?') ? '&' : '?'}_t=${Date.now()}`, {
               mode: 'no-cors',
               cache: 'no-store',
               signal: ctrl.signal,
@@ -240,14 +290,14 @@ const glossary = [
             const ms = Math.round(performance.now() - t0);
             if (badge) {
               badge.textContent = `${ms} ms`;
-              badge.style.background = ms < 180 ? '#dcfce7' : ms < 400 ? '#fef3c7' : '#fee2e2';
-              badge.style.color = ms < 180 ? '#166534' : ms < 400 ? '#92400e' : '#991b1b';
+              badge.className = `rounded px-2 py-0.5 mono text-xs font-semibold ${
+                ms < 180 ? 'badge-ok' : ms < 400 ? 'badge-warn' : 'badge-danger'
+              }`;
             }
           } catch {
             if (badge) {
               badge.textContent = '超时 / 阻断';
-              badge.style.background = '#fee2e2';
-              badge.style.color = '#991b1b';
+              badge.className = 'rounded px-2 py-0.5 mono text-xs font-semibold badge-danger';
             }
           }
         }),
@@ -257,12 +307,30 @@ const glossary = [
     runPing();
 
     // 3. 术语词典搜索过滤
-    document.getElementById('glossary-search')?.addEventListener('input', (e) => {
-      const q = ((e.target as HTMLInputElement).value || '').trim().toLowerCase();
-      document.querySelectorAll('.glossary-item').forEach((el) => {
+    const glossaryInput = document.getElementById('glossary-search') as HTMLInputElement | null;
+    const glossaryCount = document.getElementById('glossary-count');
+    function filterGlossary() {
+      const q = (glossaryInput?.value || '').trim().toLowerCase();
+      let visible = 0;
+      const allItems = document.querySelectorAll('.glossary-item');
+      allItems.forEach((el) => {
         const txt = (el as HTMLElement).dataset.text || '';
-        (el as HTMLElement).style.display = !q || txt.includes(q) ? '' : 'none';
+        const show = !q || txt.includes(q);
+        (el as HTMLElement).style.display = show ? '' : 'none';
+        if (show) visible++;
       });
+      const emptyEl = document.getElementById('glossary-empty');
+      if (emptyEl) emptyEl.hidden = visible > 0;
+      if (glossaryCount) {
+        glossaryCount.textContent = q ? `匹配 ${visible} / ${allItems.length} 条` : `共 ${allItems.length} 条`;
+      }
+    }
+    glossaryInput?.addEventListener('input', filterGlossary);
+    glossaryInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && glossaryInput.value) {
+        glossaryInput.value = '';
+        filterGlossary();
+      }
     });
 
     // 4. VPS 剩余价值与电池组计算
@@ -273,40 +341,72 @@ const glossary = [
     }
 
     function calcVps() {
-      const price = parseFloat((document.getElementById('vps-price') as HTMLInputElement).value) || 0;
-      const cycle = parseFloat((document.getElementById('vps-cycle') as HTMLInputElement).value) || 365;
-      const exp = new Date((document.getElementById('vps-expire') as HTMLInputElement).value).getTime();
-      const now = Date.now();
-      const days = Math.max(0, Math.ceil((exp - now) / 86400000));
-      const remain = ((price / cycle) * days).toFixed(2);
+      const priceRaw = parseFloat((document.getElementById('vps-price') as HTMLInputElement).value);
+      const cycleRaw = parseFloat((document.getElementById('vps-cycle') as HTMLInputElement).value);
+      const expStr = (document.getElementById('vps-expire') as HTMLInputElement).value;
       const out = document.getElementById('vps-result');
-      if (out) out.textContent = `剩余天数：${days} 天 · 折算剩余价值：${remain}`;
+      if (!out) return;
+
+      const price = Number.isFinite(priceRaw) ? Math.max(0, priceRaw) : 0;
+      const cycle = Number.isFinite(cycleRaw) && cycleRaw > 0 ? cycleRaw : 0;
+      const exp = expStr ? new Date(expStr).getTime() : NaN;
+
+      if (!cycle) {
+        out.textContent = '请输入大于 0 的周期天数（年付=365，月付=30）';
+        return;
+      }
+      if (Number.isNaN(exp)) {
+        out.textContent = '请选择有效的到期日期';
+        return;
+      }
+
+      const days = Math.max(0, Math.ceil((exp - Date.now()) / 86400000));
+      const daily = (price / cycle).toFixed(2);
+      const remain = ((price / cycle) * days).toFixed(2);
+      const pct = Math.min(100, Math.round((days / cycle) * 100));
+      out.textContent = `剩余天数：${days} 天（${pct}%）· 日均 ${daily} · 折算剩余价值：${remain}`;
     }
 
     function calcBat() {
-      const s = parseInt((document.getElementById('bat-s') as HTMLInputElement).value) || 1;
-      const p = parseInt((document.getElementById('bat-p') as HTMLInputElement).value) || 1;
-      const ah = parseFloat((document.getElementById('bat-ah') as HTMLInputElement).value) || 0;
-      const vNom = (s * 3.7).toFixed(1);
-      const vMax = (s * 4.2).toFixed(1);
+      const sRaw = parseInt((document.getElementById('bat-s') as HTMLInputElement).value, 10);
+      const pRaw = parseInt((document.getElementById('bat-p') as HTMLInputElement).value, 10);
+      const ahRaw = parseFloat((document.getElementById('bat-ah') as HTMLInputElement).value);
+      const chemStr = (document.getElementById('bat-chem') as HTMLSelectElement | null)?.value || '3.7,4.2';
+      const [nomCell, maxCell] = chemStr.split(',').map((n) => parseFloat(n));
+      const vCellNom = Number.isFinite(nomCell) ? nomCell : 3.7;
+      const vCellMax = Number.isFinite(maxCell) ? maxCell : 4.2;
+
+      const s = Number.isFinite(sRaw) && sRaw >= 1 ? sRaw : 1;
+      const p = Number.isFinite(pRaw) && pRaw >= 1 ? pRaw : 1;
+      const ah = Number.isFinite(ahRaw) && ahRaw >= 0 ? ahRaw : 0;
+
+      const vNom = (s * vCellNom).toFixed(1);
+      const vMax = (s * vCellMax).toFixed(1);
       const cap = (p * ah).toFixed(1);
-      const wh = (s * 3.7 * p * ah).toFixed(1);
+      const wh = (s * vCellNom * p * ah).toFixed(1);
       const out = document.getElementById('bat-result');
       if (out) out.textContent = `${s}S${p}P · 标称 ${vNom}V（满电 ${vMax}V）· 总容量 ${cap}Ah · 总能量 ${wh}Wh`;
     }
 
     ['vps-price', 'vps-cycle', 'vps-expire'].forEach((id) => document.getElementById(id)?.addEventListener('input', calcVps));
     ['bat-s', 'bat-p', 'bat-ah'].forEach((id) => document.getElementById(id)?.addEventListener('input', calcBat));
+    document.getElementById('bat-chem')?.addEventListener('change', calcBat);
     calcVps();
     calcBat();
 
     document.querySelectorAll('.copy-cmd').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const cmd = (btn as HTMLElement).dataset.cmd || '';
-        await navigator.clipboard.writeText(cmd);
-        const old = btn.textContent;
-        btn.textContent = '已复制';
-        setTimeout(() => { btn.textContent = old; }, 1500);
+        const ok = await copyText(cmd);
+        const w = window as any;
+        if (ok) {
+          const old = btn.textContent;
+          btn.textContent = '已复制 ✓';
+          if (w.RXFX && typeof w.RXFX.toast === 'function') w.RXFX.toast('命令已复制到剪贴板');
+          setTimeout(() => { btn.textContent = old; }, 1500);
+        } else if (w.RXFX && typeof w.RXFX.toast === 'function') {
+          w.RXFX.toast('无法自动复制，请手动从代码块复制');
+        }
       });
     });
   </script>

@@ -1,0 +1,30 @@
+---
+import { SITE } from '../config';
+import { svgIcon } from '../lib/icons';
+
+const pathname = Astro.url.pathname;
+const isCurrent = (prefix: string, exact = false) =>
+  exact ? pathname === prefix : pathname.startsWith(prefix);
+---
+<nav class="tabbar only-narrow" id="tabbar" aria-label="快捷导航">
+  <a href="/" class="tab" aria-current={isCurrent('/', true) ? 'page' : undefined}>
+    <Fragment set:html={svgIcon('home')} />
+    <span>首页</span>
+  </a>
+  <a href="/blog/" class="tab" aria-current={isCurrent('/blog/') ? 'page' : undefined}>
+    <Fragment set:html={svgIcon('book')} />
+    <span>专栏</span>
+  </a>
+  <a href={`${SITE.forumUrl}/`} class="tab tab-cta" aria-label="去论坛发帖">
+    <Fragment set:html={svgIcon('plus')} />
+    <span>发帖</span>
+  </a>
+  <a href="/qa/" class="tab" aria-current={isCurrent('/qa/') ? 'page' : undefined}>
+    <Fragment set:html={svgIcon('chat')} />
+    <span>社区</span>
+  </a>
+  <a href="/tools/" class="tab" aria-current={isCurrent('/tools/') ? 'page' : undefined}>
+    <Fragment set:html={svgIcon('wrench')} />
+    <span>工具</span>
+  </a>
+</nav>

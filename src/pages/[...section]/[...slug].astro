@@ -3,7 +3,7 @@ import PostLayout from '../../layouts/PostLayout.astro';
 import Comments from '../../components/Comments.astro';
 import { SECTIONS, getSection } from '../../config';
 import { getCollection, render } from 'astro:content';
-import { filterDrafts } from '../../lib/posts';
+import { filterDrafts, wordCount, readingMinutes } from '../../lib/posts';
 
 export async function getStaticPaths() {
   const paths = [];
@@ -19,8 +19,20 @@ export async function getStaticPaths() {
         params: { section: s.key, slug: e.id },
         props: {
           entry: e,
-          prev: prevEntry ? { title: prevEntry.data.title, href: `/${s.key}/${prevEntry.id}/` } : undefined,
-          next: nextEntry ? { title: nextEntry.data.title, href: `/${s.key}/${nextEntry.id}/` } : undefined,
+          prev: prevEntry
+            ? {
+                title: prevEntry.data.title,
+                href: `/${s.key}/${prevEntry.id}/`,
+                date: prevEntry.data.pubDate,
+              }
+            : undefined,
+          next: nextEntry
+            ? {
+                title: nextEntry.data.title,
+                href: `/${s.key}/${nextEntry.id}/`,
+                date: nextEntry.data.pubDate,
+              }
+            : undefined,
         },
       });
     }
@@ -31,6 +43,9 @@ export async function getStaticPaths() {
 const { entry, prev, next } = Astro.props;
 const meta = getSection(entry.collection)!;
 const { Content, headings } = await render(entry);
+const rawBody = entry.body ?? '';
+const words = wordCount(rawBody);
+const minutes = readingMinutes(rawBody);
 ---
 <PostLayout
   title={entry.data.title}
@@ -40,6 +55,9 @@ const { Content, headings } = await render(entry);
   tags={entry.data.tags}
   sectionName={meta.name}
   sectionKey={meta.key}
+  cover={entry.data.cover}
+  words={words}
+  minutes={minutes}
   headings={headings}
   prev={prev}
   next={next}

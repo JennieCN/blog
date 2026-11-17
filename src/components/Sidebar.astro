@@ -1,0 +1,127 @@
+---
+import { getCollection } from 'astro:content';
+import { SECTIONS, SITE } from '../config';
+import { filterDrafts } from '../lib/posts';
+import { svgIcon } from '../lib/icons';
+
+const pathname = Astro.url.pathname;
+
+const sectionCounts: Record<string, number> = {};
+let totalPosts = 0;
+for (const s of SECTIONS) {
+  const n = filterDrafts(await getCollection(s.key)).length;
+  sectionCounts[s.key] = n;
+  totalPosts += n;
+}
+
+const isCurrent = (prefix: string, exact = false) =>
+  exact ? pathname === prefix : pathname.startsWith(prefix);
+---
+<nav id="sidebar" class="sidebar" aria-label="站点导航与板块">
+  <div class="side-group">
+    <p class="side-title">浏览</p>
+    <ul class="side-list">
+      <li>
+        <a href="/" class="side-link" aria-current={isCurrent('/', true) ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('home')} />
+          <span class="side-label">首页动态</span>
+        </a>
+      </li>
+      <li>
+        <a href="/blog/" class="side-link" aria-current={isCurrent('/blog/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('book')} />
+          <span class="side-label">全部专栏</span>
+          <span class="side-count">{totalPosts}</span>
+        </a>
+      </li>
+      <li>
+        <a href="/qa/" class="side-link" aria-current={isCurrent('/qa/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('chat')} />
+          <span class="side-label">社区大厅</span>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/" class="side-link" aria-current={isCurrent('/tools/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('wrench')} />
+          <span class="side-label">实用工具箱</span>
+        </a>
+      </li>
+      <li>
+        <a href="/search/" class="side-link" aria-current={isCurrent('/search/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('search')} />
+          <span class="side-label">全站搜索</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="side-group">
+    <p class="side-title">五大核心板块</p>
+    <ul class="side-list">
+      {SECTIONS.map((s) => (
+        <li>
+          <a
+            href={`/${s.key}/`}
+            class="side-link"
+            aria-current={isCurrent(`/${s.key}/`) ? 'page' : undefined}
+          >
+            <span class="cat-dot" style={`--c: ${s.color}`} aria-hidden="true"></span>
+            <span class="side-label">{s.name}</span>
+            <span class="side-count">{sectionCounts[s.key]}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="side-group">
+    <p class="side-title">关于与记录</p>
+    <ul class="side-list">
+      <li>
+        <a href="/timeline/" class="side-link" aria-current={isCurrent('/timeline/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('calendar')} />
+          <span class="side-label">建站日志</span>
+        </a>
+      </li>
+      <li>
+        <a href="/about/" class="side-link" aria-current={isCurrent('/about/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('info')} />
+          <span class="side-label">关于本站</span>
+        </a>
+      </li>
+      <li>
+        <a href="/rss.xml" class="side-link">
+          <Fragment set:html={svgIcon('share')} />
+          <span class="side-label">RSS 订阅</span>
+        </a>
+      </li>
+      <li>
+        <a href="/yjcnb/" class="side-link admin-link hidden" style="color: var(--accent)">
+          <Fragment set:html={svgIcon('shield')} />
+          <span class="side-label">内容管理后台</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="side-foot">
+    <div class="only-narrow flex flex-col gap-2 px-1">
+      <a
+        href={`${SITE.forumUrl}/`}
+        id="nav-cta-btn-m"
+        class="btn btn-primary btn-sm w-full"
+      >
+        登录 / 发帖
+      </a>
+      <button type="button" id="skin-toggle-m" class="side-link">
+        <span class="skin-ic"><Fragment set:html={svgIcon('brush')} /></span>
+        <span class="side-label skin-label">切换风格</span>
+      </button>
+      <button type="button" id="theme-toggle-m" class="side-link">
+        <span class="theme-ic"><Fragment set:html={svgIcon('moon')} /></span>
+        <span class="side-label">深浅色切换</span>
+      </button>
+    </div>
+    <p class="side-note">按 <kbd>⌘K</kbd> 快捷跳转 · <kbd>?</kbd> 快捷键</p>
+  </div>
+</nav>

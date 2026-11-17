@@ -1,16 +1,30 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostList from '../../components/PostList.astro';
-import { SECTIONS } from '../../config';
+import { SECTIONS, SITE } from '../../config';
 import { getCollection } from 'astro:content';
-import { filterDrafts, sortByDateDesc, type PostSummary } from '../../lib/posts';
+import {
+  filterDrafts,
+  sortByDateDesc,
+  wordCount,
+  readingMinutes,
+  type PostSummary,
+} from '../../lib/posts';
 import { collectTags } from '../../lib/tags';
+import { svgIcon } from '../../lib/icons';
 
 export async function getStaticPaths() {
   const all: PostSummary[] = [];
   for (const s of SECTIONS) {
     for (const e of filterDrafts(await getCollection(s.key))) {
-      all.push({ section: s.key, slug: e.id, title: e.data.title, description: e.data.description, pubDate: e.data.pubDate, tags: e.data.tags });
+      all.push({
+        section: s.key,
+        slug: e.id,
+        title: e.data.title,
+        description: e.data.description,
+        pubDate: e.data.pubDate,
+        tags: e.data.tags,
+      });
     }
   }
   const tagMap = collectTags(all);
@@ -20,13 +34,68 @@ export async function getStaticPaths() {
 const all: PostSummary[] = [];
 for (const s of SECTIONS) {
   for (const e of filterDrafts(await getCollection(s.key))) {
-    all.push({ section: s.key, slug: e.id, title: e.data.title, description: e.data.description, pubDate: e.data.pubDate, tags: e.data.tags });
+    const raw = e.body ?? '';
+    all.push({
+      section: s.key,
+      slug: e.id,
+      title: e.data.title,
+      description: e.data.description,
+      pubDate: e.data.pubDate,
+      tags: e.data.tags,
+      words: wordCount(raw),
+      minutes: readingMinutes(raw),
+    });
   }
 }
 const { tag } = Astro.props;
-const posts = sortByDateDesc(collectTags(all).get(tag) ?? []);
+const tagMap = collectTags(all);
+const posts = sortByDateDesc(tagMap.get(tag) ?? []);
+const allTags = [...tagMap.entries()].sort(
+  (a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh'),
+);
 ---
-<BaseLayout title={`标签：${tag}`}>
-  <h1 class="text-3xl font-bold">标签：{tag}</h1>
-  <section class="mt-8"><PostList posts={posts} /></section>
+<BaseLayout title={`标签：${tag}`} description={`${SITE.title} 中标记为 #${tag} 的全部文章`}>
+  <nav class="crumbs" aria-label="位置">
+    <a href="/">首页</a>
+    <span aria-hidden="true">/</span>
+    <a href="/blog/">专栏</a>
+    <span aria-hidden="true">/</span>
+    <span>#{tag}</span>
+  </nav>
+
+  <header class="page-head board-head" style="--c: var(--accent)">
+    <span class="board-badge" aria-hidden="true" set:html={svgIcon('hash')} />
+    <div>
+      <span class="eyebrow" style="margin-bottom: 6px;">文章标签聚合</span>
+      <h1 tabindex="-1">#{tag}</h1>
+      <p class="page-stats">共 {posts.length} 篇文章</p>
+    </div>
+    <a href={`/blog/?tag=${encodeURIComponent(tag)}`} class="btn">
+      <span>在专栏页联合筛选 →</span>
+    </a>
+  </header>
+
+  <section>
+    <PostList posts={posts} grouped={true} />
+  </section>
+
+  <Fragment slot="aside">
+    <section class="card" aria-labelledby="tag-all-h">
+      <h2 id="tag-all-h" class="card-title">
+        <Fragment set:html={svgIcon('hash')} />
+        <span>全部标签</span>
+      </h2>
+      <div class="tag-cloud">
+        {allTags.map(([t, items]) => (
+          <a
+            class="tag"
+            href={`/tags/${encodeURIComponent(t)}/`}
+            aria-current={t === tag ? 'true' : undefined}
+          >
+            #{t} {items.length > 1 && <small>{items.length}</small>}
+          </a>
+        ))}
+      </div>
+    </section>
+  </Fragment>
 </BaseLayout>

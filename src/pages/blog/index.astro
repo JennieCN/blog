@@ -1,0 +1,358 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SECTIONS, SITE, getSection } from '../../config';
+import { getCollection } from 'astro:content';
+import {
+  byMonth,
+  filterDrafts,
+  formatDate,
+  readingMinutes,
+  sortByDateDesc,
+  wordCount,
+  type PostSummary,
+} from '../../lib/posts';
+import { collectTags } from '../../lib/tags';
+import { svgIcon } from '../../lib/icons';
+
+const all: PostSummary[] = [];
+const counts: Record<string, number> = {};
+let totalWords = 0;
+
+for (const s of SECTIONS) {
+  const entries = filterDrafts(await getCollection(s.key));
+  counts[s.key] = entries.length;
+  for (const e of entries) {
+    const raw = e.body ?? '';
+    const words = wordCount(raw);
+    totalWords += words;
+    all.push({
+      section: s.key,
+      slug: e.id,
+      title: e.data.title,
+      description: e.data.description,
+      pubDate: e.data.pubDate,
+      updatedDate: e.data.updatedDate,
+      tags: e.data.tags,
+      words,
+      minutes: readingMinutes(raw),
+    });
+  }
+}
+
+const posts = sortByDateDesc(all);
+const months = byMonth(posts);
+const allTags = [...collectTags(posts).entries()].sort(
+  (a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh'),
+);
+---
+<BaseLayout title="专栏归档" description="按月份与板块浏览融夕的书全部专栏长文">
+  <header class="page-head blog-head">
+    <div>
+      <span class="eyebrow">专栏长文 · 按月归档</span>
+      <h1 tabindex="-1">专栏</h1>
+      <p class="page-sub">长文沉淀经验：把一件事写清楚，再拿到社区里聊。</p>
+      <p class="page-stats" id="blog-stats-line" aria-live="polite">{posts.length} 篇文章 · 共 {totalWords.toLocaleString()} 字</p>
+    </div>
+    <a class="btn" href="/qa/">
+      <Fragment set:html={svgIcon('chat')} />
+      <span>去社区大厅</span>
+    </a>
+  </header>
+
+  <div class="blog-index">
+    <div class="list-filters">
+      <div class="stream-tabs" role="group" aria-label="按板块筛选">
+        <button type="button" class="stream-tab blog-sec-tab" data-section="" aria-current="true">
+          <span>全部</span>
+          <span class="stream-tab-count" data-sec-count="">{posts.length}</span>
+        </button>
+        {SECTIONS.map((s) => (
+          <button type="button" class="stream-tab blog-sec-tab" data-section={s.key} aria-current="false">
+            <span class="cat-dot" style={`--c: ${s.color}`} aria-hidden="true"></span>
+            <span>{s.name}</span>
+            <span class="stream-tab-count" data-sec-count={s.key}>{counts[s.key] ?? 0}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div id="blog-tag-pills" class="filter-pills" hidden>
+      <span>标签筛选：</span>
+      <button type="button" id="blog-clear-tag" class="filter-pill" aria-label="移除标签筛选">
+        <span id="blog-active-tag-label"></span>
+        <Fragment set:html={svgIcon('x')} />
+      </button>
+      <span id="blog-filter-count" class="text-xs muted" aria-live="polite"></span>
+    </div>
+
+    <div id="blog-months-wrap">
+      {months.map((g) => (
+        <section class="post-month" data-month={g.key} aria-labelledby={`m-${g.key}`}>
+          <h2 class="post-month-title" id={`m-${g.key}`}>
+            {g.label}
+            <span class="month-count">{g.posts.length} 篇</span>
+          </h2>
+          <ol class="post-list">
+            {g.posts.map((p) => {
+              const sec = getSection(p.section);
+              return (
+                <li
+                  class="post-item"
+                  style={`--c: ${sec?.color ?? 'var(--line)'}`}
+                  data-section={p.section}
+                  data-tags={JSON.stringify(p.tags)}
+                >
+                  <article>
+                    <div class="post-item-meta">
+                      <time datetime={p.pubDate.toISOString()}>{formatDate(p.pubDate)}</time>
+                      {sec && (
+                        <a class="cat-badge" href={`/${sec.key}/`} style={`--c: ${sec.color}`}>
+                          <span class="cat-dot" aria-hidden="true"></span>
+                          {sec.name}
+                        </a>
+                      )}
+                      {p.words != null && <span>{p.words} 字</span>}
+                      {p.minutes != null && <span>约 {p.minutes} 分钟</span>}
+                    </div>
+                    <h3 class="post-item-title">
+                      <a href={`/${p.section}/${p.slug}/`}>{p.title}</a>
+                    </h3>
+                    <p class="post-item-summary">{p.description}</p>
+                    <div class="post-item-foot">
+                      <span class="post-item-tags">
+                        {p.tags.map((t) => (
+                          <button type="button" class="tag blog-tag-trigger" data-blog-tag={t}>
+                            #{t}
+                          </button>
+                        ))}
+                      </span>
+                      <span class="post-item-stats">
+                        <span>
+                          <Fragment set:html={svgIcon('eye')} />
+                          <span class="waline-pageview-count" data-path={`/${p.section}/${p.slug}/`}>-</span>
+                        </span>
+                        {sec && (
+                          <a
+                            class="forum-count-badge"
+                            href={`${SITE.forumUrl}/t/${sec.key}`}
+                            target="_blank"
+                            rel="noopener"
+                            title={`${sec.name} 板块的社区讨论`}
+                          >
+                            <Fragment set:html={svgIcon('chat')} />
+                            <span>{sec.name}讨论</span>
+                          </a>
+                        )}
+                      </span>
+                    </div>
+                  </article>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))}
+    </div>
+
+    <div class="empty" id="blog-empty" hidden>
+      <div class="empty-art" aria-hidden="true"></div>
+      <h2>这里还没有匹配的文章</h2>
+      <p>换个板块或标签筛选看看。</p>
+      <div class="empty-actions">
+        <button type="button" id="blog-reset-btn" class="btn">
+          <Fragment set:html={svgIcon('x')} />
+          <span>清除筛选</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="aside">
+    <section class="card author-card" aria-labelledby="blog-author-h">
+      <div class="author-row">
+        <span class="avatar avatar-md" style="--h: 22" aria-hidden="true">{SITE.author.charAt(0)}</span>
+        <div>
+          <h2 id="blog-author-h" class="card-title">{SITE.author}</h2>
+          <p class="text-xs muted">{SITE.title}</p>
+        </div>
+      </div>
+      <p class="text-sm" style="color: var(--text-2); line-height: 1.65;">{SITE.authorBio}</p>
+      <a class="card-more" href="/about/">关于本站 →</a>
+    </section>
+
+    {allTags.length > 0 && (
+      <section class="card" aria-labelledby="btag-h">
+        <h2 id="btag-h" class="card-title">
+          <Fragment set:html={svgIcon('hash')} />
+          <span>标签筛选</span>
+        </h2>
+        <div class="tag-cloud" id="blog-tag-cloud">
+          {allTags.map(([tag, items]) => (
+            <button type="button" class="tag blog-tag-trigger" data-blog-tag={tag}>
+              #{tag} {items.length > 1 && <small>{items.length}</small>}
+            </button>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="card" aria-labelledby="bnow-h">
+      <h2 id="bnow-h" class="card-title">
+        <Fragment set:html={svgIcon('chat')} />
+        <span>社区最近在聊</span>
+      </h2>
+      <ol class="mini-list" id="blog-aside-forum">
+        <li class="muted text-xs">正在同步社区讨论…</li>
+      </ol>
+      <a class="card-more" href={`${SITE.forumUrl}/`} target="_blank" rel="noopener">进入社区 →</a>
+    </section>
+  </Fragment>
+
+  <script>
+    function esc(s: unknown): string {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function safeUrl(u: unknown): string {
+      const s = String(u ?? '').trim();
+      if (/^https?:\/\//i.test(s) || s.startsWith('/')) return esc(s);
+      return '#';
+    }
+
+    const secTabs = Array.from(document.querySelectorAll('.blog-sec-tab')) as HTMLButtonElement[];
+    const items = Array.from(document.querySelectorAll('#blog-months-wrap .post-item')) as HTMLElement[];
+    const months = Array.from(document.querySelectorAll('#blog-months-wrap .post-month')) as HTMLElement[];
+    const tagTriggers = Array.from(document.querySelectorAll('.blog-tag-trigger')) as HTMLButtonElement[];
+    const pillsWrap = document.getElementById('blog-tag-pills');
+    const activeTagLabel = document.getElementById('blog-active-tag-label');
+    const filterCountEl = document.getElementById('blog-filter-count');
+    const clearTagBtn = document.getElementById('blog-clear-tag');
+    const emptyEl = document.getElementById('blog-empty');
+    const resetBtn = document.getElementById('blog-reset-btn');
+
+    const params = new URLSearchParams(location.search);
+    let activeSection = params.get('s') || '';
+    let activeTag = params.get('tag') || '';
+
+    function syncUrl() {
+      const next = new URLSearchParams();
+      if (activeSection) next.set('s', activeSection);
+      if (activeTag) next.set('tag', activeTag);
+      const qs = next.toString();
+      const target = location.pathname + (qs ? `?${qs}` : '');
+      history.replaceState(null, '', target);
+    }
+
+    function applyFilters() {
+      const secCounts: Record<string, number> = { '': 0 };
+      items.forEach((li) => {
+        let tags: string[] = [];
+        try { tags = JSON.parse(li.dataset.tags || '[]'); } catch {}
+        const matchesTag = !activeTag || tags.includes(activeTag);
+        const sec = li.dataset.section || '';
+        const matchesSec = !activeSection || sec === activeSection;
+
+        if (matchesTag) {
+          secCounts[''] = (secCounts[''] || 0) + 1;
+          secCounts[sec] = (secCounts[sec] || 0) + 1;
+        }
+        li.style.display = matchesTag && matchesSec ? '' : 'none';
+      });
+
+      secTabs.forEach((btn) => {
+        const key = btn.dataset.section || '';
+        btn.setAttribute('aria-current', key === activeSection ? 'true' : 'false');
+        const countEl = btn.querySelector('.stream-tab-count');
+        if (countEl) countEl.textContent = String(secCounts[key] || 0);
+      });
+
+      let totalVisible = 0;
+      months.forEach((sec) => {
+        const visibleInMonth = Array.from(sec.querySelectorAll('.post-item')).filter(
+          (el) => (el as HTMLElement).style.display !== 'none',
+        ).length;
+        sec.style.display = visibleInMonth > 0 ? '' : 'none';
+        const mc = sec.querySelector('.month-count');
+        if (mc) mc.textContent = `${visibleInMonth} 篇`;
+        totalVisible += visibleInMonth;
+      });
+
+      if (pillsWrap && activeTagLabel) {
+        if (activeTag) {
+          activeTagLabel.textContent = `#${activeTag}`;
+          if (filterCountEl) filterCountEl.textContent = `共匹配 ${totalVisible} 篇`;
+          pillsWrap.hidden = false;
+        } else {
+          pillsWrap.hidden = true;
+          if (filterCountEl) filterCountEl.textContent = '';
+        }
+      }
+
+      tagTriggers.forEach((btn) => {
+        const t = btn.dataset.blogTag || '';
+        btn.setAttribute('aria-current', activeTag && t === activeTag ? 'true' : 'false');
+      });
+
+      if (emptyEl) emptyEl.hidden = totalVisible > 0;
+    }
+
+    secTabs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeSection = btn.dataset.section || '';
+        syncUrl();
+        applyFilters();
+      });
+    });
+
+    tagTriggers.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const t = btn.dataset.blogTag || '';
+        activeTag = activeTag === t ? '' : t;
+        syncUrl();
+        applyFilters();
+      });
+    });
+
+    clearTagBtn?.addEventListener('click', () => {
+      activeTag = '';
+      syncUrl();
+      applyFilters();
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      activeSection = '';
+      activeTag = '';
+      syncUrl();
+      applyFilters();
+    });
+
+    applyFilters();
+
+    const asideForum = document.getElementById('blog-aside-forum');
+    if (asideForum) {
+      fetch('https://qa.mycampusmail.com/feed.php?limit=4')
+        .then((r) => r.json())
+        .then((d) => {
+          const list = Array.isArray(d?.items) ? d.items : [];
+          if (!list.length) {
+            asideForum.innerHTML = `<li class="muted text-xs">暂时没有最新讨论。</li>`;
+            return;
+          }
+          asideForum.innerHTML = list
+            .map((t: any) => {
+              const boardName = t.tags?.[0]?.name || '社区';
+              return `<li><a href="${safeUrl(t.url)}" target="_blank" rel="noopener">${esc(t.title)}</a><span class="mini-meta">${esc(boardName)} · ${Number(t.commentCount || 1)} 条讨论</span></li>`;
+            })
+            .join('');
+        })
+        .catch(() => {
+          asideForum.innerHTML = `<li class="muted text-xs">社区讨论暂不可用。</li>`;
+        });
+    }
+  </script>
+</BaseLayout>

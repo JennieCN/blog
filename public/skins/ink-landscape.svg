@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" preserveAspectRatio="xMaxYMid slice">
+  <!-- 页头山水小景：右重左轻，向左淡入留白。远山 → 中峰 → 近石松树 → 水面扁舟，层层被云雾隔开 -->
+  <defs>
+    <filter id="blur-far" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="cun" x="-10%" y="-20%" width="120%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency=".02 .09" numOctaves="4" seed="12" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".9 .12" numOctaves="2" seed="5" result="t"/>
+      <feColorMatrix in="t" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.6 1.45" result="tm"/>
+      <feComposite in="d" in2="tm" operator="in"/>
+    </filter>
+    <filter id="soft" x="-10%" y="-20%" width="120%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+      <feGaussianBlur stdDeviation=".6"/>
+    </filter>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2824" stop-opacity=".26"/><stop offset=".75" stop-color="#2b2824" stop-opacity="0"/></linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22201c" stop-opacity=".55"/><stop offset=".55" stop-color="#22201c" stop-opacity=".18"/><stop offset=".9" stop-color="#22201c" stop-opacity="0"/></linearGradient>
+    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#161411" stop-opacity=".92"/><stop offset=".7" stop-color="#161411" stop-opacity=".45"/><stop offset="1" stop-color="#161411" stop-opacity=".05"/></linearGradient>
+    <linearGradient id="fadeL" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".38" stop-color="#fff" stop-opacity=".25"/><stop offset=".62" stop-color="#fff" stop-opacity="1"/><stop offset=".93" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <mask id="m"><rect width="900" height="240" fill="url(#fadeL)"/></mask>
+  </defs>
+  <g mask="url(#m)">
+    <!-- 远山 -->
+    <path filter="url(#blur-far)" fill="url(#far)" d="M300 170 C 360 120 400 96 440 108 C 470 116 486 70 520 62 C 556 54 572 100 600 104 C 630 108 650 60 690 48 C 730 38 752 90 790 96 C 830 102 860 70 900 66 L900 240 L300 240 Z"/>
+    <!-- 中峰：主峰在右，次峰在左 -->
+    <path filter="url(#soft)" fill="url(#mid)" d="M470 210 C 520 170 548 130 580 128 C 604 126 612 150 636 140 C 660 130 672 84 700 60 C 718 46 730 40 742 52 C 760 70 768 110 790 120 C 812 130 830 104 850 96 C 870 90 886 100 900 106 L900 240 L470 240 Z"/>
+    <!-- 中峰皴擦 -->
+    <g fill="none" stroke="#22201c" stroke-opacity=".32" stroke-width="2" stroke-linecap="round" filter="url(#soft)">
+      <path d="M716 64 C 708 92 712 120 704 150"/><path d="M736 58 C 742 90 736 116 744 146"/>
+      <path d="M690 80 C 680 104 682 128 670 152"/><path d="M760 84 C 770 108 768 130 778 150"/>
+    </g>
+    <!-- 云雾带 -->
+    <rect x="300" y="150" width="600" height="34" fill="#f3ede0" opacity=".55" filter="url(#blur-far)"/>
+    <!-- 近石 -->
+    <path filter="url(#cun)" fill="url(#near)" d="M700 240 C 712 210 730 186 760 176 C 780 170 790 150 816 146 C 846 142 862 162 880 166 C 892 168 898 172 900 174 L900 240 Z"/>
+    <!-- 松树 -->
+    <g filter="url(#soft)">
+      <path d="M820 150 C 816 126 822 104 812 82 C 806 70 810 60 806 50" fill="none" stroke="#161411" stroke-width="4" stroke-linecap="round"/>
+      <path d="M812 96 C 798 92 786 96 776 104" fill="none" stroke="#161411" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M816 118 C 832 112 846 114 858 122" fill="none" stroke="#161411" stroke-width="2.5" stroke-linecap="round"/>
+      <g fill="#161411" fill-opacity=".85">
+        <ellipse cx="804" cy="54" rx="22" ry="7"/><ellipse cx="780" cy="102" rx="20" ry="6"/>
+        <ellipse cx="856" cy="120" rx="22" ry="6.5"/><ellipse cx="812" cy="78" rx="16" ry="5"/>
+      </g>
+    </g>
+    <!-- 水面与扁舟 -->
+    <g fill="none" stroke="#22201c" stroke-linecap="round">
+      <path d="M560 222 C 600 220 640 222 680 220" stroke-opacity=".25" stroke-width="1.2"/>
+      <path d="M520 230 C 560 228 610 230 650 229" stroke-opacity=".18" stroke-width="1"/>
+      <path d="M612 212 C 624 218 648 218 662 212" stroke-opacity=".85" stroke-width="2.6"/>
+      <path d="M640 212 L 641 198" stroke-opacity=".85" stroke-width="1.6"/>
+      <path d="M636 199 C 640 195 644 195 646 199" stroke-opacity=".8" stroke-width="2"/>
+    </g>
+    <!-- 飞鸟 -->
+    <g fill="none" stroke="#22201c" stroke-opacity=".6" stroke-width="1.6" stroke-linecap="round">
+      <path d="M560 52 q 6 -6 12 0 q 6 -6 12 0"/><path d="M596 36 q 4 -4 8 0 q 4 -4 8 0"/><path d="M540 32 q 3 -3 7 0 q 3 -3 7 0"/>
+    </g>
+  </g>
+</svg>
