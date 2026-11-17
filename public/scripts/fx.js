@@ -145,7 +145,11 @@
       root.dataset.skin = id;
       SKINS.forEach(function (s) {
         var link = document.getElementById('skin-' + s.id);
-        if (link) link.disabled = s.id !== id;
+        if (link) {
+          var active = s.id === id;
+          link.media = active ? 'all' : 'print';
+          link.disabled = !active;
+        }
       });
       try { localStorage.setItem('rx-skin', id); } catch (e) {}
       syncSkinButtons();

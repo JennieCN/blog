@@ -23,7 +23,7 @@ export const SITE = {
   authorBio: '聚焦 VPS 网络基建、大学生方程式赛车（FSAE）、RoboMaster 机器人与 AI 工程实践。长文沉淀系统经验，社区讨论当下问题。',
   url: 'https://blog.mycampusmail.com',
   forumUrl: 'https://qa.mycampusmail.com',
-  walineServerURL: 'https://blog-waline-snowy-psi.vercel.app',
+  walineServerURL: 'https://waline.mycampusmail.com',
 };
 
 export function getSection(key: string): Section | undefined {

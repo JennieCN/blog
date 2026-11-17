@@ -32,7 +32,10 @@ const canonical = new URL(Astro.url.pathname, SITE.url).href;
     <link rel="dns-prefetch" href={SITE.forumUrl} />
     <link rel="preconnect" href={SITE.forumUrl} crossorigin />
     {type === 'article' && SITE.walineServerURL && (
-      <link rel="dns-prefetch" href={SITE.walineServerURL} />
+      <>
+        <link rel="dns-prefetch" href={SITE.walineServerURL} />
+        <link rel="preconnect" href={SITE.walineServerURL} crossorigin />
+      </>
     )}
 
     <meta property="og:type" content={type} />
@@ -58,12 +61,12 @@ const canonical = new URL(Astro.url.pathname, SITE.url).href;
 
     <link rel="stylesheet" href={globalCssUrl} />
     <link rel="stylesheet" href="/skins/luxe.css" />
-    <link rel="stylesheet" href="/skins/pop.css" id="skin-pop" />
-    <link rel="stylesheet" href="/skins/ink.css" id="skin-ink" />
-    <link rel="stylesheet" href="/skins/plain.css" id="skin-plain" />
+    <link rel="stylesheet" href="/skins/pop.css" id="skin-pop" media="print" />
+    <link rel="stylesheet" href="/skins/ink.css" id="skin-ink" media="print" />
+    <link rel="stylesheet" href="/skins/plain.css" id="skin-plain" media="print" />
 
     <script is:inline>
-      // 首屏防闪烁：默认使用「撞色（pop）」皮肤，支持 pop / ink / plain 切换
+      // 首屏防闪烁：默认使用「撞色（pop）」皮肤，非当前皮肤以 print 媒体非阻塞加载
       (function () {
         var skins = ['pop', 'ink', 'plain'];
         var skin = 'pop';
@@ -74,7 +77,11 @@ const canonical = new URL(Astro.url.pathname, SITE.url).href;
         document.documentElement.dataset.skin = skin;
         for (var i = 0; i < skins.length; i++) {
           var el = document.getElementById('skin-' + skins[i]);
-          if (el) el.disabled = skins[i] !== skin;
+          if (el) {
+            var active = skins[i] === skin;
+            el.media = active ? 'all' : 'print';
+            el.disabled = !active;
+          }
         }
       })();
     </script>
