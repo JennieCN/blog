@@ -29,6 +29,11 @@ const canonical = new URL(Astro.url.pathname, SITE.url).href;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+    <link rel="dns-prefetch" href={SITE.forumUrl} />
+    <link rel="preconnect" href={SITE.forumUrl} crossorigin />
+    {type === 'article' && SITE.walineServerURL && (
+      <link rel="dns-prefetch" href={SITE.walineServerURL} />
+    )}
 
     <meta property="og:type" content={type} />
     <meta property="og:title" content={pageTitle} />

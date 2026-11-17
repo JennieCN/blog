@@ -16,11 +16,11 @@ const { path } = Astro.props;
   if (serverURL && !serverURL.includes('example')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/@waline/client@3/dist/waline.css';
+    link.href = '/vendor/waline/waline.css';
     document.head.appendChild(link);
 
     const s = document.createElement('script');
-    s.src = 'https://unpkg.com/@waline/client@3/dist/waline.umd.js';
+    s.src = '/vendor/waline/waline.umd.js';
     s.onload = () => {
       if (window.Waline && typeof window.Waline.init === 'function') {
         window.Waline.init({
