@@ -5,9 +5,10 @@ Idempotently deploy CC's 4-skin system (pop, ink, luxe, plain) across BOTH live 
   - https://blog.mycampusmail.com (Halo 2.27 + theme-earth)
   - https://qa.mycampusmail.com   (Flarum 2.0)
 
-Zero hardcoded credentials:
+Zero hardcoded & zero temp-file credentials:
   - Halo admin credentials are read strictly from ../private/gatewave-halo-admin.txt
-    or HALO_USER / HALO_PASS environment variables.
+    or HALO_USER / HALO_PASS environment variables and streamed in-memory over SSH stdin
+    (never written to local or remote /tmp files).
   - Flarum database credentials are read inside vps8's site-flarum-db container environment.
 
 Usage:
@@ -18,8 +19,8 @@ import argparse
 import base64
 import json
 import os
+import shlex
 import subprocess
-import tempfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -73,12 +74,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-payload_path = Path(sys.argv[1])
-cfg = json.loads(payload_path.read_text(encoding="utf-8"))
-try:
-    payload_path.unlink()
-except Exception:
-    pass
+cfg = json.loads(sys.stdin.read())
 
 STACK_DIR = Path("/opt/site-stack")
 RX_DIR = STACK_DIR / "rx-skins"
@@ -308,28 +304,11 @@ def main():
         "flarum_custom_header": flarum_header,
     }
 
-    with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as tf:
-        json.dump(payload, tf, ensure_ascii=False)
-        local_payload = tf.name
-    with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".py", delete=False) as rf:
-        rf.write(REMOTE_DEPLOY_SCRIPT)
-        local_runner = rf.name
-
-    remote_payload = "/tmp/rx_skins_deploy_payload.json"
-    remote_runner = "/tmp/rx_skins_deploy_runner.py"
-    try:
-        subprocess.check_call(["scp", "-q", local_payload, f"{args.ssh_host}:{remote_payload}"])
-        subprocess.check_call(["scp", "-q", local_runner, f"{args.ssh_host}:{remote_runner}"])
-        subprocess.check_call([
-            "ssh", args.ssh_host,
-            f"chmod 600 {remote_payload} && python3 {remote_runner} {remote_payload}; rc=$?; rm -f {remote_payload} {remote_runner}; exit $rc",
-        ])
-    finally:
-        for p in (local_payload, local_runner):
-            try:
-                os.unlink(p)
-            except Exception:
-                pass
+    subprocess.run(
+        ["ssh", args.ssh_host, f"python3 -c {shlex.quote(REMOTE_DEPLOY_SCRIPT)}"],
+        input=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        check=True,
+    )
 
 
 if __name__ == "__main__":

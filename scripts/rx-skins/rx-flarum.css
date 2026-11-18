@@ -307,6 +307,10 @@ html[data-rx-skin="ink"] .rx-checkin-pill {
   box-shadow: none !important;
 }
 
+.rx-qa-mobile-btn {
+  min-width: 30px;
+}
+
 /* 桌面端隐藏 .rx-qa-mobile-btn（桌面端由 .App-header 内的 #rx-skin-toggle / #rx-theme-toggle 提供） */
 @media (min-width: 768px) {
   .rx-qa-mobile-btn {
@@ -360,6 +364,7 @@ html[data-rx-skin="pop"] .rx-qa-strip a {
 
 html[data-rx-skin] .App-header,
 html[data-rx-skin] .App-navigation {
+  position: relative;
   background: var(--rx-surface) !important;
   color: var(--rx-text) !important;
   border-bottom: var(--rx-bw) solid var(--rx-line) !important;
@@ -746,7 +751,7 @@ html[data-rx-skin] #rx-captcha-float .FormControl {
   text-align: left;
 }
 
-/* ---------------- 7. 移动端 390px 防溢出紧凑规则 ---------------- */
+/* ---------------- 7. 移动端 390px 防溢出紧凑规则与降低透明度保护 ---------------- */
 
 @media (max-width: 640px) {
   .rx-qa-crossbar {
@@ -782,5 +787,19 @@ html[data-rx-skin] #rx-captcha-float .FormControl {
   }
   html[data-rx-skin] .Header-controls {
     gap: 4px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-rx-skin="luxe"] body::after {
+    display: none !important;
+  }
+  html[data-rx-skin="luxe"] .rx-qa-crossbar,
+  html[data-rx-skin="luxe"] .App-header,
+  html[data-rx-skin="luxe"] .App-navigation,
+  html[data-rx-skin="ink"] .App-header {
+    background: var(--rx-surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }

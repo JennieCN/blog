@@ -788,6 +788,7 @@ html[data-rx-skin="plain"] .rx-legal-meta {
 }
 
 html[data-rx-skin] #vps-quick-toolbar #vps-vendor-wall,
+html[data-rx-skin] #rx-reviews .rx-box,
 html[data-rx-skin] #rx-toolbox .rx-box {
   background: var(--rx-surface-2) !important;
   border-color: var(--rx-line) !important;
@@ -824,19 +825,33 @@ html[data-rx-skin] #rx-toolbox .rx-input {
 html[data-rx-skin] #vps-quick-toolbar .vps-tb-btn,
 html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip,
 html[data-rx-skin] #vps-quick-toolbar .vps-vendor-pill,
-html[data-rx-skin] #rx-reviews .rx-jump a {
+html[data-rx-skin] #rx-reviews .rx-jump a,
+html[data-rx-skin] #rx-reviews .rx-tab,
+html[data-rx-skin] #rx-toolbox .rx-btn,
+html[data-rx-skin] #rx-about .rx-pill,
+html[data-rx-skin] #rx-about .rx-badge {
   background: var(--rx-surface) !important;
   color: var(--rx-text) !important;
   border: 1px solid var(--rx-line) !important;
 }
 
-html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip.is-active {
+html[data-rx-skin] #vps-quick-toolbar .vps-vendor-pill.is-crown {
+  background: var(--rx-warn-bg) !important;
+  border-color: var(--rx-warn) !important;
+  color: var(--rx-text) !important;
+}
+
+html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip.is-active,
+html[data-rx-skin] #rx-reviews .rx-tab.is-active,
+html[data-rx-skin] #rx-reviews .rx-tab[aria-selected="true"] {
   background: var(--rx-accent) !important;
   border-color: var(--rx-accent) !important;
   color: var(--rx-accent-ink) !important;
 }
 
-html[data-rx-skin="pop"] #vps-quick-toolbar .vps-tb-chip.is-active {
+html[data-rx-skin="pop"] #vps-quick-toolbar .vps-tb-chip.is-active,
+html[data-rx-skin="pop"] #rx-reviews .rx-tab.is-active,
+html[data-rx-skin="pop"] #rx-reviews .rx-tab[aria-selected="true"] {
   background: var(--rx-pop-yellow) !important;
   border: 2px solid var(--rx-line) !important;
   color: #15121c !important;
@@ -849,4 +864,17 @@ html[data-rx-skin] .toc-container a {
 html[data-rx-skin] .toc-container a.is-active-link,
 html[data-rx-skin] .toc-container a:hover {
   color: var(--rx-accent) !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-rx-skin="luxe"] body::after {
+    display: none !important;
+  }
+  html[data-rx-skin="luxe"] header#header-menu,
+  html[data-rx-skin="ink"] header#header-menu,
+  html[data-rx-skin="luxe"] footer {
+    background: var(--rx-surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

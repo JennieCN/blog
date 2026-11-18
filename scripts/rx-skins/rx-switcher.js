@@ -62,6 +62,16 @@
     return m ? decodeURIComponent(m[1]) : '';
   }
 
+  function readSavedTheme() {
+    var th = readCookie('rx_theme');
+    if (th === 'dark' || th === 'light') return th;
+    try {
+      var ls = localStorage.getItem('rx_theme') || localStorage.getItem('rx-theme') || '';
+      if (ls === 'dark' || ls === 'light') return ls;
+    } catch (e) {}
+    return '';
+  }
+
   function isFlarumPage() {
     return !!(root.hasAttribute('data-theme') || document.querySelector('.App-header, #app.App'));
   }
@@ -123,8 +133,10 @@
         );
       }).catch(function () {});
       vt.finished.finally(function () {
-        if (activeVt === vt) activeVt = null;
-        root.classList.remove('fx-theme-vt');
+        if (activeVt === vt) {
+          activeVt = null;
+          root.classList.remove('fx-theme-vt');
+        }
       });
     } catch (e) {
       activeVt = null;
@@ -260,7 +272,9 @@
       root.setAttribute('data-theme', isDark ? 'dark' : 'light');
     } else {
       root.classList.toggle('dark', isDark);
-      try { localStorage.setItem('color-scheme', isDark ? 'dark' : 'light'); } catch (e) {}
+      if (persist !== false) {
+        try { localStorage.setItem('color-scheme', isDark ? 'dark' : 'light'); } catch (e) {}
+      }
     }
     if (persist !== false) {
       writeCrossCookie('rx_theme', isDark ? 'dark' : 'light');
@@ -417,7 +431,7 @@
           syncingAttr = false;
         }
       } else if (attr === 'data-theme' && isFlarumPage()) {
-        var saved = readCookie('rx_theme');
+        var saved = readSavedTheme();
         var dt = root.getAttribute('data-theme') || '';
         if ((saved === 'dark' || saved === 'light') && dt !== saved) {
           syncingAttr = true;
@@ -466,12 +480,19 @@
     } else {
       currentSkinState = root.getAttribute('data-rx-skin');
     }
-    var savedTheme = readCookie('rx_theme');
-    if (isFlarumPage() && (savedTheme === 'dark' || savedTheme === 'light')) {
+    var savedTheme = readSavedTheme();
+    if (savedTheme === 'dark' || savedTheme === 'light') {
       currentThemeState = savedTheme;
+      applyThemeNow(false);
+    } else if (isFlarumPage()) {
+      var osDark = !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      currentThemeState = osDark ? 'dark' : 'light';
       applyThemeNow(false);
     } else {
       currentThemeState = root.classList.contains('rx-dark') ? 'dark' : 'light';
+      syncingAttr = true;
+      root.classList.toggle('dark', currentThemeState === 'dark');
+      syncingAttr = false;
     }
     mountButtons();
     startBodyObserver();

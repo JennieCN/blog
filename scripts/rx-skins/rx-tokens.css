@@ -498,4 +498,10 @@ html.rx-dark[data-rx-skin="pop"] .rx-icon-btn {
     --rx-glass: var(--rx-surface);
     --rx-glass-strong: var(--rx-surface);
   }
+  :root[data-rx-skin] *,
+  :root[data-rx-skin] *::before,
+  :root[data-rx-skin] *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

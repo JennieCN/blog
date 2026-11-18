@@ -130,19 +130,33 @@ class ChromeHarnessMixin:
             raise AssertionError(f"JS exception: {res['exceptionDetails']}")
         return res.get("result", {}).get("value")
 
-    def open_fixture(self, name: str, html: str, width: int = 1280, height: int = 900, clear_storage: bool = True):
+    def open_fixture(self, name: str, html: str, width: int = 1280, height: int = 900, clear_storage: bool = True, media_features=None):
         self.sync_skin_files()
         out = self.serve_dir / name
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(html, encoding="utf-8")
         self.cdp("Emulation.setDeviceMetricsOverride", width=width, height=height, deviceScaleFactor=1, mobile=width < 640)
+        self.cdp("Emulation.setEmulatedMedia", media="", features=media_features or [])
         if clear_storage:
             self.cdp("Network.clearBrowserCookies")
+            self.cdp("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/rx-skins/ink-stroke.svg")
+            time.sleep(0.08)
+            self.eval_js("try { localStorage.clear(); } catch (e) {}")
         self.cdp("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/{name}?_={time.time_ns()}")
         time.sleep(0.35)
 
 
 class TestRxSkinsCore(ChromeHarnessMixin, unittest.TestCase):
+    def test_bootstrap_snippet_synced_and_zero_disk_deploy(self):
+        boot = (SKINS_DIR / "bootstrap-snippet.js").read_text(encoding="utf-8").strip()
+        halo_head = (SKINS_DIR / "halo-global-head.html").read_text(encoding="utf-8")
+        flarum_hdr = (SKINS_DIR / "flarum-custom-header.html").read_text(encoding="utf-8")
+        self.assertIn(boot, halo_head, "halo-global-head.html drifted from bootstrap-snippet.js")
+        self.assertIn(boot, flarum_hdr, "flarum-custom-header.html drifted from bootstrap-snippet.js")
+
+        deploy_src = (REPO_ROOT / "scripts" / "deploy-rx-skins.py").read_text(encoding="utf-8")
+        self.assertNotIn("rx_skins_deploy_payload.json", deploy_src, "deploy-rx-skins.py must not write plaintext credential payload files to /tmp")
+
     def test_svg_assets_and_token_selectors(self):
         for svg_name in ("ink-landscape.svg", "ink-mountains.svg", "ink-stroke.svg"):
             p = SKINS_DIR / svg_name
@@ -293,18 +307,24 @@ class TestRxSkinsCore(ChromeHarnessMixin, unittest.TestCase):
           const beforeTheme = document.querySelectorAll('#rx-theme-toggle').length;
           ul.innerHTML = '<li class="item-search">Search Redrawn</li><li class="item-logIn">Log In</li>';
           setTimeout(() => {
+            const autoSkin = document.querySelectorAll('#rx-skin-toggle').length;
+            const autoTheme = document.querySelectorAll('#rx-theme-toggle').length;
             window.RXSkins.mountButtons();
             resolve({
               beforeSkin,
               beforeTheme,
+              autoSkin,
+              autoTheme,
               afterSkin: document.querySelectorAll('#rx-skin-toggle').length,
               afterTheme: document.querySelectorAll('#rx-theme-toggle').length,
             });
-          }, 80);
+          }, 120);
         })
         """)
         self.assertEqual(remount["beforeSkin"], 1)
         self.assertEqual(remount["beforeTheme"], 1)
+        self.assertEqual(remount["autoSkin"], 1, "MutationObserver failed to automatically remount #rx-skin-toggle")
+        self.assertEqual(remount["autoTheme"], 1, "MutationObserver failed to automatically remount #rx-theme-toggle")
         self.assertEqual(remount["afterSkin"], 1)
         self.assertEqual(remount["afterTheme"], 1)
 
@@ -336,6 +356,10 @@ HALO_FIXTURE_BODY = """
     <h2><a href="/archives/test">117 家 VPS 测评归档</a></h2>
     <p>路线与网络质量汇总</p>
   </article>
+  <div id="rx-reviews">
+    <style>#rx-reviews .rx-box { background: #f8fafc; color: #334155; padding: 8px; } html.dark #rx-reviews .rx-box { background: #0f172a; color: #cbd5e1; }</style>
+    <div class="rx-card"><div class="rx-box">自用节点实测内框</div></div>
+  </div>
   <div class="rounded-xl bg-white p-4 dark:bg-slate-800" style="margin-top:16px">
     <article id="post-content" class="markdown-body">
       <h2>水墨与贴纸二级标题</h2>
@@ -353,16 +377,16 @@ ASN: AS54574 | Route: CN2 GIA | Loss: 0.0%</pre>
 
 
 class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
-    def _load_halo(self, width: int = 1280):
+    def _load_halo(self, width: int = 1280, media_features=None):
         head_path = SKINS_DIR / "halo-global-head.html"
         self.assertTrue(head_path.is_file(), f"Missing {head_path}")
         self.assertTrue((SKINS_DIR / "rx-halo.css").is_file(), "Missing rx-halo.css")
         head_html = re.sub(r"\?v=[^\"']+", "", head_path.read_text(encoding="utf-8"))
         doc = f"<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>{head_html}</head><body style='margin:0'>{HALO_FIXTURE_BODY}</body></html>"
-        self.open_fixture("halo-fixture.html", doc, width=width)
+        self.open_fixture("halo-fixture.html", doc, width=width, media_features=media_features)
 
     def test_halo_four_skins_distinct_backgrounds_and_cards(self):
-        self._load_halo(1280)
+        self._load_halo(1280, media_features=[{"name": "prefers-color-scheme", "value": "light"}])
         snaps = self.eval_js("""
         (() => {
           const out = {};
@@ -395,6 +419,41 @@ class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
 
         self.assertEqual(snaps["plain"]["bodyBg"], "rgb(255, 255, 255)")
         self.assertEqual(snaps["plain"]["cardBorderW"], 1.0)
+
+    def test_halo_first_visit_os_dark_mode_and_reduced_transparency(self):
+        self._load_halo(
+            1280,
+            media_features=[
+                {"name": "prefers-color-scheme", "value": "dark"},
+                {"name": "prefers-reduced-transparency", "value": "reduce"},
+            ],
+        )
+        res = self.eval_js("""
+        (() => {
+          const root = document.documentElement;
+          const box = document.querySelector('#rx-reviews .rx-box');
+          const boxCs = getComputedStyle(box);
+          root.dataset.rxSkin = 'luxe';
+          const hdrCs = getComputedStyle(document.getElementById('header-menu'));
+          const cardCs = getComputedStyle(document.getElementById('sample-card'));
+          return {
+            hasRxDark: root.classList.contains('rx-dark'),
+            hasHaloDark: root.classList.contains('dark'),
+            cookieStr: document.cookie,
+            boxBg: boxCs.backgroundColor,
+            boxFg: boxCs.color,
+            hdrFilter: hdrCs.backdropFilter || hdrCs.webkitBackdropFilter || 'none',
+            cardFilter: cardCs.backdropFilter || cardCs.webkitBackdropFilter || 'none',
+          };
+        })()
+        """)
+        self.assertTrue(res["hasRxDark"], f"Expected rx-dark on first-visit OS dark mode: {res}")
+        self.assertTrue(res["hasHaloDark"], f"Expected Halo .dark synced with rx-dark on first-visit OS dark mode: {res}")
+        self.assertNotIn("rx_theme=", res["cookieStr"], "First-visit OS dark mode must not force-write rx_theme cookie")
+        self.assertLess(_rgb_luminance(res["boxBg"]), 0.18, f"#rx-reviews .rx-box remained light in dark mode: {res}")
+        self.assertGreater(_rgb_luminance(res["boxFg"]), 0.55, f"#rx-reviews .rx-box text unreadable in dark mode: {res}")
+        self.assertEqual(res["hdrFilter"], "none", f"Header backdrop-filter still active under prefers-reduced-transparency: {res}")
+        self.assertEqual(res["cardFilter"], "none", f"Card backdrop-filter still active under prefers-reduced-transparency: {res}")
 
     def test_halo_raw_report_never_blurred_and_high_contrast_in_plain(self):
         self._load_halo(1280)
@@ -432,10 +491,15 @@ class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
           const res = {};
           for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
             document.documentElement.dataset.rxSkin = sk;
+            const btn = document.getElementById('rx-skin-toggle');
+            const rect = btn ? btn.getBoundingClientRect() : null;
             res[sk] = {
               scrollW: document.documentElement.scrollWidth,
               innerW: window.innerWidth,
-              hasBtn: !!document.getElementById('rx-skin-toggle')
+              hasBtn: !!btn,
+              btnW: rect ? rect.width : 0,
+              btnH: rect ? rect.height : 0,
+              btnRight: rect ? rect.right : 9999,
             };
           }
           return res;
@@ -443,6 +507,9 @@ class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
         """)
         for sk, info in overflow.items():
             self.assertTrue(info["hasBtn"], f"Missing #rx-skin-toggle on 390px in {sk}")
+            self.assertGreater(info["btnW"], 20, f"#rx-skin-toggle hidden on Halo 390px in {sk}: {info}")
+            self.assertGreater(info["btnH"], 20, f"#rx-skin-toggle zero-height on Halo 390px in {sk}: {info}")
+            self.assertLessEqual(info["btnRight"], info["innerW"], f"#rx-skin-toggle overflows 390px in {sk}: {info}")
             self.assertLessEqual(info["scrollW"], info["innerW"], f"Horizontal overflow on Halo 390px in {sk}: {info}")
 
 
@@ -515,7 +582,7 @@ FLARUM_APP_BODY = """
 
 
 class TestRxFlarumAdapter(ChromeHarnessMixin, unittest.TestCase):
-    def _load_flarum(self, width: int = 1280):
+    def _load_flarum(self, width: int = 1280, media_features=None):
         header_path = SKINS_DIR / "flarum-custom-header.html"
         self.assertTrue(header_path.is_file(), f"Missing {header_path}")
         self.assertTrue((SKINS_DIR / "rx-flarum.css").is_file(), "Missing rx-flarum.css")
@@ -525,10 +592,39 @@ class TestRxFlarumAdapter(ChromeHarnessMixin, unittest.TestCase):
             "<meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
             f"<style>{FLARUM_NATIVE_STYLE}</style></head><body>{custom_header}{FLARUM_APP_BODY}</body></html>"
         )
-        self.open_fixture("flarum-fixture.html", doc, width=width)
+        self.open_fixture("flarum-fixture.html", doc, width=width, media_features=media_features)
+
+    def test_flarum_first_visit_os_dark_mode_and_reduced_transparency(self):
+        self._load_flarum(
+            1280,
+            media_features=[
+                {"name": "prefers-color-scheme", "value": "dark"},
+                {"name": "prefers-reduced-transparency", "value": "reduce"},
+            ],
+        )
+        res = self.eval_js("""
+        (() => {
+          const root = document.documentElement;
+          root.dataset.rxSkin = 'luxe';
+          const hdrCs = getComputedStyle(document.querySelector('.App-header'));
+          const itemCs = getComputedStyle(document.querySelector('.DiscussionListItem'));
+          return {
+            hasRxDark: root.classList.contains('rx-dark'),
+            dataTheme: root.getAttribute('data-theme'),
+            cookieStr: document.cookie,
+            hdrFilter: hdrCs.backdropFilter || hdrCs.webkitBackdropFilter || 'none',
+            itemFilter: itemCs.backdropFilter || itemCs.webkitBackdropFilter || 'none',
+          };
+        })()
+        """)
+        self.assertTrue(res["hasRxDark"], f"Flarum ignored OS prefers-color-scheme: dark on first visit: {res}")
+        self.assertEqual(res["dataTheme"], "dark", f"Flarum data-theme not upgraded to dark on first visit: {res}")
+        self.assertNotIn("rx_theme=", res["cookieStr"], "First-visit OS dark mode must not force-write rx_theme cookie")
+        self.assertEqual(res["hdrFilter"], "none", f"Flarum .App-header backdrop-filter active under reduced transparency: {res}")
+        self.assertEqual(res["itemFilter"], "none", f"Flarum .DiscussionListItem backdrop-filter active under reduced transparency: {res}")
 
     def test_flarum_four_skins_override_cold_blue_and_style_crossbar(self):
-        self._load_flarum(1280)
+        self._load_flarum(1280, media_features=[{"name": "prefers-color-scheme", "value": "light"}])
         snaps = self.eval_js("""
         (() => {
           const out = {};

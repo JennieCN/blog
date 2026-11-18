@@ -25,18 +25,18 @@
     ? true
     : th === 'light'
       ? false
-      : dt.indexOf('dark') === 0
-        ? true
-        : dt.indexOf('light') === 0
-          ? false
-          : root.classList.contains('dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      : window.matchMedia
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        : (dt.indexOf('dark') === 0 || root.classList.contains('dark'));
 
   root.setAttribute('data-rx-skin', skin);
   root.classList.toggle('rx-dark', !!isDark);
   if (dt) {
     root.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  } else if (th === 'dark' || th === 'light') {
-    root.classList.toggle('dark', isDark);
-    try { localStorage.setItem('color-scheme', isDark ? 'dark' : 'light'); } catch (e) {}
+  } else {
+    root.classList.toggle('dark', !!isDark);
+    if (th === 'dark' || th === 'light') {
+      try { localStorage.setItem('color-scheme', isDark ? 'dark' : 'light'); } catch (e) {}
+    }
   }
 })();
