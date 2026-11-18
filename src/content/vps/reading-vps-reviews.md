@@ -3,6 +3,7 @@ title: VPS 测评怎么读：带宽、IP 标签与流量成本
 description: 区分测速观察与根因推测，读懂单连接、重传、IP 分类、内网免计费和流量池，避免用营销标签代替选型。
 pubDate: 2026-11-12
 tags: [VPS, 测评, IP, 流量计费]
+cover: /covers/reading-vps-reviews-cover.png
 ---
 
 一张千兆测速图，不能回答你家晚高峰能否稳定使用；一排绿色 IP 标签，也不能回答某个账号能否长期正常使用。

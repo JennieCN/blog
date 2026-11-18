@@ -3,6 +3,7 @@ title: VPS 线路与落地怎么搭：链式代理、反向隧道与 Po0
 description: 把入口、传输和出口分开，理解链式代理、NAT 家宽、IPv6 与 Po0 的适用条件，按实际需求搭配服务器。
 pubDate: 2026-11-12
 tags: [VPS, 线路, 落地, 组网]
+cover: /covers/relay-and-egress-guide-cover.png
 ---
 
 买了一台线路不错的 VPS，还需要再买一台家宽落地吗？看到别人用国内入口、香港中转、台湾出口，是否也应该照着搭？

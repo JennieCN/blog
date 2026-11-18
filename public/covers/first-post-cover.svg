@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="55%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#134e4a"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#14b8a6" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="1050" cy="120" r="240" fill="#14b8a6" fill-opacity="0.12"/>
+  <circle cx="140" cy="540" r="200" fill="#3b82f6" fill-opacity="0.12"/>
+
+  <rect x="72" y="68" width="280" height="42" rx="21" fill="#0d9488" fill-opacity="0.28" stroke="#5eead4" stroke-opacity="0.55" stroke-width="1.5"/>
+  <text x="212" y="95" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18" font-weight="700" fill="#5eead4">建站与容器运维 · 开篇实录</text>
+
+  <text x="72" y="195" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="50" font-weight="800" fill="#f8fafc">从零搭建「融夕的书」全记录</text>
+  <text x="72" y="262" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="29" font-weight="500" fill="#cbd5e1">博客主站 + 问答社区双栈容器化收拢与日常巡检体系</text>
+
+  <g transform="translate(72, 326)">
+    <rect width="332" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#2dd4bf">Caddy 2</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">自动证书与新旧路由收拢</text>
+  </g>
+  <g transform="translate(428, 326)">
+    <rect width="342" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#38bdf8">Halo + Flarum</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">长文沉淀与实时问答协同</text>
+  </g>
+  <g transform="translate(794, 326)">
+    <rect width="334" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#a78bfa">每日快照</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">PostgreSQL / MariaDB 自动备份</text>
+  </g>
+
+  <text x="72" y="542" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="21" font-weight="600" fill="#94a3b8">融夕的书 · blog.mycampusmail.com</text>
+  <text x="1128" y="542" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="600" fill="#5eead4">Docker Compose · Caddy · Halo · Flarum</text>
+</svg>

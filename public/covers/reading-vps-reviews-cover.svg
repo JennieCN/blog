@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="55%" stop-color="#132a2e"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#10b981" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="1050" cy="120" r="240" fill="#10b981" fill-opacity="0.12"/>
+  <circle cx="140" cy="540" r="200" fill="#0ea5e9" fill-opacity="0.12"/>
+
+  <rect x="72" y="68" width="310" height="42" rx="21" fill="#059669" fill-opacity="0.28" stroke="#6ee7b7" stroke-opacity="0.55" stroke-width="1.5"/>
+  <text x="227" y="95" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18" font-weight="700" fill="#6ee7b7">VPS 选型与测评方法论 · 指南 01</text>
+
+  <text x="72" y="195" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="50" font-weight="800" fill="#f8fafc">VPS 测评怎么读：带宽、IP 与成本</text>
+  <text x="72" y="262" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="29" font-weight="500" fill="#cbd5e1">区分测速观察与根因推测 · 告别只看绿色标签选机</text>
+
+  <g transform="translate(72, 326)">
+    <rect width="332" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#34d399">单流 / 多流</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">iperf3 方向与重传率判读</text>
+  </g>
+  <g transform="translate(428, 326)">
+    <rect width="342" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#38bdf8">IP 标签辨析</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">ASN 归属与双 ISP 伪家宽</text>
+  </g>
+  <g transform="translate(794, 326)">
+    <rect width="334" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#fbbf24">真实流量成本</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">双向计费、内网与流量池</text>
+  </g>
+
+  <text x="72" y="542" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="21" font-weight="600" fill="#94a3b8">融夕的书 · blog.mycampusmail.com</text>
+  <text x="1128" y="542" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="600" fill="#6ee7b7">iperf3 · curl · ASN · BGP · Billing</text>
+</svg>

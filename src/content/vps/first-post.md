@@ -4,6 +4,7 @@ description: 记录「融夕的书」博客主站与问答社区的架构选型�
 pubDate: 2026-11-09
 updatedDate: 2026-11-18
 tags: [VPS, 建站]
+cover: /covers/first-post-cover.png
 ---
 
 这是「融夕的书」的第一篇文章，记录整个站点的架构选型、演进过程与日常运维习惯。

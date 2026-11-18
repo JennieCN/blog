@@ -38,6 +38,11 @@ PAGE_URLS = [
     f"{BASE}/upload/favicon.png",
     f"{BASE}/upload/vps-vol1-cover.png",
     f"{BASE}/upload/vps-vol2-cover.png",
+    f"{BASE}/upload/reading-vps-reviews-cover.png",
+    f"{BASE}/upload/relay-and-egress-guide-cover.png",
+    f"{BASE}/upload/mihomo-chain-and-fallback-cover.png",
+    f"{BASE}/upload/first-post-cover.png",
+    f"{QA_BASE}/assets/favicon.png",
     f"{BASE}/categories/vps",
     f"{BASE}/categories/ai",
     f"{BASE}/categories/fsae",
@@ -93,6 +98,14 @@ def check_flarum_vps_guide():
     g = vps_guides[0]
     print(f"  Found Flarum VPS Guide ID={g['id']} | sticky={g['attributes'].get('isSticky')} | title={g['attributes']['title']}")
     assert g["attributes"].get("isSticky") is True
+    _, qa_raw = http_fetch(urllib.request.Request(f"{QA_BASE}/", headers={"User-Agent": "Mozilla/5.0"}), timeout=15)
+    qa_html = qa_raw.decode("utf-8", errors="replace")
+    assert "assets/favicon.png" in qa_html, "Flarum missing favicon.png link"
+    assert "117 家商家测评" in qa_html, "Flarum missing updated forum_description / header"
+    assert "https://blog.mycampusmail.com/tools" in qa_html, "Flarum header missing /tools direct link"
+    assert "https://blog.mycampusmail.com/my-reviews" in qa_html, "Flarum header missing /my-reviews direct link"
+    assert "/vps/first-post/" not in qa_html, "Flarum header still has legacy /vps/first-post/ link"
+    print("  Flarum HTML Head & Top Banner : favicon.png=True | /my-reviews=True | /tools=True | legacy_links=0")
 
 
 def main():
@@ -162,8 +175,14 @@ def main():
           }
           const iconHref = document.querySelector('link[rel*="icon"]')?.getAttribute('href') || '';
           const imgs = Array.from(document.querySelectorAll('img')).map(i => i.getAttribute('src') || '');
-          const hasVol1Cover = imgs.some(s => s.includes('vps-vol1-cover.png'));
-          const hasVol2Cover = imgs.some(s => s.includes('vps-vol2-cover.png'));
+          const expectedCovers = [
+            'vps-vol1-cover.png', 'vps-vol2-cover.png',
+            'reading-vps-reviews-cover.png', 'relay-and-egress-guide-cover.png',
+            'mihomo-chain-and-fallback-cover.png', 'first-post-cover.png'
+          ];
+          const coversFound = expectedCovers.filter(c => imgs.some(s => s.includes(c))).length;
+          const hasVol1Cover = coversFound === 6;
+          const hasVol2Cover = coversFound === 6;
           const hasMyReviewsNav = Array.from(document.querySelectorAll('header a[href="/my-reviews"]')).length > 0;
           const hasToolsNav = Array.from(document.querySelectorAll('header a[href="/tools"]')).length > 0;
           const bodyTxt = document.body.innerText;
@@ -269,6 +288,40 @@ def main():
         assert "剩余天数" in tools_res["vpsTxt"] and "6S1P" in tools_res["batTxt"]
         assert tools_res["blurredPres"] == 0
         assert tools_res["sw"] <= tools_res["iw"] and tools_mob["sw"] <= tools_mob["iw"]
+
+        # 2a. Audit /about SinglePage (Zero Default Placeholder Meta Description + Light/Dark Cards)
+        call("Emulation.setDeviceMetricsOverride", width=1280, height=900, deviceScaleFactor=1, mobile=False)
+        call("Page.navigate", url=f"{BASE}/about?_t={int(time.time())}")
+        time.sleep(2.0)
+        about_js = r"""
+        (() => {
+          document.documentElement.classList.remove('dark');
+          const box = document.getElementById('rx-about');
+          const card = box ? box.querySelector('.rx-card') : null;
+          const lightCardBg = card ? getComputedStyle(card).backgroundColor : '';
+          document.documentElement.classList.add('dark');
+          const darkCardBg = card ? getComputedStyle(card).backgroundColor : '';
+          document.documentElement.classList.remove('dark');
+          const metaDesc = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+          return JSON.stringify({
+            exists: !!box, lightCardBg, darkCardBg, metaDesc,
+            sw: document.documentElement.scrollWidth, iw: window.innerWidth
+          });
+        })()
+        """
+        about_res = json.loads(call("Runtime.evaluate", expression=about_js, returnByValue=True)["result"]["value"])
+        call("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True)
+        time.sleep(0.4)
+        about_mob = json.loads(call("Runtime.evaluate", expression="JSON.stringify({sw: document.documentElement.scrollWidth, iw: window.innerWidth})", returnByValue=True)["result"]["value"])
+        print("\n=== /about SINGLEPAGE AUDIT ===")
+        print(f"  Cards Light/Dark : {about_res['lightCardBg']} -> {about_res['darkCardBg']} | desc={about_res['metaDesc'][:42]}...")
+        print(f"  Responsive       : 1280px ({about_res['sw']}<={about_res['iw']}), 390px ({about_mob['sw']}<={about_mob['iw']})")
+        assert about_res["exists"] is True
+        assert "这是一个自定义页面" not in about_res["metaDesc"], about_res["metaDesc"]
+        assert "117 家" in about_res["metaDesc"], about_res["metaDesc"]
+        assert about_res["lightCardBg"] == "rgb(255, 255, 255)"
+        assert about_res["darkCardBg"] == "rgb(30, 41, 59)"
+        assert about_res["sw"] <= about_res["iw"] and about_mob["sw"] <= about_mob["iw"]
 
         # 2b. Audit /privacy-policy & /user-agreement Legal SinglePages
         for slug in ["privacy-policy", "user-agreement"]:

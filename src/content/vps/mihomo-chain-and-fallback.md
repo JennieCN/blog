@@ -3,6 +3,7 @@ title: Mihomo 链式与回退：三个配置陷阱
 description: 对照 Mihomo v1.19.34 源码，分清组级 dialer-proxy 不生效、节点全失败与空列表回退，避免把配置加载成功当成路径正确。
 pubDate: 2026-11-12
 tags: [VPS, Mihomo, 链式代理, 源码]
+cover: /covers/mihomo-chain-and-fallback-cover.png
 ---
 
 配置能加载、节点能测速，并不代表请求真的经过预想的前置，也不代表失败时一定拒绝连接。

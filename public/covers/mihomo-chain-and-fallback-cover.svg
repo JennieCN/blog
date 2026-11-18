@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="55%" stop-color="#2e1065"/>
+      <stop offset="100%" stop-color="#3b0764"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#a855f7" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="1050" cy="120" r="240" fill="#a855f7" fill-opacity="0.12"/>
+  <circle cx="140" cy="540" r="200" fill="#f59e0b" fill-opacity="0.12"/>
+
+  <rect x="72" y="68" width="290" height="42" rx="21" fill="#7e22ce" fill-opacity="0.28" stroke="#d8b4fe" stroke-opacity="0.55" stroke-width="1.5"/>
+  <text x="217" y="95" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18" font-weight="700" fill="#d8b4fe">源码级配置排障 · 指南 03</text>
+
+  <text x="72" y="195" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="50" font-weight="800" fill="#f8fafc">Mihomo 链式与回退：三个配置陷阱</text>
+  <text x="72" y="262" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="29" font-weight="500" fill="#cbd5e1">对照 v1.19.34 源码分清组级字段失效与异常回退分支</text>
+
+  <g transform="translate(72, 326)">
+    <rect width="332" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#c084fc">陷阱 01</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">策略组级 dialer-proxy 失效</text>
+  </g>
+  <g transform="translate(428, 326)">
+    <rect width="342" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#fbbf24">陷阱 02</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">全节点不可用时的失败传播</text>
+  </g>
+  <g transform="translate(794, 326)">
+    <rect width="334" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="26" y="54" font-family="PingFang SC, ui-monospace, SFMono-Regular, sans-serif" font-size="34" font-weight="800" fill="#38bdf8">陷阱 03</text>
+    <text x="26" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18.5" fill="#94a3b8">空列表过滤与隐式回退陷阱</text>
+  </g>
+
+  <text x="72" y="542" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="21" font-weight="600" fill="#94a3b8">融夕的书 · blog.mycampusmail.com</text>
+  <text x="1128" y="542" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="600" fill="#d8b4fe">Mihomo v1.19.34 · dialer-proxy · fallback</text>
+</svg>

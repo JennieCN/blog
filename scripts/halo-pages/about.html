@@ -1,0 +1,178 @@
+<div id="rx-about">
+<style>
+#rx-about {
+  margin: 4px 0 24px;
+  color: #1e293b;
+  line-height: 1.72;
+  font-size: 15px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#rx-about *,
+#rx-about *::before,
+#rx-about *::after {
+  box-sizing: border-box;
+}
+#rx-about .rx-hero {
+  padding: 20px 22px;
+  margin-bottom: 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+}
+#rx-about .rx-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #e0f2fe;
+  color: #0369a1;
+  margin-bottom: 8px;
+}
+#rx-about .rx-hero h2 {
+  margin: 0 0 8px !important;
+  font-size: 21px !important;
+  color: #0f172a;
+  border: none !important;
+  padding: 0 !important;
+}
+#rx-about .rx-hero p {
+  margin: 0;
+  color: #475569;
+  font-size: 14.5px;
+}
+#rx-about .rx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+#rx-about .rx-card {
+  min-width: 0;
+  max-width: 100%;
+  padding: 18px 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+#rx-about .rx-card h3 {
+  margin: 0 0 10px !important;
+  font-size: 16.5px !important;
+  font-weight: 700;
+  color: #0f172a;
+}
+#rx-about .rx-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #334155;
+  font-size: 14px;
+}
+#rx-about .rx-card li {
+  margin-bottom: 8px;
+}
+#rx-about .rx-card li:last-child {
+  margin-bottom: 0;
+}
+#rx-about .rx-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+#rx-about .rx-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0284c7 !important;
+  text-decoration: none !important;
+}
+#rx-about .rx-pill:hover {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+html.dark #rx-about {
+  color: #e2e8f0;
+}
+html.dark #rx-about .rx-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-color: #334155;
+}
+html.dark #rx-about .rx-badge {
+  background: #0c4a6e;
+  color: #7dd3fc;
+}
+html.dark #rx-about .rx-hero h2,
+html.dark #rx-about .rx-card h3 {
+  color: #f8fafc;
+}
+html.dark #rx-about .rx-hero p,
+html.dark #rx-about .rx-card ul {
+  color: #cbd5e1;
+}
+html.dark #rx-about .rx-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: none;
+}
+html.dark #rx-about .rx-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #7dd3fc !important;
+}
+html.dark #rx-about .rx-pill:hover {
+  border-color: #38bdf8;
+}
+</style>
+
+<div class="rx-hero">
+  <span class="rx-badge">ABOUT · 关于本站</span>
+  <h2>长文沉淀系统经验，社区讨论当下问题</h2>
+  <p>欢迎来到<strong>「融夕的书」</strong>（<code>blog.mycampusmail.com</code>）。这里是融夕的长期技术与工程实践笔记站，采用「专栏深度归档 + 问答社区实时交流 + 纯前端工具箱」三位一体的结构，持续记录网络基础设施、赛车电控、机器人与 AI 工程踩坑经验。</p>
+  <div class="rx-links">
+    <a class="rx-pill" href="/archives/nodeseek-merchant-reviews-2026h2">📚 117 家商家测评·上卷（61 家）</a>
+    <a class="rx-pill" href="/archives/meowvps-official-merchants-2026h2">👑 56 家主力与皇冠标杆·下卷</a>
+    <a class="rx-pill" href="/my-reviews">⭐ 我的自用节点实测</a>
+    <a class="rx-pill" href="/tools">🧰 实用工具箱</a>
+    <a class="rx-pill" href="https://qa.mycampusmail.com" target="_blank" rel="noopener">💬 问答社区</a>
+  </div>
+</div>
+
+<div class="rx-grid">
+  <section class="rx-card">
+    <h3>🗂️ 站内核心专题与工具</h3>
+    <ul>
+      <li><strong>117 家海外 VPS 实测双卷档案</strong>：按「线路机 / 落地机 / 性能独服 → 细分小类 → 地区」完整收录 117 家商家（205 篇专测 + 456 份可展开 NodeQuality / TQ 原始终端报告），支持页内筛选与圈内俗称（如 <code>大妈</code>、<code>瓦工</code>、<code>御坂</code>、<code>小秘书</code>）检索。</li>
+      <li><strong><a href="/my-reviews">站长自持节点一手实测</a></strong>：持续追踪自用主力机（BWG DC1 CN2 GIA、Lisahost 美西双 ISP、Taphip 香港三网优化）的 Check.Place 硬件与回程表现。</li>
+      <li><strong><a href="/tools">纯前端在线工具箱</a></strong>：集成出口 IP 分流检测、多节点 HTTP 延迟测速、二手 VPS 剩余价值溢价计算器与 FSAE/RM 锂电池包参数速算，所有计算均在浏览器本地完成。</li>
+      <li><strong>选型与组网实战三部曲</strong>：<a href="/archives/reading-vps-reviews">《VPS 测评怎么读》</a> · <a href="/archives/relay-and-egress-guide">《VPS 线路与落地怎么搭》</a> · <a href="/archives/mihomo-chain-and-fallback">《Mihomo 链式与回退：三个配置陷阱》</a>。</li>
+    </ul>
+  </section>
+
+  <section class="rx-card">
+    <h3>🧭 五大长期记录板块</h3>
+    <ul>
+      <li><strong><a href="/categories/vps">VPS 科普与网络基建</a></strong>：海外云服务器选型、ASN/IP 纯净度核验、BGP 回程路由分析、Docker 与 Caddy 自建服务运维。</li>
+      <li><strong><a href="/categories/fsae">大学生方程式赛车（FSAE）</a></strong>：电车动力电池箱 BMS 选型、IMD 绝缘检测、散热仿真与整车低压线束设计。</li>
+      <li><strong><a href="/categories/rm">RoboMaster 机器人</a></strong>：步兵/英雄云台电控 PID 整定、CAN 总线电机通信、超级电容管理与视觉弹道解算。</li>
+      <li><strong><a href="/categories/ai">AI 工程实践</a></strong>：大模型 API 评测、RAG 知识库离线审查、Agent 自动化工作流与本地推理部署。</li>
+      <li><strong><a href="/categories/resources">开源资源与脚本</a></strong>：值得长期收藏的工程参考仓库、数据手册、自动化排障脚本与配置模板。</li>
+    </ul>
+  </section>
+</div>
+
+<div class="rx-card">
+  <h3>🤝 互动交流、订阅与站点说明</h3>
+  <ul>
+    <li><strong>提问与交流</strong>：遇到具体线路选型、配置排错或电控工程问题，欢迎直接前往配套 <a href="https://qa.mycampusmail.com" target="_blank" rel="noopener">问答社区（qa.mycampusmail.com）</a> 对应板块发帖，或在文章底部留言评论。</li>
+    <li><strong>订阅与索引</strong>：支持标准 <a href="/rss.xml">RSS 订阅（<code>/rss.xml</code>）</a> 与 <a href="/sitemap.xml">XML 站点地图（<code>/sitemap.xml</code>）</a>。</li>
+    <li><strong>合规与隐私边界</strong>：站内所有第三方商家测评数据仅作客观网络基准归档参考，不构成任何商业背书；详见 <a href="/privacy-policy">《隐私政策》</a> 与 <a href="/user-agreement">《用户协议与免责声明》</a>。</li>
+  </ul>
+</div>
+</div>

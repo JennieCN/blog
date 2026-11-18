@@ -17,6 +17,7 @@
 
 | 脚本路径 | 用途说明 |
 | :--- | :--- |
+| `scripts/server-watch-meowvps.py` | 部署在 `vps8:/opt/site-stack/watch-meowvps.py` 的每周定时巡检脚本（每周一 `09:15` 自动运行），对比线上 `meowvps.com` 目录与 Sitemap，发现新增商家或新专测时写入日志并通过 Resend SMTP 发送去重邮件提醒（零硬编码凭据）。 |
 | `scripts/check-meowvps-diff.py` | 对比线上 `meowvps.com` 最新商家目录与 `sitemap-0.xml` 全部 `/blog/` 测评页，校验上卷（61 家）+ 下卷（56 家）是否 **100% 零遗漏、零重叠**。 |
 | `scripts/generators/generate_full_article.py` | 生成上卷（`nodeseek-merchant-reviews-2026h2`）带锚点模板 Markdown。 |
 | `scripts/generators/parse_vol2_all.py` & `build_vol2.py` | 解析猫猫正式收录商家并生成下卷（`meowvps-official-merchants-2026h2`）带锚点模板 Markdown。 |
