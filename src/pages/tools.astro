@@ -4,14 +4,19 @@ import { svgIcon } from '../lib/icons';
 
 const scripts = [
   {
-    name: '系统基础信息与资源巡检',
-    desc: '一行命令查看 CPU 核数、内存、Swap、磁盘与负载',
-    cmd: 'hostname && nproc && free -m && df -h / && uptime',
+    name: 'NodeQuality (NQ) 一键综合测评脚本',
+    desc: '测试 Geekbench 5、fio 磁盘、IP 纯净度、流媒体解锁与三网回程路由',
+    cmd: 'bash <(curl -sL https://run.NodeQuality.com)',
   },
   {
     name: '融合怪 VPS 综合测评脚本（ECS）',
     desc: '社区常用的硬件、回程路由、流媒体解锁与测速综合脚本',
     cmd: 'curl -L https://gitlab.com/spiritysdx/za/-/raw/main/ecs.sh -o ecs.sh && chmod +x ecs.sh && bash ecs.sh',
+  },
+  {
+    name: '系统基础信息与端口监听巡检',
+    desc: '一行命令查看 CPU 核数、内存、Swap、磁盘、负载与监听端口',
+    cmd: 'hostname && nproc && free -m && df -h / && uptime && ss -lntup',
   },
   {
     name: 'Docker 官方一键安装',
@@ -29,7 +34,9 @@ const glossary = [
   { cat: 'VPS 线路', term: 'CN2 GIA (AS4809)', desc: '中国电信最高等级精品国际专线，双向全程 59.43 节点，晚高峰极少拥堵。' },
   { cat: 'VPS 线路', term: 'CUII / AS9929', desc: '中国联通精品 A 网国际线路，对标电信 CN2 GIA，延迟低且晚高峰稳定。' },
   { cat: 'VPS 线路', term: 'CMIN2 (AS58807)', desc: '中国移动新一代精品国际专线，大幅改善移动跨境晚高峰丢包。' },
-  { cat: 'VPS 线路', term: '163 骨干网 / 4837', desc: '电信 AS4134 与联通 AS4837 普通民用国际骨干网，性价比高但晚高峰视线路优化而定。' },
+  { cat: 'VPS 线路', term: '4837 / 软银 / CMI / IIJ', desc: '高性价比次优直连回程：联通 AS4837、日本 SoftBank/IIJ、移动 CMI，适合日常大流量。' },
+  { cat: 'VPS 落地', term: '真家宽 vs 双 ISP 伪家宽', desc: '真家宽接入本土运营商（Hinet/AT&T/HKT）；双 ISP 伪家宽物理托管在机房但宣告了住宅属性 IP 段。' },
+  { cat: 'VPS 落地', term: 'NAT 家宽 / 共享端口机', desc: '多人共享公网家宽 IP 并按分配端口入站，百元内年付体验真实住宅出口，需留意邻居风控。' },
   { cat: 'FSAE 赛车', term: 'BMS / IMD / BSPD', desc: '电池管理系统（BMS）、绝缘监测装置（IMD）与制动系统合理性检测器（BSPD），电车安全回路三大核心。' },
   { cat: 'FSAE 赛车', term: 'TSAL (高压指示灯)', desc: 'Tractive System Active Light，用于指示整车动力系统是否带高压电的安全灯。' },
   { cat: 'RoboMaster', term: 'C板 / CAN 总线 / 达妙', desc: 'STM32F407 开发板（C型）通过 CAN 总线以 1Mbps 波特率驱动大疆 M3508/GM6020 或达妙关节电机。' },
@@ -57,10 +64,10 @@ const glossary = [
         <h2 class="card-title" style="margin-bottom: 0;">🌐 本机出口 IP 与分流检测</h2>
         <button type="button" id="btn-recheck-ip" class="btn btn-primary btn-sm">重新检测</button>
       </div>
-      <p class="mt-2 text-sm muted">实时对比你访问本站边缘节点与国际 API 的出口 IP、归属地与运营商 ASN。</p>
+      <p class="mt-2 text-sm muted">实时对比当前浏览器访问 Cloudflare 边缘节点与国际 ASN 接口的出口地址与归属运营商。</p>
       <div class="mt-4 flex flex-col gap-3 text-sm">
         <div class="tool-box">
-          <span class="text-xs font-semibold" style="color: var(--accent)">Cloudflare 边缘识别出口（本站直连）</span>
+          <span class="text-xs font-semibold" style="color: var(--accent)">Cloudflare 边缘识别出口（1.1.1.1 Anycast）</span>
           <p id="ip-cf-box" class="mt-1 mono text-sm">正在检测边缘出口…</p>
         </div>
         <div class="tool-box">
@@ -142,12 +149,12 @@ const glossary = [
           <span>📚 圈子黑话与技术术语词典（Glossary）</span>
           <span id="glossary-count" class="text-xs font-normal muted" aria-live="polite">共 {glossary.length} 条</span>
         </h2>
-        <p class="text-sm muted">收录 VPS 国际线路、FSAE 方程式电检、RoboMaster 机器人与 AI 常用术语缩写。</p>
+        <p class="text-sm muted">收录猫猫 VPS 选机分类口径、国际线路、FSAE 方程式电检、RoboMaster 机器人与 AI 常用术语缩写。</p>
       </div>
       <input
         id="glossary-search"
         type="search"
-        placeholder="输入术语或关键词过滤（如 CN2 / BMS / CAN）…"
+        placeholder="输入术语或关键词过滤（如 CN2 / 双ISP / BMS）…"
         class="tool-input sm:w-72"
       />
     </div>
@@ -218,7 +225,7 @@ const glossary = [
       if (cfEl) cfEl.textContent = '正在检测边缘出口…';
       if (intlEl) intlEl.textContent = '正在检测国际出口…';
 
-      fetch('/cdn-cgi/trace')
+      fetch('https://1.1.1.1/cdn-cgi/trace', { cache: 'no-store' })
         .then((r) => r.text())
         .then((txt) => {
           const map: Record<string, string> = {};
@@ -229,14 +236,14 @@ const glossary = [
           if (cfEl) {
             cfEl.textContent = map.ip
               ? `IP: ${map.ip} · 地区: ${map.loc || '未知'} · 边缘机房: ${map.colo || '未知'} (${map.http || ''})`
-              : '本地开发环境（上线后由 Cloudflare 边缘节点返回）';
+              : '未能解析边缘节点返回结果';
           }
         })
         .catch(() => {
-          if (cfEl) cfEl.textContent = '无法连接边缘 trace 接口';
+          if (cfEl) cfEl.textContent = '无法连接 1.1.1.1 边缘 trace 接口';
         });
 
-      fetch('https://ipwho.is/')
+      fetch('https://ipwho.is/', { cache: 'no-store' })
         .then((r) => r.json())
         .then((d) => {
           if (intlEl && d && d.ip) {
@@ -254,11 +261,11 @@ const glossary = [
 
     // 2. 多节点 HTTP 延迟测速
     const pingTargets = [
-      { name: '融夕的书 · 博客主站 (Cloudflare)', url: 'https://blog.mycampusmail.com/favicon.svg' },
-      { name: '融夕的书 · 问答社区 (AWS 新加坡)', url: 'https://qa.mycampusmail.com/feed.php?limit=1' },
+      { name: '融夕的书 · 博客主站 (blog.mycampusmail.com)', url: 'https://blog.mycampusmail.com/rss.xml' },
+      { name: '融夕的书 · 问答社区 (qa.mycampusmail.com)', url: 'https://qa.mycampusmail.com/api' },
       { name: 'Cloudflare 全球边缘 (1.1.1.1)', url: 'https://1.1.1.1/cdn-cgi/trace' },
-      { name: 'unpkg 前端 CDN 节点', url: 'https://unpkg.com/@waline/client@3/dist/waline.css' },
-      { name: 'GitHub 连通性检测', url: 'https://github.githubassets.com/favicons/favicon.svg' },
+      { name: 'MeowVPS 商家目录 (meowvps.com)', url: 'https://meowvps.com/favicon.ico' },
+      { name: 'GitHub 国际静态节点', url: 'https://github.githubassets.com/favicons/favicon.svg' },
     ];
 
     async function runPing() {

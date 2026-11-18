@@ -1,0 +1,706 @@
+<div id="rx-toolbox">
+<style>
+#rx-toolbox {
+  color: #0f172a;
+  line-height: 1.6;
+}
+#rx-toolbox .rx-lead {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 14px;
+}
+#rx-toolbox .rx-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+#rx-toolbox .rx-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+#rx-toolbox .rx-card {
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+#rx-toolbox .rx-card-mt {
+  margin-top: 18px;
+}
+#rx-toolbox .rx-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+#rx-toolbox .rx-title {
+  margin: 0 !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #0f172a;
+}
+#rx-toolbox .rx-muted {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+}
+#rx-toolbox .rx-box {
+  min-width: 0;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+#rx-toolbox .rx-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0284c7;
+  margin-bottom: 3px;
+}
+#rx-toolbox .rx-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #334155;
+}
+#rx-toolbox .rx-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13.5px;
+}
+#rx-toolbox .rx-btn {
+  padding: 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+#rx-toolbox .rx-btn:hover {
+  border-color: #64748b;
+  background: #f1f5f9;
+}
+#rx-toolbox .rx-btn-primary {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+#rx-toolbox .rx-btn-primary:hover {
+  background: #1e293b;
+  border-color: #1e293b;
+}
+#rx-toolbox .rx-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+#rx-toolbox .rx-ping-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 12px 0 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#rx-toolbox .rx-ping-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 !important;
+  font-size: 13.5px;
+}
+#rx-toolbox .rx-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: #334155;
+}
+#rx-toolbox .rx-badge-ok {
+  background: #dcfce7;
+  color: #166534;
+}
+#rx-toolbox .rx-badge-warn {
+  background: #fef3c7;
+  color: #92400e;
+}
+#rx-toolbox .rx-badge-err {
+  background: #fee2e2;
+  color: #991b1b;
+}
+#rx-toolbox .rx-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+#rx-toolbox pre.vps-raw-report {
+  margin: 10px 0 0 !important;
+  padding: 10px 12px !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #1e293b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+  filter: none !important;
+}
+html.dark #rx-toolbox {
+  color: #f1f5f9;
+}
+html.dark #rx-toolbox .rx-lead {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+html.dark #rx-toolbox .rx-card {
+  min-width: 0;
+  max-width: 100%;
+  background: #1e293b;
+  border-color: #334155;
+}
+html.dark #rx-toolbox .rx-title {
+  color: #f8fafc;
+}
+html.dark #rx-toolbox .rx-muted {
+  color: #94a3b8;
+}
+html.dark #rx-toolbox .rx-box {
+  min-width: 0;
+  max-width: 100%;
+  background: #0f172a;
+  border-color: #334155;
+}
+html.dark #rx-toolbox .rx-label {
+  color: #38bdf8;
+}
+html.dark #rx-toolbox .rx-field-label {
+  color: #cbd5e1;
+}
+html.dark #rx-toolbox .rx-input {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f8fafc;
+}
+html.dark #rx-toolbox .rx-btn {
+  background: #0f172a;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+html.dark #rx-toolbox .rx-btn:hover {
+  border-color: #64748b;
+  background: #1e293b;
+}
+html.dark #rx-toolbox .rx-btn-primary {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  color: #0f172a;
+}
+html.dark #rx-toolbox .rx-btn-primary:hover {
+  background: #7dd3fc;
+  border-color: #7dd3fc;
+}
+html.dark #rx-toolbox .rx-badge {
+  background: #334155;
+  color: #cbd5e1;
+}
+html.dark #rx-toolbox .rx-badge-ok {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+html.dark #rx-toolbox .rx-badge-warn {
+  background: #78350f;
+  color: #fcd34d;
+}
+html.dark #rx-toolbox .rx-badge-err {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+html.dark #rx-toolbox .rx-tag {
+  background: #0c4a6e;
+  color: #7dd3fc;
+}
+html.dark #rx-toolbox pre.vps-raw-report {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+</style>
+  <div class="rx-lead">
+    即开即用的站内工程小工具：集合 <strong>本机分流出口 IP 检测</strong>、<strong>多节点 HTTP 握手延迟测速</strong>、<strong>二手 VPS 剩余价值计算器</strong>、<strong>FSAE / RM 锂电池包速算</strong>、<strong>圈子黑话速查词典</strong> 与 <strong>常用测评运维一键脚本</strong>。选机实测对比可直接查阅 <a href="/archives/nodeseek-merchant-reviews-2026h2">《上卷：61 家新收录与转正商家汇总》</a> 与 <a href="/archives/meowvps-official-merchants-2026h2">《下卷：56 家主力商家与皇冠标杆汇总》</a>。
+  </div>
+
+  <div class="rx-grid-2">
+    <section class="rx-card">
+      <div class="rx-head">
+        <div class="rx-title">🌐 本机出口 IP 与分流检测</div>
+        <button type="button" id="btn-recheck-ip" class="rx-btn rx-btn-primary">重新检测</button>
+      </div>
+      <p class="rx-muted">实时对比当前浏览器访问 Cloudflare 边缘节点与国际 ASN 接口的出口地址与归属运营商。</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+        <div class="rx-box">
+          <span class="rx-label">Cloudflare 边缘识别出口（1.1.1.1 Anycast）</span>
+          <div id="ip-cf-box" class="rx-mono" style="font-size:13px;">正在检测边缘出口…</div>
+        </div>
+        <div class="rx-box">
+          <span class="rx-label">国际通用出口 IP 与 ASN 运营商</span>
+          <div id="ip-intl-box" class="rx-mono" style="font-size:13px;">正在检测国际出口…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rx-card">
+      <div class="rx-head">
+        <div class="rx-title">⚡ 多节点 HTTP 握手延迟测速</div>
+        <button type="button" id="btn-run-ping" class="rx-btn rx-btn-primary">一键测速</button>
+      </div>
+      <p class="rx-muted">从当前浏览器直接向常用站点发起无缓存 HTTP 握手探测，直观检验分流或直连响应延迟。</p>
+      <ul id="ping-list" class="rx-ping-list"></ul>
+    </section>
+  </div>
+
+  <div class="rx-grid-2">
+    <section class="rx-card">
+      <div class="rx-head">
+        <div class="rx-title">💰 VPS 剩余价值计算器</div>
+        <button type="button" id="btn-copy-vps" class="rx-btn">复制结果</button>
+      </div>
+      <p class="rx-muted">按续费金额、账单周期与到期日期实时折算剩余天数与剩余价值，支持一键复制交易摘要。</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px;">
+        <label class="rx-field-label">
+          <span>续费价格（元或美元）</span>
+          <input id="vps-price" type="number" min="0" step="0.01" value="100" class="rx-input" />
+        </label>
+        <label class="rx-field-label">
+          <span>周期天数（年=365 / 月=30）</span>
+          <input id="vps-cycle" type="number" min="1" value="365" class="rx-input" />
+        </label>
+        <label class="rx-field-label" style="grid-column:1 / -1;">
+          <span>到期日期</span>
+          <input id="vps-expire" type="date" class="rx-input" />
+        </label>
+      </div>
+      <div id="vps-result" class="rx-box" style="margin-top:12px;font-size:13.5px;font-weight:600;" aria-live="polite"></div>
+    </section>
+
+    <section class="rx-card">
+      <div class="rx-head">
+        <div class="rx-title">🔋 FSAE / RM 锂电池包参数速算</div>
+      </div>
+      <p class="rx-muted">根据串联数 S、并联数 P、单节容量与电芯体系速算标称电压、满电电压与总能量。</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px;">
+        <label class="rx-field-label">
+          <span>串联数 (S)</span>
+          <input id="bat-s" type="number" value="6" min="1" class="rx-input" />
+        </label>
+        <label class="rx-field-label">
+          <span>并联数 (P)</span>
+          <input id="bat-p" type="number" value="1" min="1" class="rx-input" />
+        </label>
+        <label class="rx-field-label">
+          <span>单节容量 (Ah)</span>
+          <input id="bat-ah" type="number" min="0" step="0.1" value="5.0" class="rx-input" />
+        </label>
+        <label class="rx-field-label">
+          <span>电芯化学体系</span>
+          <select id="bat-chem" class="rx-input">
+            <option value="3.7,4.2" selected>LiPo / 三元锂 (3.7V / 4.2V)</option>
+            <option value="3.6,4.2">动力 18650 / 21700 (3.6V / 4.2V)</option>
+            <option value="3.2,3.65">磷酸铁锂 LiFePO4 (3.2V / 3.65V)</option>
+          </select>
+        </label>
+      </div>
+      <div id="bat-result" class="rx-box" style="margin-top:12px;font-size:13.5px;font-weight:600;" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="rx-card rx-card-mt">
+    <div class="rx-head">
+      <div>
+        <div class="rx-title">📚 圈子黑话与技术术语词典 <span id="glossary-count" style="font-size:12px;font-weight:400;color:#64748b;">共 12 条</span></div>
+        <p class="rx-muted" style="margin-top:2px;">收录猫猫 VPS 选机分类口径、国际线路、FSAE 电检、RoboMaster 与 AI 常用缩写。</p>
+      </div>
+      <input id="glossary-search" type="search" placeholder="输入关键词过滤（如 9929 / 双ISP / NQ / BMS）…" class="rx-input" style="max-width:290px;" />
+    </div>
+    <div id="glossary-grid" class="rx-grid-3">
+      <div class="glossary-item rx-box" data-text="vps 线路 cn2 gia as4809 59.43 电信精品专线">
+        <span class="rx-tag">VPS 线路</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">CN2 GIA (AS4809)</div>
+        <p class="rx-muted" style="margin-top:4px;">中国电信最高等级精品国际专线，双向全程 59.43 节点，晚高峰极少拥堵。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 线路 cuii as9929 联通精品 a网">
+        <span class="rx-tag">VPS 线路</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">CUII / AS9929</div>
+        <p class="rx-muted" style="margin-top:4px;">中国联通精品 A 网国际线路，对标电信 CN2 GIA，延迟低且晚高峰稳定。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 线路 cmin2 as58807 移动精品专线">
+        <span class="rx-tag">VPS 线路</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">CMIN2 (AS58807)</div>
+        <p class="rx-muted" style="margin-top:4px;">中国移动新一代精品国际专线，大幅改善移动跨境晚高峰丢包。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 线路 4837 软银 softbank cmi iij lumen 次优直连">
+        <span class="rx-tag">VPS 线路</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">4837 / 软银 / CMI / IIJ</div>
+        <p class="rx-muted" style="margin-top:4px;">高性价比次优直连回程：联通 AS4837、日本 SoftBank/IIJ、移动 CMI 与亚太 Lumen，适合日常大流量。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 落地 真家宽 双 isp 伪家宽 hinet att verizon">
+        <span class="rx-tag">VPS 落地</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">真家宽 vs 双 ISP 伪家宽</div>
+        <p class="rx-muted" style="margin-top:4px;">真家宽接入当地本土运营商（如 Hinet、AT&amp;T、HKT）；双 ISP 伪家宽物理托管在机房但宣告了住宅属性 IP 段。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 落地 nat 共享 ip 端口映射 动态 ddns">
+        <span class="rx-tag">VPS 落地</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">NAT 家宽 / 共享端口机</div>
+        <p class="rx-muted" style="margin-top:4px;">多人共享公网家宽 IP、按分配端口范围入站，以百元内年付体验真实住宅出口，需关注邻居风控与协议限制。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 测评 nodequality nq tquality tq 融合怪 脚本">
+        <span class="rx-tag">VPS 测评</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">NodeQuality (NQ) / TQuality</div>
+        <p class="rx-muted" style="margin-top:4px;">社区主流综合体检脚本：NQ 聚合 GB5/磁盘 fio/IP 质量/流媒体解锁/三网回程；TQ 侧重三网 TCP 大包重传与单线程实测。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="vps 组网 dialer-proxy 链式代理 po0 ix 中转">
+        <span class="rx-tag">VPS 组网</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">链式代理 / IX / Po0</div>
+        <p class="rx-muted" style="margin-top:4px;">通过线路机前置拉取家宽/机房落地机出口（如 Mihomo dialer-proxy 或服务端转发），兼顾国内低延迟接入与纯净海外身份。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="fsae 赛车 bms imd bspd 电检 安全回路">
+        <span class="rx-tag">FSAE 赛车</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">BMS / IMD / BSPD</div>
+        <p class="rx-muted" style="margin-top:4px;">电池管理系统（BMS）、绝缘监测装置（IMD）与制动系统合理性检测器（BSPD），电车安全回路三大核心。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="fsae 赛车 tsal 高压指示灯 安全灯">
+        <span class="rx-tag">FSAE 赛车</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">TSAL (高压指示灯)</div>
+        <p class="rx-muted" style="margin-top:4px;">Tractive System Active Light，用于指示整车动力系统是否带高压电的车外频闪安全灯。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="robomaster c板 can 总线 达妙 m3508 gm6020">
+        <span class="rx-tag">RoboMaster</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">C板 / CAN 总线 / 达妙</div>
+        <p class="rx-muted" style="margin-top:4px;">STM32F407 开发板（C型）通过 1Mbps CAN 总线驱动大疆 M3508/GM6020 或达妙关节电机。</p>
+      </div>
+      <div class="glossary-item rx-box" data-text="ai 工程 rag vllm kv cache pagedattention">
+        <span class="rx-tag">AI 工程</span>
+        <div style="margin-top:6px;font-weight:700;font-size:14px;">RAG / vLLM / KV Cache</div>
+        <p class="rx-muted" style="margin-top:4px;">检索增强生成（RAG）结合外部知识库降低幻觉；vLLM 利用 PagedAttention 管理 KV Cache 显著提升推理吞吐。</p>
+      </div>
+    </div>
+    <p id="glossary-empty" class="rx-muted" style="margin-top:12px;display:none;">没有匹配的术语条目，请换个关键词或按 Esc 清空搜索框。</p>
+  </section>
+
+  <section class="rx-card rx-card-mt">
+    <div class="rx-title" style="margin-bottom:4px !important;">💻 常用 VPS 测评与运维脚本速查</div>
+    <p class="rx-muted" style="margin-bottom:12px;">新机到手体检、系统巡检与基础环境初始化常用命令，点击右侧按钮一键复制。</p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="rx-box">
+        <div class="rx-head">
+          <div>
+            <strong>NodeQuality (NQ) 一键综合测评脚本</strong>
+            <div class="rx-muted">测试 Geekbench 5、fio 磁盘、IP 纯净度、流媒体解锁与三网回程路由</div>
+          </div>
+          <button type="button" class="rx-btn copy-cmd" data-cmd="bash &lt;(curl -sL https://run.NodeQuality.com)">复制命令</button>
+        </div>
+        <pre class="vps-raw-report">bash &lt;(curl -sL https://run.NodeQuality.com)</pre>
+      </div>
+
+      <div class="rx-box">
+        <div class="rx-head">
+          <div>
+            <strong>融合怪 VPS 综合测评脚本（ECS）</strong>
+            <div class="rx-muted">社区常用硬件跑分、回程路由、流媒体解锁与三网测速脚本</div>
+          </div>
+          <button type="button" class="rx-btn copy-cmd" data-cmd="curl -L https://gitlab.com/spiritysdx/za/-/raw/main/ecs.sh -o ecs.sh &amp;&amp; chmod +x ecs.sh &amp;&amp; bash ecs.sh">复制命令</button>
+        </div>
+        <pre class="vps-raw-report">curl -L https://gitlab.com/spiritysdx/za/-/raw/main/ecs.sh -o ecs.sh &amp;&amp; chmod +x ecs.sh &amp;&amp; bash ecs.sh</pre>
+      </div>
+
+      <div class="rx-box">
+        <div class="rx-head">
+          <div>
+            <strong>系统基础信息与端口监听巡检</strong>
+            <div class="rx-muted">一行命令查看 CPU 核数、内存、Swap、磁盘占用、负载与 TCP/UDP 监听端口</div>
+          </div>
+          <button type="button" class="rx-btn copy-cmd" data-cmd="hostname &amp;&amp; nproc &amp;&amp; free -m &amp;&amp; df -h / &amp;&amp; uptime &amp;&amp; ss -lntup">复制命令</button>
+        </div>
+        <pre class="vps-raw-report">hostname &amp;&amp; nproc &amp;&amp; free -m &amp;&amp; df -h / &amp;&amp; uptime &amp;&amp; ss -lntup</pre>
+      </div>
+
+      <div class="rx-box">
+        <div class="rx-head">
+          <div>
+            <strong>Docker 官方一键安装 &amp; 2GB Swap 交换文件</strong>
+            <div class="rx-muted">Ubuntu / Debian 安装最新 Docker Engine，或为 1G/2G 小内存机器防 OOM</div>
+          </div>
+          <button type="button" class="rx-btn copy-cmd" data-cmd="curl -fsSL https://get.docker.com | sudo sh">复制 Docker 命令</button>
+        </div>
+        <pre class="vps-raw-report"># 安装 Docker 与 Compose 插件
+curl -fsSL https://get.docker.com | sudo sh
+
+# 创建并启用 2GB Swap（适合小内存落地机）
+sudo fallocate -l 2G /swapfile &amp;&amp; sudo chmod 600 /swapfile &amp;&amp; sudo mkswap /swapfile &amp;&amp; sudo swapon /swapfile</pre>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function() {
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).then(function() { return true; }).catch(function() { return fallbackCopy(text); });
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+  function fallbackCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function checkIp() {
+    var cfEl = document.getElementById('ip-cf-box');
+    var intlEl = document.getElementById('ip-intl-box');
+    if (cfEl) cfEl.textContent = '正在检测边缘出口…';
+    if (intlEl) intlEl.textContent = '正在检测国际出口…';
+
+    fetch('https://1.1.1.1/cdn-cgi/trace', { cache: 'no-store' })
+      .then(function(r) { return r.text(); })
+      .then(function(txt) {
+        var map = {};
+        txt.split('\n').forEach(function(line) {
+          var idx = line.indexOf('=');
+          if (idx > 0) map[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+        });
+        if (cfEl) {
+          cfEl.textContent = map.ip
+            ? ('IP: ' + map.ip + ' · 国家/地区: ' + (map.loc || '未知') + ' · 边缘机房: ' + (map.colo || '未知') + ' (' + (map.http || '') + ')')
+            : '未能解析边缘节点返回结果';
+        }
+      })
+      .catch(function() {
+        if (cfEl) cfEl.textContent = '无法连接 1.1.1.1 边缘检测接口';
+      });
+
+    fetch('https://ipwho.is/', { cache: 'no-store' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (!d || !d.ip) throw new Error('empty');
+        var isp = (d.connection && (d.connection.isp || d.connection.org)) || '';
+        var asn = (d.connection && d.connection.asn) ? ('AS' + d.connection.asn) : '';
+        if (intlEl) intlEl.textContent = 'IP: ' + d.ip + ' · ' + (d.country || '') + ' ' + (d.city || '') + ' · ' + asn + ' ' + isp;
+      })
+      .catch(function() {
+        fetch('https://api.ip.sb/geoip', { cache: 'no-store' })
+          .then(function(r) { return r.json(); })
+          .then(function(d) {
+            if (intlEl && d && d.ip) {
+              intlEl.textContent = 'IP: ' + d.ip + ' · ' + (d.country || '') + ' ' + (d.city || '') + ' · ' + (d.asn ? 'AS' + d.asn : '') + ' ' + (d.isp || d.organization || '');
+            } else if (intlEl) {
+              intlEl.textContent = '国际 IP 接口请求受限或超时';
+            }
+          })
+          .catch(function() {
+            if (intlEl) intlEl.textContent = '国际 IP 接口请求受限或超时';
+          });
+      });
+  }
+  var btnIp = document.getElementById('btn-recheck-ip');
+  if (btnIp) btnIp.addEventListener('click', checkIp);
+  checkIp();
+
+  var pingTargets = [
+    { name: '融夕的书 · 博客主站 (blog.mycampusmail.com)', url: 'https://blog.mycampusmail.com/rss.xml' },
+    { name: '融夕的书 · 问答社区 (qa.mycampusmail.com)', url: 'https://qa.mycampusmail.com/api' },
+    { name: 'Cloudflare 全球边缘 (1.1.1.1)', url: 'https://1.1.1.1/cdn-cgi/trace' },
+    { name: 'MeowVPS 商家目录 (meowvps.com)', url: 'https://meowvps.com/favicon.ico' },
+    { name: 'GitHub 国际静态节点', url: 'https://github.githubassets.com/favicons/favicon.svg' }
+  ];
+
+  function runPing() {
+    var ul = document.getElementById('ping-list');
+    if (!ul) return;
+    ul.innerHTML = pingTargets.map(function(t, i) {
+      return '<li class="rx-box rx-ping-item"><span>' + t.name + '</span><span id="ping-res-' + i + '" class="rx-badge rx-mono">测速中…</span></li>';
+    }).join('');
+
+    pingTargets.forEach(function(t, i) {
+      var badge = document.getElementById('ping-res-' + i);
+      var t0 = performance.now();
+      var ctrl = new AbortController();
+      var timer = setTimeout(function() { ctrl.abort(); }, 5000);
+      fetch(t.url + (t.url.indexOf('?') !== -1 ? '&' : '?') + '_t=' + Date.now(), {
+        mode: 'no-cors',
+        cache: 'no-store',
+        signal: ctrl.signal
+      }).then(function() {
+        clearTimeout(timer);
+        var ms = Math.round(performance.now() - t0);
+        if (badge) {
+          badge.textContent = ms + ' ms';
+          badge.className = 'rx-badge rx-mono ' + (ms < 180 ? 'rx-badge-ok' : (ms < 400 ? 'rx-badge-warn' : 'rx-badge-err'));
+        }
+      }).catch(function() {
+        clearTimeout(timer);
+        if (badge) {
+          badge.textContent = '超时 / 阻断';
+          badge.className = 'rx-badge rx-mono rx-badge-err';
+        }
+      });
+    });
+  }
+  var btnPing = document.getElementById('btn-run-ping');
+  if (btnPing) btnPing.addEventListener('click', runPing);
+  runPing();
+
+  var expEl = document.getElementById('vps-expire');
+  if (expEl && !expEl.value) {
+    var d = new Date(Date.now() + 180 * 86400000);
+    expEl.value = d.toISOString().slice(0, 10);
+  }
+
+  function calcVps() {
+    var pEl = document.getElementById('vps-price');
+    var cEl = document.getElementById('vps-cycle');
+    var eEl = document.getElementById('vps-expire');
+    var out = document.getElementById('vps-result');
+    if (!out || !pEl || !cEl || !eEl) return;
+    var price = Math.max(0, parseFloat(pEl.value) || 0);
+    var cycle = parseFloat(cEl.value) || 0;
+    var exp = eEl.value ? new Date(eEl.value).getTime() : NaN;
+    if (cycle <= 0) {
+      out.textContent = '请输入大于 0 的周期天数（年付=365，月付=30）';
+      return;
+    }
+    if (isNaN(exp)) {
+      out.textContent = '请选择有效的到期日期';
+      return;
+    }
+    var days = Math.max(0, Math.ceil((exp - Date.now()) / 86400000));
+    var daily = (price / cycle).toFixed(2);
+    var remain = ((price / cycle) * days).toFixed(2);
+    var pct = Math.min(100, Math.round((days / cycle) * 100));
+    out.textContent = '剩余天数：' + days + ' 天（' + pct + '%） · 日均成本：' + daily + ' · 折算剩余价值：' + remain;
+  }
+
+  function calcBat() {
+    var sEl = document.getElementById('bat-s');
+    var pEl = document.getElementById('bat-p');
+    var aEl = document.getElementById('bat-ah');
+    var chEl = document.getElementById('bat-chem');
+    var out = document.getElementById('bat-result');
+    if (!out || !sEl || !pEl || !aEl || !chEl) return;
+    var parts = (chEl.value || '3.7,4.2').split(',');
+    var vNomCell = parseFloat(parts[0]) || 3.7;
+    var vMaxCell = parseFloat(parts[1]) || 4.2;
+    var s = Math.max(1, parseInt(sEl.value, 10) || 1);
+    var p = Math.max(1, parseInt(pEl.value, 10) || 1);
+    var ah = Math.max(0, parseFloat(aEl.value) || 0);
+    out.textContent = s + 'S' + p + 'P · 标称 ' + (s * vNomCell).toFixed(1) + 'V（满电 ' + (s * vMaxCell).toFixed(1) + 'V） · 总容量 ' + (p * ah).toFixed(1) + 'Ah · 总能量 ' + (s * vNomCell * p * ah).toFixed(1) + 'Wh';
+  }
+
+  ['vps-price', 'vps-cycle', 'vps-expire'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', calcVps);
+  });
+  ['bat-s', 'bat-p', 'bat-ah'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', calcBat);
+  });
+  var chEl = document.getElementById('bat-chem');
+  if (chEl) chEl.addEventListener('change', calcBat);
+  calcVps();
+  calcBat();
+
+  var btnCopyVps = document.getElementById('btn-copy-vps');
+  if (btnCopyVps) {
+    btnCopyVps.addEventListener('click', function() {
+      var out = document.getElementById('vps-result');
+      if (!out) return;
+      copyText(out.textContent || '').then(function(ok) {
+        if (!ok) return;
+        var old = btnCopyVps.textContent;
+        btnCopyVps.textContent = '已复制 ✓';
+        setTimeout(function() { btnCopyVps.textContent = old; }, 1400);
+      });
+    });
+  }
+
+  var gInput = document.getElementById('glossary-search');
+  var gCount = document.getElementById('glossary-count');
+  var gEmpty = document.getElementById('glossary-empty');
+  var gItems = Array.prototype.slice.call(document.querySelectorAll('#rx-toolbox .glossary-item'));
+  function filterGlossary() {
+    var q = (gInput ? gInput.value : '').trim().toLowerCase();
+    var vis = 0;
+    gItems.forEach(function(el) {
+      var hay = ((el.getAttribute('data-text') || '') + ' ' + (el.textContent || '')).toLowerCase();
+      var ok = !q || hay.indexOf(q) !== -1;
+      el.style.display = ok ? '' : 'none';
+      if (ok) vis += 1;
+    });
+    if (gEmpty) gEmpty.style.display = vis === 0 ? '' : 'none';
+    if (gCount) gCount.textContent = q ? ('匹配 ' + vis + ' / ' + gItems.length + ' 条') : ('共 ' + gItems.length + ' 条');
+  }
+  if (gInput) {
+    gInput.addEventListener('input', filterGlossary);
+    gInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && gInput.value) {
+        gInput.value = '';
+        filterGlossary();
+      }
+    });
+  }
+
+  Array.prototype.slice.call(document.querySelectorAll('#rx-toolbox .copy-cmd')).forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var cmd = btn.getAttribute('data-cmd') || '';
+      copyText(cmd).then(function(ok) {
+        if (!ok) return;
+        var old = btn.textContent;
+        btn.textContent = '已复制 ✓';
+        setTimeout(function() { btn.textContent = old; }, 1400);
+      });
+    });
+  });
+})();
+</script>

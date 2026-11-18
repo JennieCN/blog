@@ -5,6 +5,8 @@
  *   2. Frontmatter-stripped Markdown body (--out-body) for Halo raw content
  *   3. Halo HTML (--out-html) with:
  *      - Heading IDs emitted ONLY on h1/h2/h3 (converting h4..h6 to div[role="heading"] so Halo tocbot stays concise)
+ *      - Plaintext / language-text <pre><code> unwrapped to <pre class="vps-raw-report"> so Halo plugin-shiki
+ *        neither blurs them (pre:has(code) { filter: blur(10px) }) nor mounts 300+ Shadow DOM Web Components
  *      - Styled <details>/<summary> collapsible benchmark blocks
  *      - Optional progressive interactive filter + expand/collapse toolbar (--inject-toolbar) with Light & Dark (html.dark) support
  *      - Strict 0-broken-anchor & <details> balance verification
@@ -71,31 +73,47 @@ function splitFrontmatter(md) {
   return { frontmatter: m[1], body: md.slice(m[1].length) };
 }
 
-function buildInteractiveToolbarHtml(detailsCount) {
-  const chips = [
-    ['全部', ''],
-    ['👑 皇冠/推荐', '皇冠'],
-    ['9929 / CN2 / CMIN2', '9929|CN2|CMIN2|CTGGIA|专线'],
-    ['4837 / 软银 / CMI', '4837|SoftBank|软银|CMI|IIJ|Lumen'],
-    ['真家宽 / 商宽', 'Hinet|Seednet|HKT|AT&T|Verizon|Frontier|KDDI|夏威夷|家宽|商宽'],
-    ['NAT 共享', 'NAT'],
-    ['双 ISP 伪家宽', '双 ISP|伪家宽'],
-    ['9950X / EPYC 性能', '9950X|7950X|EPYC|Turin|Genoa|RS 1000'],
-    ['香港', '香港|HK'],
-    ['日本', '日本|东京|大阪|JP'],
-    ['台湾', '台湾|台北|彰化|Hinet|Seednet'],
-    ['美国', '美国|洛杉矶|圣何塞|夏威夷|西雅图|达拉斯'],
-    ['欧洲', '德国|法兰克福|英国|伦敦|荷兰|西班牙'],
-  ];
-  const chipBtns = chips
-    .map(
-      ([label, pat], idx) =>
-        `<button type="button" class="vps-tb-chip${idx === 0 ? ' is-active' : ''}" data-vps-chip="${pat}">${label}</button>`
-    )
-    .join('');
+// Wrap <style> inside a <div> so Halo's server-side Jsoup.parseBodyFragment enters InBody state
+// instead of hoisting a leading <style> into discarded <head>.
+function buildScopedStyleBlock(includeToolbar) {
+  const baseCss = `
+.markdown-body pre.vps-raw-report,
+pre.vps-raw-report {
+  margin: 10px 0 14px;
+  padding: 12px 14px !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #1e293b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+  filter: none !important;
+}
+html.dark .markdown-body pre.vps-raw-report,
+html.dark pre.vps-raw-report {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+.vps-review-subheading {
+  margin: 1.25em 0 0.5em;
+  font-size: 1.05em;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #0f172a;
+}
+html.dark .vps-review-subheading {
+  color: #f8fafc;
+}`.trim();
 
-  return `
-<style>
+  if (!includeToolbar) {
+    return `<div class="vps-style-carrier"><style>\n${baseCss}\n</style></div>`;
+  }
+
+  const toolbarCss = `
 #vps-quick-toolbar {
   margin: 16px 0 20px;
   padding: 14px 16px;
@@ -157,13 +175,6 @@ function buildInteractiveToolbarHtml(detailsCount) {
   font-size: 12.5px;
   color: #64748b;
 }
-.vps-review-subheading {
-  margin: 1.25em 0 0.5em;
-  font-size: 1.05em;
-  font-weight: 700;
-  line-height: 1.4;
-  color: #0f172a;
-}
 html.dark #vps-quick-toolbar {
   background: #1e293b;
   border-color: #334155;
@@ -201,11 +212,35 @@ html.dark #vps-quick-toolbar .vps-tb-chip.is-active {
 }
 html.dark #vps-quick-toolbar #vps-filter-status {
   color: #94a3b8;
+}`.trim();
+
+  return `<div class="vps-style-carrier"><style>\n${baseCss}\n${toolbarCss}\n</style></div>`;
 }
-html.dark .vps-review-subheading {
-  color: #f8fafc;
-}
-</style>
+
+function buildInteractiveToolbarHtml(detailsCount) {
+  const chips = [
+    ['全部', ''],
+    ['👑 皇冠/推荐', '皇冠'],
+    ['9929 / CN2 / CMIN2', '9929|CN2|CMIN2|CTGGIA|专线'],
+    ['4837 / 软银 / CMI', '4837|SoftBank|软银|CMI|IIJ|Lumen'],
+    ['真家宽 / 商宽', 'Hinet|Seednet|HKT|AT&T|Verizon|Frontier|KDDI|夏威夷|家宽|商宽'],
+    ['NAT 共享', 'NAT'],
+    ['双 ISP 伪家宽', '双 ISP|伪家宽'],
+    ['9950X / EPYC 性能', '9950X|7950X|EPYC|Turin|Genoa|RS 1000'],
+    ['香港', '香港|HK'],
+    ['日本', '日本|东京|大阪|JP'],
+    ['台湾', '台湾|台北|彰化|Hinet|Seednet'],
+    ['美国', '美国|洛杉矶|圣何塞|夏威夷|西雅图|达拉斯'],
+    ['欧洲', '德国|法兰克福|英国|伦敦|荷兰|西班牙'],
+  ];
+  const chipBtns = chips
+    .map(
+      ([label, pat], idx) =>
+        `<button type="button" class="vps-tb-chip${idx === 0 ? ' is-active' : ''}" data-vps-chip="${pat}">${label}</button>`
+    )
+    .join('');
+
+  return `
 <div id="vps-quick-toolbar">
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
     <div style="flex:1 1 260px;display:flex;gap:8px;align-items:center;">
@@ -287,7 +322,7 @@ html.dark .vps-review-subheading {
       if (item.regionP) item.regionP.style.display = showTbl ? '' : 'none';
     });
     if (!q) {
-      statusEl.textContent = '当前显示全部分类表共 ' + total + ' 条机型记录（支持空格多词组合筛选，如：美国 家宽、香港 9929）';
+      statusEl.textContent = '当前显示全部分类表共 ' + total + ' 条机型记录（支持空格多词组合筛选，点击商家或机型直接跳转测评）';
     } else {
       statusEl.textContent = '筛选「' + q.replace(/\\|/g, ' / ') + '」：匹配 ' + matched + ' / ' + total + ' 条分类机型记录';
     }
@@ -400,6 +435,8 @@ const emittedIds = new Set();
 const internalHrefs = [];
 let rawDetailsOpen = 0;
 let rawDetailsClose = 0;
+let rawReportPreCount = 0;
+let subheadingCount = 0;
 
 function rehypeAddSlugsAndVerify() {
   return (tree) => {
@@ -418,6 +455,16 @@ function rehypeAddSlugsAndVerify() {
         } else {
           throw new Error(`Unexpected raw HTML node encountered: ${val.slice(0, 120)}`);
         }
+      } else if (node.type === 'element' && node.tagName === 'pre') {
+        const onlyChild = node.children?.length === 1 ? node.children[0] : null;
+        if (onlyChild && onlyChild.type === 'element' && onlyChild.tagName === 'code') {
+          const classes = Array.isArray(onlyChild.properties?.className) ? onlyChild.properties.className : [];
+          if (classes.length === 0 || classes.includes('language-text') || classes.includes('language-plaintext')) {
+            node.children = onlyChild.children || [];
+            node.properties = { ...(node.properties || {}), className: ['vps-raw-report'] };
+            rawReportPreCount += 1;
+          }
+        }
       } else if (node.type === 'element' && HEADING_TAGS_WITH_ID.has(node.tagName)) {
         const txt = textOf(node).trim();
         const id = slugger.slug(txt);
@@ -434,6 +481,7 @@ function rehypeAddSlugsAndVerify() {
           'aria-level': lvl,
           className: ['vps-review-subheading'],
         };
+        subheadingCount += 1;
       } else if (node.type === 'element' && node.tagName === 'a') {
         const href = node.properties?.href;
         if (typeof href === 'string' && href.startsWith('#')) {
@@ -477,8 +525,12 @@ if (opts.injectToolbar) {
   htmlStr = htmlStr.replace(markerRx, `$1\n${toolbarHtml}`);
 }
 
+if (opts.injectToolbar || rawReportPreCount > 0 || subheadingCount > 0) {
+  htmlStr = `${buildScopedStyleBlock(opts.injectToolbar)}\n${htmlStr}`;
+}
+
 fs.writeFileSync(opts.outHtml, htmlStr, 'utf8');
 
 console.log(
-  `[render-halo-markdown] OK: headingIDs=${emittedIds.size} (h1-h3 only), anchors=${internalHrefs.length} (0 broken), details=${rawDetailsOpen}, toolbar=${opts.injectToolbar}, mdBytes=${Buffer.byteLength(finalMd, 'utf8').toLocaleString()}, htmlBytes=${Buffer.byteLength(htmlStr, 'utf8').toLocaleString()}`
+  `[render-halo-markdown] OK: headingIDs=${emittedIds.size} (h1-h3 only), anchors=${internalHrefs.length} (0 broken), details=${rawDetailsOpen}, rawPre=${rawReportPreCount}, toolbar=${opts.injectToolbar}, mdBytes=${Buffer.byteLength(finalMd, 'utf8').toLocaleString()}, htmlBytes=${Buffer.byteLength(htmlStr, 'utf8').toLocaleString()}`
 );

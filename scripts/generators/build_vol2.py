@@ -641,7 +641,7 @@ def build_vol2(out_path="/tmp/vol2_templated.md"):
     # ---------- Footer Cross-Link ----------
     w("## 上下卷联动与选机延伸阅读")
     w("")
-    w("- **想查近期新冒头的黑马商家与 457 条论坛实测？** 请看 **[上卷：NodeSeek 商家测评汇总：MeowVPS 新收录 57 家商家的产品线与 NQ/TQ 原文](/archives/nodeseek-merchant-reviews-2026h2)**（涵盖 61 家新晋/转正商家与 319 份可展开终端报告原文）。")
+    w("- **想查近期新冒头的黑马商家与 457 条论坛实测？** 请看 **[上卷：NodeSeek 商家测评汇总：MeowVPS 61 家新收录与转正商家的产品线与 NQ/TQ 原文（上卷）](/archives/nodeseek-merchant-reviews-2026h2)**（涵盖 61 家新晋/转正商家与 319 份可展开终端报告原文）。")
     w("- **想看猫猫博客跨商家横向对比跑分？** 请参考 [**《热门机器横评系列(1)：美西优化线路》**](https://meowvps.com/blog/benchboxus/) 与 [**《热门机器横评系列(2)：欧洲线路机器》**](https://meowvps.com/blog/benchboxeu/)。")
     w("- **不确定怎么看单线程、重传、双 ISP 与流量池？** 请看 **[VPS 测评怎么读：带宽、IP 标签与流量成本](/archives/reading-vps-reviews)**。")
     w("- **买好线路机与家宽落地后怎么串成完整链路？** 请看 **[VPS 线路与落地怎么搭：链式代理、反向隧道与 Po0](/archives/relay-and-egress-guide)** 与 **[Mihomo 链式与回退：三个配置陷阱](/archives/mihomo-chain-and-fallback)**。")
