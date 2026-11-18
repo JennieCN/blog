@@ -582,6 +582,14 @@ html[data-rx-skin] .DiscussionListItem {
   margin-bottom: 10px;
 }
 
+html[data-rx-skin] .DiscussionListItem-info,
+html[data-rx-skin] .DiscussionListItem-info span,
+html[data-rx-skin] .DiscussionListItem-info a,
+html[data-rx-skin] .DiscussionListItem-info .username,
+html[data-rx-skin] .DiscussionListItem-info .TagsLabel {
+  color: var(--rx-text-3) !important;
+}
+
 html[data-rx-skin="pop"] .DiscussionListItem {
   border: 2.5px solid var(--rx-line);
   transition: transform .2s var(--rx-ease-spring), box-shadow .2s var(--rx-ease-spring);
@@ -671,17 +679,41 @@ html[data-rx-skin="plain"] .Button--primary {
   box-shadow: none !important;
 }
 
-/* 标签 (.TagLabel / .TagTile) */
+/* 标签 (.TagLabel / .DiscussionHero--colored .TagLabel)
+   覆盖 Flarum 在 .DiscussionHero--colored 内把标签背景反转为纯白 #fff 导致白底白字的问题 */
+html[data-rx-skin] .TagLabel:not(.colored),
+html[data-rx-skin] .DiscussionHero--colored .TagLabel:not(.colored) {
+  background: var(--rx-surface-2) !important;
+  color: var(--rx-text-2) !important;
+}
+html[data-rx-skin] .TagLabel.colored,
+html[data-rx-skin] .DiscussionHero .TagLabel.colored,
+html[data-rx-skin] .DiscussionHero--colored .TagLabel.colored {
+  background: var(--tag-bg, var(--rx-accent)) !important;
+  color: #ffffff !important;
+}
+html[data-rx-skin] .TagLabel.colored.text-contrast--dark,
+html[data-rx-skin] .DiscussionHero .TagLabel.colored.text-contrast--dark,
+html[data-rx-skin] .DiscussionHero--colored .TagLabel.colored.text-contrast--dark {
+  color: #15121c !important;
+}
+html[data-rx-skin] .TagLabel .TagLabel-text,
+html[data-rx-skin] .TagLabel .TagLabel-name {
+  color: inherit !important;
+}
 html[data-rx-skin="pop"] .TagLabel {
   border: 1.5px solid var(--rx-line);
   border-radius: 999px;
   font-weight: 700;
 }
-html[data-rx-skin="ink"] .TagLabel {
+html[data-rx-skin="ink"] .TagLabel,
+html[data-rx-skin="ink"] .TagLabel.colored,
+html[data-rx-skin="ink"] .DiscussionHero .TagLabel.colored,
+html[data-rx-skin="ink"] .DiscussionHero--colored .TagLabel.colored {
   border-radius: 0;
-  border: 1px solid var(--rx-line-strong);
-  background: transparent !important;
-  color: var(--rx-text-2) !important;
+  border: 1px solid var(--rx-line-strong) !important;
+  background: var(--rx-surface-2) !important;
+  color: var(--rx-text) !important;
   font-family: var(--rx-font-serif);
 }
 html[data-rx-skin="plain"] .TagLabel {

@@ -41,6 +41,12 @@ def _rgb_luminance(rgb_str: str) -> float:
     return 0.2126 * vals[0] + 0.7152 * vals[1] + 0.0722 * vals[2]
 
 
+def _contrast_ratio(fg_str: str, bg_str: str) -> float:
+    l1 = _rgb_luminance(fg_str)
+    l2 = _rgb_luminance(bg_str)
+    return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
+
+
 class _SilentHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
@@ -156,6 +162,16 @@ class TestRxSkinsCore(ChromeHarnessMixin, unittest.TestCase):
 
         deploy_src = (REPO_ROOT / "scripts" / "deploy-rx-skins.py").read_text(encoding="utf-8")
         self.assertNotIn("rx_skins_deploy_payload.json", deploy_src, "deploy-rx-skins.py must not write plaintext credential payload files to /tmp")
+        self.assertIn("/favicon.ico", deploy_src, "deploy-rx-skins.py should configure /favicon.ico rewrite in Caddyfile")
+        self.assertIn("-type d -empty -delete", deploy_src, "deploy-rx-skins.py should clean expired empty backup directories in backup.sh")
+
+        tokens_css = (SKINS_DIR / "rx-tokens.css").read_text(encoding="utf-8")
+        btn_rule = re.search(r"\.rx-icon-btn\s*\{([^}]*)\}", tokens_css)
+        self.assertIsNotNone(btn_rule)
+        self.assertIn("color", btn_rule.group(1), ".rx-icon-btn transition should synchronize color alongside background")
+        m_trans = re.search(r"transition\s*:\s*([^;]+);", btn_rule.group(1))
+        self.assertIsNotNone(m_trans)
+        self.assertIn("color", m_trans.group(1), ".rx-icon-btn transition property missing color sync")
 
     def test_svg_assets_and_token_selectors(self):
         for svg_name in ("ink-landscape.svg", "ink-mountains.svg", "ink-stroke.svg"):
@@ -420,6 +436,40 @@ class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
         self.assertEqual(snaps["plain"]["bodyBg"], "rgb(255, 255, 255)")
         self.assertEqual(snaps["plain"]["cardBorderW"], 1.0)
 
+    def test_halo_pop_dark_skin_button_label_contrast_and_reviews_tokens(self):
+        self._load_halo(1280, media_features=[{"name": "prefers-color-scheme", "value": "dark"}])
+        btn_state = self.eval_js("""
+        (() => {
+          const st = document.createElement('style');
+          st.textContent = '*, *::before, *::after { transition: none !important; }';
+          document.head.appendChild(st);
+          document.documentElement.dataset.rxSkin = 'pop';
+          document.documentElement.classList.add('rx-dark', 'dark');
+          document.body.offsetHeight;
+          const btn = document.getElementById('rx-skin-toggle');
+          const lbl = btn ? btn.querySelector('.rx-btn-label') : null;
+          return {
+            btnBg: btn ? getComputedStyle(btn).backgroundColor : '',
+            btnFg: btn ? getComputedStyle(btn).color : '',
+            lblFg: lbl ? getComputedStyle(lbl).color : '',
+          };
+        })()
+        """)
+        ratio = _contrast_ratio(btn_state["lblFg"], btn_state["btnBg"])
+        self.assertGreaterEqual(
+            ratio,
+            8.0,
+            f"#rx-skin-toggle .rx-btn-label unreadable in Halo pop:dark ({ratio:.2f}:1): {btn_state}",
+        )
+
+        # Ensure my-reviews.html & render-halo-markdown.mjs use skin variables instead of legacy sky-blue hexes
+        legacy_sky_hexes = ("#0284c7", "#0369a1", "#38bdf8", "#0c4a6e", "#f0f9ff", "#e0f2fe")
+        self.assertNotIn('id="rx-toast"', (REPO_ROOT / "scripts/halo-pages/my-reviews.html").read_text(encoding="utf-8"), "my-reviews.html must not declare duplicate #rx-toast")
+        for rel_file in ("scripts/halo-pages/my-reviews.html", "scripts/render-halo-markdown.mjs"):
+            content = (REPO_ROOT / rel_file).read_text(encoding="utf-8").lower()
+            for hx in legacy_sky_hexes:
+                self.assertNotIn(hx, content, f"Legacy sky-blue hex {hx} still hardcoded in {rel_file}")
+
     def test_halo_first_visit_os_dark_mode_and_reduced_transparency(self):
         self._load_halo(
             1280,
@@ -537,6 +587,14 @@ body { margin: 0; background: var(--body-bg); color: var(--text-color); }
 .App-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--header-bg); box-sizing: border-box; }
 .Header-controls { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .Button--primary { background: var(--button-primary-bg); color: var(--button-primary-color); border: 0; padding: 6px 12px; }
+/* Flarum 2.0 native colored DiscussionHero TagLabel & muted DiscussionListItem-info rules */
+.TagLabel.colored { background: var(--tag-bg); color: #ffffff; padding: 2px 8px; display: inline-block; }
+.TagLabel.colored.text-contrast--light { color: #ffffff; }
+.DiscussionHero--colored .TagLabel,
+.DiscussionHero--colored .TagLabel.colored { background: #ffffff; }
+.DiscussionListItem-info,
+.DiscussionListItem-info .username,
+.DiscussionListItem-info .TagsLabel { color: #aaaaaa; }
 """
 
 FLARUM_APP_BODY = """
@@ -551,8 +609,11 @@ FLARUM_APP_BODY = """
     </div>
   </header>
   <main class="App-content">
-    <header class="Hero WelcomeHero">
+    <header class="Hero DiscussionHero DiscussionHero--colored" style="--hero-bg: #2563eb">
       <div class="container">
+        <ul class="DiscussionHero-items" style="list-style:none;padding:0;margin:0 0 8px">
+          <li class="item-tags"><a class="TagLabel colored text-contrast--light" style="--tag-bg: #2563eb;" href="/t/vps"><span class="TagLabel-text">VPS 科普</span></a></li>
+        </ul>
         <h1 class="Hero-title">融夕问答社区</h1>
         <div class="Hero-subtitle">VPS 线路实测、赛车电控、机器人与 AI 交流</div>
       </div>
@@ -565,7 +626,10 @@ FLARUM_APP_BODY = """
         <ul class="DiscussionList-discussions" style="list-style:none;padding:0;margin:12px 0">
           <li class="DiscussionListItem DiscussionListItem--sticky" style="padding:12px">
             <a class="DiscussionListItem-main" href="/d/1"><h2 class="DiscussionListItem-title">【置顶】117 家 VPS 测评索引</h2></a>
-            <span class="TagLabel">VPS 交流</span>
+            <ul class="DiscussionListItem-info" style="list-style:none;padding:0;margin:4px 0 0;display:flex;gap:8px">
+              <li class="item-tags"><span class="TagsLabel">VPS 科普</span></li>
+              <li class="item-terminalPost"><span><span class="username">admin</span> 发布于 5 小时前</span></li>
+            </ul>
           </li>
           <li class="DiscussionListItem" style="padding:12px;margin-top:8px">
             <a class="DiscussionListItem-main" href="/d/2"><h2 class="DiscussionListItem-title">CN2 GIA 晚高峰延迟对比</h2></a>
@@ -593,6 +657,62 @@ class TestRxFlarumAdapter(ChromeHarnessMixin, unittest.TestCase):
             f"<style>{FLARUM_NATIVE_STYLE}</style></head><body>{custom_header}{FLARUM_APP_BODY}</body></html>"
         )
         self.open_fixture("flarum-fixture.html", doc, width=width, media_features=media_features)
+
+    def test_flarum_colored_tag_label_and_meta_contrast_across_all_modes(self):
+        self._load_flarum(1280, media_features=[{"name": "prefers-color-scheme", "value": "light"}])
+        matrix = self.eval_js("""
+        (() => {
+          const st = document.createElement('style');
+          st.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+          document.head.appendChild(st);
+          function parseRgb(s) {
+            const m = s && s.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)(?:,\\s*([\\d.]+))?\\)/);
+            if (!m) return null;
+            return [+m[1], +m[2], +m[3], m[4] === undefined ? 1 : +m[4]];
+          }
+          function effBg(el) {
+            let cur = el;
+            while (cur && cur !== document.documentElement) {
+              const c = parseRgb(getComputedStyle(cur).backgroundColor);
+              if (c && c[3] >= 0.55) return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+              cur = cur.parentElement;
+            }
+            return getComputedStyle(document.body).backgroundColor;
+          }
+          const tag = document.querySelector('.DiscussionHero .TagLabel.colored');
+          const tagTxt = tag.querySelector('.TagLabel-text') || tag;
+          const user = document.querySelector('.DiscussionListItem-info .username');
+          const out = {};
+          for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+            for (const dk of [false, true]) {
+              document.documentElement.dataset.rxSkin = sk;
+              document.documentElement.classList.toggle('rx-dark', dk);
+              document.documentElement.setAttribute('data-theme', dk ? 'dark' : 'light');
+              document.body.offsetHeight;
+              out[sk + ':' + (dk ? 'dark' : 'light')] = {
+                tagFg: getComputedStyle(tagTxt).color,
+                tagBg: effBg(tagTxt),
+                userFg: getComputedStyle(user).color,
+                userBg: effBg(user),
+              };
+            }
+          }
+          return out;
+        })()
+        """)
+        for mode, st in matrix.items():
+            tag_ratio = _contrast_ratio(st["tagFg"], st["tagBg"])
+            user_ratio = _contrast_ratio(st["userFg"], st["userBg"])
+            self.assertGreaterEqual(
+                tag_ratio,
+                4.2,
+                f"Flarum .TagLabel.colored unreadable ({tag_ratio:.2f}:1) in {mode}: {st}",
+            )
+            self.assertGreaterEqual(
+                user_ratio,
+                4.0,
+                f"Flarum .DiscussionListItem-info .username low contrast ({user_ratio:.2f}:1) in {mode}: {st}",
+            )
 
     def test_flarum_first_visit_os_dark_mode_and_reduced_transparency(self):
         self._load_flarum(

@@ -48,6 +48,7 @@ PAGE_URLS = [
     f"{BASE}/about",
     f"{BASE}/privacy-policy",
     f"{BASE}/user-agreement",
+    f"{BASE}/favicon.ico",
     f"{BASE}/upload/favicon.png",
     f"{BASE}/upload/vps-vol1-cover.png",
     f"{BASE}/upload/vps-vol2-cover.png",
@@ -56,6 +57,7 @@ PAGE_URLS = [
     f"{BASE}/upload/mihomo-chain-and-fallback-cover.png",
     f"{BASE}/upload/first-post-cover.png",
     f"{BASE}/upload/site-hero-banner.png",
+    f"{QA_BASE}/favicon.ico",
     f"{QA_BASE}/assets/favicon.png",
     f"{QA_BASE}/sitemap.xml",
     f"{QA_BASE}/feed.rss",
@@ -77,6 +79,12 @@ def _rgb_luminance(rgb_str: str) -> float:
         v = c / 255.0
         vals.append(v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4)
     return 0.2126 * vals[0] + 0.7152 * vals[1] + 0.0722 * vals[2]
+
+
+def _contrast_ratio(fg_str: str, bg_str: str) -> float:
+    l1 = _rgb_luminance(fg_str)
+    l2 = _rgb_luminance(bg_str)
+    return (max(l1, l2) + 0.05) / (min(l1, l2) + 0.05)
 
 
 def http_fetch(req, timeout=20, retries=3):
@@ -182,9 +190,15 @@ def check_dual_site_cc_skins(call, guide_id: str):
         document.documentElement.classList.add('rx-dark', 'dark');
         bgs[sk + ':dark'] = getComputedStyle(document.body).backgroundColor;
       }
-      document.documentElement.classList.remove('rx-dark', 'dark');
       window.RXSkins.setSkin('pop');
-      return JSON.stringify({ initialSkin, hasBtn, hasProgress, bgs });
+      document.documentElement.dataset.rxSkin = 'pop';
+      document.documentElement.classList.add('rx-dark', 'dark');
+      const btn = document.getElementById('rx-skin-toggle');
+      const lbl = btn ? btn.querySelector('.rx-btn-label') : null;
+      const popDarkBtnBg = btn ? getComputedStyle(btn).backgroundColor : '';
+      const popDarkLblFg = lbl ? getComputedStyle(lbl).color : '';
+      document.documentElement.classList.remove('rx-dark', 'dark');
+      return JSON.stringify({ initialSkin, hasBtn, hasProgress, bgs, popDarkBtnBg, popDarkLblFg });
     })()
     """, returnByValue=True)["result"]["value"])
 
@@ -192,6 +206,7 @@ def check_dual_site_cc_skins(call, guide_id: str):
     print(f"  Halo 4-Skin Light Bgs         : pop={halo_home_skins['bgs']['pop:light']} | ink={halo_home_skins['bgs']['ink:light']} | luxe={halo_home_skins['bgs']['luxe:light']} | plain={halo_home_skins['bgs']['plain:light']}")
     assert halo_home_skins["initialSkin"] == "pop", halo_home_skins
     assert halo_home_skins["hasBtn"] is True and halo_home_skins["hasProgress"] is True
+    assert _contrast_ratio(halo_home_skins["popDarkLblFg"], halo_home_skins["popDarkBtnBg"]) >= 8.0, halo_home_skins
     assert halo_home_skins["bgs"]["pop:light"] == "rgb(255, 247, 232)", halo_home_skins["bgs"]
     assert halo_home_skins["bgs"]["ink:light"] == "rgb(239, 231, 214)", halo_home_skins["bgs"]
     assert halo_home_skins["bgs"]["luxe:light"] == "rgb(246, 241, 233)", halo_home_skins["bgs"]
@@ -319,6 +334,31 @@ def check_dual_site_cc_skins(call, guide_id: str):
     # Flarum 390px mobile zero-overflow check across all 4 skins
     call("Page.navigate", url=f"{QA_BASE}/d/{guide_id}?_mob={int(time.time())}")
     time.sleep(2.5)
+    tag_matrix = json.loads(call("Runtime.evaluate", expression=r"""
+    (() => {
+      const tag = document.querySelector('.DiscussionHero .TagLabel.colored');
+      const txt = tag ? (tag.querySelector('.TagLabel-text') || tag) : null;
+      const out = {};
+      if (!tag || !txt) return JSON.stringify(out);
+      for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+        for (const dk of [false, true]) {
+          document.documentElement.dataset.rxSkin = sk;
+          document.documentElement.classList.toggle('rx-dark', dk);
+          document.documentElement.setAttribute('data-theme', dk ? 'dark' : 'light');
+          out[sk + ':' + (dk ? 'dark' : 'light')] = {
+            fg: getComputedStyle(txt).color,
+            bg: getComputedStyle(tag).backgroundColor
+          };
+        }
+      }
+      return JSON.stringify(out);
+    })()
+    """, returnByValue=True)["result"]["value"])
+    assert len(tag_matrix) == 8, f"Missing .TagLabel.colored on Flarum guide thread: {tag_matrix}"
+    for mk, tv in tag_matrix.items():
+        cr = _contrast_ratio(tv["fg"], tv["bg"])
+        assert cr >= 4.2, f"Flarum .TagLabel.colored contrast too low ({cr:.2f}:1) in {mk}: {tv}"
+    print("  Flarum Colored TagLabel 8-Mode: ALL >= 4.2:1 contrast (zero white-on-white)")
     call("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True)
     time.sleep(0.6)
     qa_mob = json.loads(call("Runtime.evaluate", expression=r"""

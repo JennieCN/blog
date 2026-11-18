@@ -122,6 +122,7 @@ html[data-rx-skin] header#header-menu {
   color: var(--rx-text) !important;
   border-bottom: var(--rx-bw) solid var(--rx-line);
   box-shadow: none !important;
+  transition: none !important;
 }
 
 html[data-rx-skin] header#header-menu a,
@@ -135,10 +136,12 @@ html[data-rx-skin] header#header-menu a:hover {
   color: var(--rx-accent) !important;
 }
 
-html[data-rx-skin] header#header-menu #rx-skin-toggle {
+html[data-rx-skin] header#header-menu #rx-skin-toggle,
+html[data-rx-skin] header#header-menu #rx-skin-toggle span {
   color: var(--rx-text);
 }
-html[data-rx-skin="pop"] header#header-menu #rx-skin-toggle {
+html[data-rx-skin="pop"] header#header-menu #rx-skin-toggle,
+html[data-rx-skin="pop"] header#header-menu #rx-skin-toggle span {
   color: #15121c !important;
 }
 
@@ -605,7 +608,7 @@ html[data-rx-skin] .markdown-body td {
   color: var(--rx-text-2);
 }
 
-html[data-rx-skin] .markdown-body a:not(.vps-vendor-pill):not(.rx-btn) {
+html[data-rx-skin] .markdown-body a:not(.vps-vendor-pill):not(.rx-btn):not(.vps-back-reviews-link) {
   color: var(--rx-accent);
 }
 
@@ -765,6 +768,8 @@ html[data-rx-skin] #vps-quick-toolbar,
 html[data-rx-skin] #rx-about .rx-hero,
 html[data-rx-skin] #rx-about .rx-card,
 html[data-rx-skin] #rx-reviews .rx-lead,
+html[data-rx-skin] #rx-reviews .rx-toolbar,
+html[data-rx-skin] #rx-reviews .rx-compare-panel,
 html[data-rx-skin] #rx-reviews .rx-card,
 html[data-rx-skin] #rx-toolbox .rx-lead,
 html[data-rx-skin] #rx-toolbox .rx-card,
@@ -780,6 +785,8 @@ html[data-rx-skin] .rx-legal-meta {
 html[data-rx-skin="plain"] .vps-summary-panel,
 html[data-rx-skin="plain"] #vps-quick-toolbar,
 html[data-rx-skin="plain"] #rx-about .rx-card,
+html[data-rx-skin="plain"] #rx-reviews .rx-toolbar,
+html[data-rx-skin="plain"] #rx-reviews .rx-compare-panel,
 html[data-rx-skin="plain"] #rx-reviews .rx-card,
 html[data-rx-skin="plain"] #rx-toolbox .rx-card,
 html[data-rx-skin="plain"] .rx-legal .rx-legal-meta,
@@ -815,6 +822,7 @@ html[data-rx-skin] .rx-legal {
 }
 
 html[data-rx-skin] #vps-quick-toolbar .vps-tb-input,
+html[data-rx-skin] #rx-reviews .rx-search-input,
 html[data-rx-skin] #rx-toolbox .rx-input {
   background: var(--rx-surface) !important;
   color: var(--rx-text) !important;
@@ -826,6 +834,10 @@ html[data-rx-skin] #vps-quick-toolbar .vps-tb-btn,
 html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip,
 html[data-rx-skin] #vps-quick-toolbar .vps-vendor-pill,
 html[data-rx-skin] #rx-reviews .rx-jump a,
+html[data-rx-skin] #rx-reviews .rx-chip,
+html[data-rx-skin] #rx-reviews .rx-mode-btn,
+html[data-rx-skin] #rx-reviews .rx-rail-pill,
+html[data-rx-skin] #rx-reviews .rx-tool-btn,
 html[data-rx-skin] #rx-reviews .rx-tab,
 html[data-rx-skin] #rx-toolbox .rx-btn,
 html[data-rx-skin] #rx-about .rx-pill,
@@ -842,6 +854,9 @@ html[data-rx-skin] #vps-quick-toolbar .vps-vendor-pill.is-crown {
 }
 
 html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip.is-active,
+html[data-rx-skin] #rx-reviews .rx-chip.is-active,
+html[data-rx-skin] #rx-reviews .rx-mode-btn.is-active,
+html[data-rx-skin] #rx-reviews .rx-rail-pill.is-current,
 html[data-rx-skin] #rx-reviews .rx-tab.is-active,
 html[data-rx-skin] #rx-reviews .rx-tab[aria-selected="true"] {
   background: var(--rx-accent) !important;
@@ -850,6 +865,9 @@ html[data-rx-skin] #rx-reviews .rx-tab[aria-selected="true"] {
 }
 
 html[data-rx-skin="pop"] #vps-quick-toolbar .vps-tb-chip.is-active,
+html[data-rx-skin="pop"] #rx-reviews .rx-chip.is-active,
+html[data-rx-skin="pop"] #rx-reviews .rx-mode-btn.is-active,
+html[data-rx-skin="pop"] #rx-reviews .rx-rail-pill.is-current,
 html[data-rx-skin="pop"] #rx-reviews .rx-tab.is-active,
 html[data-rx-skin="pop"] #rx-reviews .rx-tab[aria-selected="true"] {
   background: var(--rx-pop-yellow) !important;
@@ -872,7 +890,8 @@ html[data-rx-skin] .toc-container a:hover {
   }
   html[data-rx-skin="luxe"] header#header-menu,
   html[data-rx-skin="ink"] header#header-menu,
-  html[data-rx-skin="luxe"] footer {
+  html[data-rx-skin="luxe"] footer,
+  html[data-rx-skin] #rx-reviews .rx-sticky-rail {
     background: var(--rx-surface) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;

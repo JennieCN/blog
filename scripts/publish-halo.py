@@ -3,7 +3,7 @@
 """
 Publish, update, pin, unpublish Posts or SinglePages (with optional Menu registration) on Halo CMS on vps8 (127.0.0.1:8091).
 Credentials are read strictly from private/gatewave-halo-admin.txt or environment variables
-(NEVER hardcoded in repository scripts).
+and streamed in-memory over SSH stdin (never written to local or remote /tmp files).
 
 Usage (publish/update a Post + optional pin):
   python3 scripts/publish-halo.py \
@@ -33,7 +33,7 @@ Usage (batch publish multiple items in one session):
 Usage (unpublish placeholder stub):
   python3 scripts/publish-halo.py --post-name post-ai-welcome --unpublish-only
 """
-import argparse, json, os, re, subprocess, tempfile
+import argparse, json, os, re, shlex, subprocess
 
 
 def read_credentials(cred_path):
@@ -84,9 +84,9 @@ def parse_tag_specs(tags_str):
 
 
 REMOTE_RUNNER = r"""
-import os, sys, subprocess, re, json, base64, time, urllib.request, urllib.parse, urllib.error, http.cookiejar
+import os, sys, subprocess, re, json, base64, tempfile, time, urllib.request, urllib.parse, urllib.error, http.cookiejar
 
-cfg = json.load(open("/tmp/halo_pub_job.json", encoding="utf-8"))
+cfg = json.loads(sys.stdin.read())
 BASE = cfg["base_url"]
 
 cj = http.cookiejar.CookieJar()
@@ -96,10 +96,14 @@ html = opener.open(BASE + "/login").read().decode("utf-8")
 csrf = re.search(r'name="_csrf"\s+value="([^"]+)"', html).group(1)
 pub = re.search(r'const\s+publicKey\s*=\s*"([^"]+)"', html).group(1).replace("\\/", "/")
 pem = "-----BEGIN PUBLIC KEY-----\n" + "\n".join(pub[i:i+64] for i in range(0, len(pub), 64)) + "\n-----END PUBLIC KEY-----\n"
-open("/tmp/hp_pub.pem", "w").write(pem)
-enc = subprocess.check_output(["openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", "/tmp/hp_pub.pem"], input=cfg["password"].encode("utf-8"))
-try: os.unlink("/tmp/hp_pub.pem")
-except Exception: pass
+with tempfile.NamedTemporaryFile("w", delete=False) as tf:
+    tf.write(pem)
+    pem_path = tf.name
+try:
+    enc = subprocess.check_output(["openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", pem_path], input=cfg["password"].encode("utf-8"))
+finally:
+    try: os.unlink(pem_path)
+    except Exception: pass
 pw_b64 = base64.b64encode(enc).decode("ascii")
 data = urllib.parse.urlencode({"_csrf": csrf, "username": cfg["username"], "password": pw_b64}).encode("utf-8")
 opener.open(urllib.request.Request(BASE + "/login", data=data, headers={"Content-Type": "application/x-www-form-urlencoded"}))
@@ -330,30 +334,26 @@ def publish_single_page_item(item):
                     api_req("PUT", f"/api/v1alpha1/menuitems/{mname}", mi_obj)
             print(f"[publish-halo] ENSURED MenuItem {menu_item_name} ({menu_display}) in primary menu -> {items_list}")
 
-try:
-    if cfg.get("list_posts"):
-        st_l, res_l = api_req("GET", "/apis/content.halo.run/v1alpha1/posts?size=100")
-        for it in res_l.get("items", []):
-            sp = it.get("spec", {})
-            print(f"  {it['metadata']['name']:38s} | slug={sp.get('slug',''):36s} | pub={str(sp.get('publish')):5s} | pinned={str(sp.get('pinned')):5s} | prio={sp.get('priority',0):2d} | {sp.get('title','')}")
-        sys.exit(0)
+if cfg.get("list_posts"):
+    st_l, res_l = api_req("GET", "/apis/content.halo.run/v1alpha1/posts?size=100")
+    for it in res_l.get("items", []):
+        sp = it.get("spec", {})
+        print(f"  {it['metadata']['name']:38s} | slug={sp.get('slug',''):36s} | pub={str(sp.get('publish')):5s} | pinned={str(sp.get('pinned')):5s} | prio={sp.get('priority',0):2d} | {sp.get('title','')}")
+    sys.exit(0)
 
-    if cfg.get("unpublish_only"):
-        for pname in [x.strip() for x in cfg["post_name"].split(",") if x.strip()]:
-            st_u, res_u = api_req("PUT", f"/apis/api.console.halo.run/v1alpha1/posts/{pname}/unpublish")
-            if st_u != 200:
-                raise RuntimeError(f"Unpublish {pname} failed ({st_u}): {res_u}")
-            print(f"[publish-halo] UNPUBLISHED {pname}")
-        sys.exit(0)
+if cfg.get("unpublish_only"):
+    for pname in [x.strip() for x in cfg["post_name"].split(",") if x.strip()]:
+        st_u, res_u = api_req("PUT", f"/apis/api.console.halo.run/v1alpha1/posts/{pname}/unpublish")
+        if st_u != 200:
+            raise RuntimeError(f"Unpublish {pname} failed ({st_u}): {res_u}")
+        print(f"[publish-halo] UNPUBLISHED {pname}")
+    sys.exit(0)
 
-    for item in cfg.get("items", []):
-        if item.get("single_page"):
-            publish_single_page_item(item)
-        else:
-            publish_post_item(item)
-finally:
-    try: os.unlink("/tmp/halo_pub_job.json")
-    except Exception: pass
+for item in cfg.get("items", []):
+    if item.get("single_page"):
+        publish_single_page_item(item)
+    else:
+        publish_post_item(item)
 """
 
 
@@ -463,16 +463,11 @@ def main():
         })
         job = {"base_url": args.base_url, "username": user, "password": pw, "items": [item]}
 
-    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as tf:
-        json.dump(job, tf, ensure_ascii=False)
-        local_job = tf.name
-
-    try:
-        subprocess.check_call(["scp", "-q", local_job, f"{args.ssh_host}:/tmp/halo_pub_job.json"])
-        subprocess.run(["ssh", "-o", "BatchMode=yes", args.ssh_host, "python3", "-"], input=REMOTE_RUNNER.encode("utf-8"), check=True)
-    finally:
-        if os.path.exists(local_job):
-            os.unlink(local_job)
+    subprocess.run(
+        ["ssh", "-o", "BatchMode=yes", args.ssh_host, f"python3 -c {shlex.quote(REMOTE_RUNNER)}"],
+        input=json.dumps(job, ensure_ascii=False).encode("utf-8"),
+        check=True,
+    )
 
 
 if __name__ == "__main__":

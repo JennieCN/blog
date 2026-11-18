@@ -113,7 +113,7 @@ if "./rx-skins:/srv/rx-skins:ro" not in compose_txt:
 else:
     print("[deploy-rx-skins] docker-compose.yml already mounts ./rx-skins:/srv/rx-skins:ro")
 
-# 4. Idempotently add handle_path /rx-skins/* to both subdomains in Caddyfile
+# 4. Idempotently add handle_path /rx-skins/* & handle /favicon.ico to both subdomains in Caddyfile
 caddy_path = STACK_DIR / "Caddyfile"
 caddy_txt = caddy_path.read_text(encoding="utf-8")
 RX_CADDY_SNIPPET = (
@@ -121,6 +121,20 @@ RX_CADDY_SNIPPET = (
     "\t\troot * /srv/rx-skins\n"
     "\t\theader Cache-Control \"public, max-age=604800\"\n"
     "\t\tfile_server\n"
+    "\t}\n\n"
+)
+BLOG_FAVICON_SNIPPET = (
+    "\thandle /favicon.ico {\n"
+    "\t\theader Cache-Control \"public, max-age=604800\"\n"
+    "\t\trewrite * /upload/favicon.png\n"
+    "\t\treverse_proxy halo:8090\n"
+    "\t}\n\n"
+)
+QA_FAVICON_SNIPPET = (
+    "\thandle /favicon.ico {\n"
+    "\t\theader Cache-Control \"public, max-age=604800\"\n"
+    "\t\trewrite * /assets/favicon.png\n"
+    "\t\treverse_proxy flarum:8000\n"
     "\t}\n\n"
 )
 
@@ -132,32 +146,53 @@ if "handle_path /rx-skins/*" not in caddy_txt:
         caddy_txt = caddy_txt.replace(target, RX_CADDY_SNIPPET + target, 1)
     updated_caddy = True
 elif caddy_txt.count("handle_path /rx-skins/*") < 2:
-    if "\treverse_proxy flarum:8000" in caddy_txt and "qa.mycampusmail.com" in caddy_txt:
-        parts = caddy_txt.split("qa.mycampusmail.com", 1)
+    if "\treverse_proxy flarum:8000" in caddy_txt and "\nqa.mycampusmail.com {" in caddy_txt:
+        parts = caddy_txt.split("\nqa.mycampusmail.com {", 1)
         if "handle_path /rx-skins/*" not in parts[1]:
             parts[1] = parts[1].replace("\treverse_proxy flarum:8000", RX_CADDY_SNIPPET + "\treverse_proxy flarum:8000", 1)
-            caddy_txt = "qa.mycampusmail.com".join(parts)
+            caddy_txt = "\nqa.mycampusmail.com {".join(parts)
             updated_caddy = True
+
+if "\nqa.mycampusmail.com {" in caddy_txt:
+    blog_part, qa_part = caddy_txt.split("\nqa.mycampusmail.com {", 1)
+    if "handle /favicon.ico" not in blog_part and "\treverse_proxy halo:8090" in blog_part:
+        blog_part = blog_part.replace("\treverse_proxy halo:8090", BLOG_FAVICON_SNIPPET + "\treverse_proxy halo:8090", 1)
+        updated_caddy = True
+    if "handle /favicon.ico" not in qa_part and "\treverse_proxy flarum:8000" in qa_part:
+        qa_part = qa_part.replace("\treverse_proxy flarum:8000", QA_FAVICON_SNIPPET + "\treverse_proxy flarum:8000", 1)
+        updated_caddy = True
+    caddy_txt = blog_part + "\nqa.mycampusmail.com {" + qa_part
 
 if updated_caddy:
     caddy_path.write_text(caddy_txt, encoding="utf-8")
-    print("[deploy-rx-skins] Updated Caddyfile with /rx-skins/* handler on both subdomains")
+    print("[deploy-rx-skins] Updated Caddyfile with /rx-skins/* and /favicon.ico handlers on both subdomains")
 else:
-    print("[deploy-rx-skins] Caddyfile already serves /rx-skins/* on both subdomains")
+    print("[deploy-rx-skins] Caddyfile already serves /rx-skins/* and /favicon.ico on both subdomains")
 
-# 5. Idempotently include rx-skins & configs in backup.sh
+# 5. Idempotently include rx-skins & configs + expired empty dir cleanup in backup.sh
 backup_sh = STACK_DIR / "backup.sh"
 if backup_sh.is_file():
     btxt = backup_sh.read_text(encoding="utf-8")
+    changed_backup = False
     if "site-configs_" not in btxt:
         line_to_add = 'tar czf "$DIR/site-configs_${TS}.tar.gz" -C /opt/site-stack docker-compose.yml Caddyfile backup.sh rx-skins\n'
         if "find \"$DIR\"" in btxt:
             btxt = btxt.replace('find "$DIR"', line_to_add + 'find "$DIR"', 1)
         else:
             btxt = btxt.rstrip() + "\n" + line_to_add
+        changed_backup = True
+    if "-type d -empty -delete" not in btxt:
+        old_find = 'find "$DIR" -type f -mtime +7 -delete'
+        new_find = old_find + '\nfind "$DIR" -mindepth 1 -type d -empty -delete'
+        if old_find in btxt:
+            btxt = btxt.replace(old_find, new_find, 1)
+        else:
+            btxt = btxt.rstrip() + '\nfind "$DIR" -mindepth 1 -type d -empty -delete\n'
+        changed_backup = True
+    if changed_backup:
         backup_sh.write_text(btxt, encoding="utf-8")
         os.chmod(backup_sh, 0o755)
-        print("[deploy-rx-skins] Updated backup.sh to archive rx-skins and proxy configs")
+        print("[deploy-rx-skins] Updated backup.sh (site-configs archive + empty dir cleanup)")
 
 # 6. Recreate site-proxy if needed & reload Caddy
 subprocess.check_call(["docker", "compose", "up", "-d", "site-proxy"], cwd=str(STACK_DIR))

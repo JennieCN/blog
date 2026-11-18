@@ -330,7 +330,7 @@ html.rx-dark[data-rx-skin="plain"] {
   line-height: 1;
   cursor: pointer;
   white-space: nowrap;
-  transition: transform .2s var(--rx-ease-spring), background .18s, border-color .18s, box-shadow .18s;
+  transition: transform .2s var(--rx-ease-spring), background .18s, color .18s, border-color .18s, box-shadow .18s;
 }
 .rx-icon-btn:hover {
   background: var(--rx-surface-2);
@@ -353,6 +353,9 @@ html.rx-dark[data-rx-skin="plain"] {
   color: #15121c;
   font-weight: 800;
   box-shadow: 2px 2px 0 var(--rx-line);
+}
+:root[data-rx-skin="pop"] .rx-icon-btn span {
+  color: #15121c;
 }
 html.rx-dark[data-rx-skin="pop"] .rx-icon-btn {
   box-shadow: 2px 2px 0 #000;
