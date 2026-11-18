@@ -5,7 +5,7 @@
   line-height: 1.65;
 }
 #rx-reviews .rx-lead {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   padding: 14px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -13,11 +13,22 @@
   color: #334155;
   font-size: 14px;
 }
+#rx-reviews .rx-nav-group {
+  margin: 0 0 16px;
+}
+#rx-reviews .rx-nav-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #475569;
+  margin: 0 0 8px;
+  letter-spacing: 0.02em;
+}
 #rx-reviews .rx-jump {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 20px;
+  margin: 0 0 14px;
 }
 #rx-reviews .rx-jump a {
   display: inline-flex;
@@ -35,6 +46,26 @@
 #rx-reviews .rx-jump a:hover {
   background: #f1f5f9;
   border-color: #64748b;
+}
+#rx-reviews .rx-sec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 28px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+#rx-reviews .rx-sec-head h2 {
+  margin: 0 !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #0f172a;
+}
+#rx-reviews .rx-sec-head span {
+  font-size: 13px;
+  color: #64748b;
 }
 #rx-reviews .rx-card {
   min-width: 0;
@@ -127,19 +158,19 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 #rx-reviews .rx-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   padding: 6px 12px;
   border: 1px solid #0f172a;
   border-radius: 8px;
   background: #0f172a;
   color: #ffffff !important;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   text-decoration: none !important;
   transition: background-color 0.15s ease, border-color 0.15s ease;
@@ -147,6 +178,14 @@
 #rx-reviews .rx-btn:hover {
   background: #1e293b;
   border-color: #1e293b;
+}
+#rx-reviews .rx-btn-tq {
+  background: #0369a1;
+  border-color: #0369a1;
+}
+#rx-reviews .rx-btn-tq:hover {
+  background: #0284c7;
+  border-color: #0284c7;
 }
 #rx-reviews .rx-btn-ghost {
   background: #ffffff;
@@ -156,6 +195,33 @@
 #rx-reviews .rx-btn-ghost:hover {
   background: #f1f5f9;
   border-color: #64748b;
+}
+#rx-reviews .rx-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+#rx-reviews .rx-tab {
+  appearance: none;
+  padding: 5px 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+#rx-reviews .rx-tab:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+#rx-reviews .rx-tab.is-active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
 }
 #rx-reviews .rx-svg-wrap {
   width: 100%;
@@ -184,6 +250,9 @@ html.dark #rx-reviews .rx-lead {
   border-color: #334155;
   color: #cbd5e1;
 }
+html.dark #rx-reviews .rx-nav-label {
+  color: #94a3b8;
+}
 html.dark #rx-reviews .rx-jump a {
   background: #0f172a;
   border-color: #475569;
@@ -192,6 +261,15 @@ html.dark #rx-reviews .rx-jump a {
 html.dark #rx-reviews .rx-jump a:hover {
   background: #1e293b;
   border-color: #64748b;
+}
+html.dark #rx-reviews .rx-sec-head {
+  border-bottom-color: #334155;
+}
+html.dark #rx-reviews .rx-sec-head h2 {
+  color: #f8fafc;
+}
+html.dark #rx-reviews .rx-sec-head span {
+  color: #94a3b8;
 }
 html.dark #rx-reviews .rx-card {
   background: #1e293b;
@@ -238,6 +316,15 @@ html.dark #rx-reviews .rx-btn:hover {
   background: #7dd3fc;
   border-color: #7dd3fc;
 }
+html.dark #rx-reviews .rx-btn-tq {
+  background: #a78bfa;
+  border-color: #a78bfa;
+  color: #0f172a !important;
+}
+html.dark #rx-reviews .rx-btn-tq:hover {
+  background: #c4b5fd;
+  border-color: #c4b5fd;
+}
 html.dark #rx-reviews .rx-btn-ghost {
   background: #0f172a;
   border-color: #475569;
@@ -247,104 +334,323 @@ html.dark #rx-reviews .rx-btn-ghost:hover {
   background: #1e293b;
   border-color: #64748b;
 }
+html.dark #rx-reviews .rx-tab {
+  background: #0f172a;
+  border-color: #475569;
+  color: #cbd5e1;
+}
+html.dark #rx-reviews .rx-tab:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+html.dark #rx-reviews .rx-tab.is-active {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  color: #0f172a;
+}
 html.dark #rx-reviews .rx-svg-wrap {
   border-color: #334155;
 }
 </style>
 
   <div class="rx-lead">
-    这里集中留档我<strong>自购在用 VPS 套餐</strong>的一手实测报告与调优手记（区别于站内 <a href="/archives/nodeseek-merchant-reviews-2026h2">《NodeSeek 社区汇总（上卷）》</a> 与 <a href="/archives/meowvps-official-merchants-2026h2">《MeowVPS 收录汇总（下卷）》</a> 第三方档案库）。每台机器均附原始体检报告直链与实际上机排坑记录。
+    这里集中留档我<strong>自购在用 10 台主力 VPS 套餐</strong>的一手实测档案（区别于站内 <a href="/archives/nodeseek-merchant-reviews-2026h2">《NodeSeek 社区汇总（上卷）》</a> 与 <a href="/archives/meowvps-official-merchants-2026h2">《MeowVPS 收录汇总（下卷）》</a> 第三方档案库）。按架构分工统一采用标准测评口径：<strong>线路机执行 <code>TcpQuality (TQ) + NodeQuality (NQ)</code> 双脚本实测</strong>，<strong>落地机执行 <code>NodeQuality (NQ)</code> 全维体检</strong>，支持卡片内一键切换查看各维度原图（敏感 IP 末两段均已脱敏）。
   </div>
 
-  <nav class="rx-jump" aria-label="自购套餐快捷导航">
-    <a href="#attvps-standard">① ATTVPS · 加州洛杉矶 AT&amp;T 静态家宽（4C8G · 四库 0 分极净）</a>
-    <a href="#usvps24-att-pro9">② 干杯Cloud · AT&amp;T 商业宽带 PRO-9线（2C2G · 200Mbps）</a>
-  </nav>
+  <div class="rx-nav-group">
+    <span class="rx-nav-label">🚀 中转 / 精品线路机（TQ + NQ 双脚本实测 · 3 台）</span>
+    <nav class="rx-jump" aria-label="线路机快捷导航">
+      <a href="#dc9-gia">① 搬瓦工 · 洛杉矶 DC9 CN2 GIA</a>
+      <a href="#ppf-lax">② PPFlight · 洛杉矶三网精品优化</a>
+      <a href="#flawless-9929">③ 完美节点 · 洛杉矶三网 9929 回程</a>
+    </nav>
+    <span class="rx-nav-label">🏡 家宽 / 机房落地机（NQ 全维体检 · 7 台）</span>
+    <nav class="rx-jump" aria-label="落地机快捷导航">
+      <a href="#attvps-standard">④ ATTVPS · 洛杉矶 AT&amp;T 静态家宽（4C8G）</a>
+      <a href="#usvps24-att-pro9">⑤ 干杯Cloud · AT&amp;T 宽带 PRO-9线</a>
+      <a href="#nmcloud-hinet">⑥ NMCloud · 台湾 HiNet 家宽</a>
+      <a href="#zorocloud-sg">⑦ ZoroCloud · 新加坡 SPTel 家宽</a>
+      <a href="#novix-lax">⑧ NovixLink · 洛杉矶 LAX-BGP Lite</a>
+      <a href="#yunyou-4837">⑨ 云悠 · 洛杉矶 US4 Mini</a>
+      <a href="#taipei101-tex1">⑩ Taipei101 · 得州 TEX1 双栈</a>
+    </nav>
+  </div>
 
+  <div class="rx-sec-head">
+    <h2>🚀 一、中转线路机（TQ + NQ 双脚本实测）</h2>
+    <span>重点考察：京沪粤三网回程路由、TCP 大包丢包率与晚高峰单线程测速</span>
+  </div>
+
+  <!-- 1. DC9 -->
+  <article id="dc9-gia" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇺🇸 搬瓦工 BandwagonHost · 洛杉矶 DC9 CN2 GIA（SPECIAL 20G PROMO V5）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 晚高峰 · 节点区域：美西洛杉矶 DC9 · 虚拟化：KVM（AlmaLinux 9.7）</p>
+      </div>
+      <span class="rx-badge rx-badge-info">线路主力 · 单线程 600M+</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">电信 CN2 GIA / 9929</span>
+      <span class="rx-badge rx-badge-info">联通 10099→9929</span>
+      <span class="rx-badge rx-badge-info">移动 CMIN2</span>
+      <span class="rx-badge rx-badge-ok">EPYC-Genoa · GB5 700 / 1184</span>
+      <span class="rx-badge rx-badge-ok">沪电单线程 604.5 Mbps</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>AMD EPYC-Genoa 1C / 1019 MB / 19G SSD · GB5 单核 <code>700</code> / 多核 <code>1184</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与脱敏网段</span>
+        <div><code>AS25820</code> IT7 Networks · <code>69.194.*.*</code> · 美西传家宝线路机</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">三网回程路由（TQ+NQ）</span>
+        <div>沪粤电信 <code>CN2 GIA</code>（京 <code>9929</code>）· 联通三地 <code>9929</code>（0%丢包）· 移动 <code>CMIN2</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">晚高峰单线程测速（TQ）</span>
+        <div>沪电 <code>604.5M</code> / 沪联 <code>576.6M</code> / 京联 <code>568.7M</code> / 京电 <code>566.8M</code> / 京移 <code>498.1M</code></div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>晚高峰吞吐统治力</strong>：在 22:40 晚高峰时段，北京与上海电信/联通单线程下行均稳定在 <strong>566–604 Mbps</strong>、重传率接近 0.00%，广东电信上行高达 586.6 Mbps，作为美西前置链式转发入口稳如磐石。</li>
+      <li><strong>解锁与风控表现</strong>：Scamalytics <code>4</code> / ipapi <code>0.00%</code> / AbuseIPDB <code>0</code>，TikTok、Disney+、Netflix、YouTube、ChatGPT 全绿解锁。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn rx-btn-tq" href="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd" target="_blank" rel="noopener noreferrer">⚡ TcpQuality 完整报告 ↗</a>
+      <a class="rx-btn" href="https://nodequality.com/r/i3lo1X9OoZR0A12sCCpZF9Ag6BbCg9i9" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#搬瓦工-bandwagonhost">📚 站内商家档案</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="DC9 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=ipv4" data-alt="搬瓦工 DC9 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
+      <button type="button" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=speedtest" data-alt="搬瓦工 DC9 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/KVPQAV98I.svg" data-alt="搬瓦工 DC9 Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/24F1PYCFX.svg" data-alt="搬瓦工 DC9 Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/2RU045U8A.svg" data-alt="搬瓦工 DC9 Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/2WFGZ6349.svg" data-alt="搬瓦工 DC9 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=ipv4" alt="搬瓦工 DC9 TcpQuality IPv4三网回程报告" loading="lazy" />
+    </div>
+  </article>
+
+  <!-- 2. PPFlight -->
+  <article id="ppf-lax" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇺🇸 PPFlight · 洛杉矶三网精品优化（CN2 GIA / 9929 / CMIN2）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 晚高峰 · 节点区域：美西加州洛杉矶 · 虚拟化：KVM（双栈 IPv4/IPv6）</p>
+      </div>
+      <span class="rx-badge rx-badge-info">三网各自顶配回程 · 0% 丢包</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">电信三地全 CN2 GIA</span>
+      <span class="rx-badge rx-badge-info">联通三地 10099→9929</span>
+      <span class="rx-badge rx-badge-info">移动三地 CMIN2</span>
+      <span class="rx-badge rx-badge-ok">EPYC 7742 · GB5 969</span>
+      <span class="rx-badge rx-badge-ok">Scamalytics 0 零风险</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>AMD EPYC 7742 1C / 950 MB / 9.6G · GB5 单核 <code>969</code> / 多核 <code>963</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与脱敏网段</span>
+        <div><code>AS402898</code> · <code>68.164.*.*</code> · IPv4 精品直连 + IPv6 双栈</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">三网回程与延迟（TQ）</span>
+        <div>沪电 <code>CN2GIA 131ms</code> / 沪联 <code>9929 133ms</code> / 沪移 <code>CMIN2 130ms</code>（京沪粤全 0% 丢包）</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">晚高峰单线程测速（TQ）</span>
+        <div>京沪粤三网九节点下行稳定跑满 <code>98.2–109.0 Mbps</code>（重传 0.00%–0.44%），上行峰值 <code>232M</code></div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>标准三网分流回程教科书</strong>：IPv4 去回程严格执行电信走 <code>CN2 GIA</code>、联通走 <code>10099→9929</code>、移动走 <code>CMIN2</code>，晚高峰京沪粤九向 TCP 小包探测<strong>全线 0% 丢包</strong>，上海三网延迟齐刷刷压在 130–133 ms。</li>
+      <li><strong>IP 干净度惊喜</strong>：虽然是线路中转机，但 Scamalytics <code>0</code>、AbuseIPDB <code>0</code>、ipapi <code>0.00%</code>，且 IPv4 原生解锁 TikTok、Disney+、Netflix、YouTube 与 ChatGPT。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn rx-btn-tq" href="https://tcpquality.ibsgss.uk/r/HymWJDfjaH" target="_blank" rel="noopener noreferrer">⚡ TcpQuality 完整报告 ↗</a>
+      <a class="rx-btn" href="https://nodequality.com/r/DsoYVJpUualn1pL7iCPamxne1GHM25gx" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="PPFlight 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=ipv4" data-alt="PPFlight 洛杉矶 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
+      <button type="button" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=speedtest" data-alt="PPFlight 洛杉矶 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/30SYJBW7G.svg" data-alt="PPFlight Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/17F9SUT8A.svg" data-alt="PPFlight Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/3PO651FZS.svg" data-alt="PPFlight Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/3U3ZRCXTR.svg" data-alt="PPFlight Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=ipv4" alt="PPFlight 洛杉矶 TcpQuality IPv4三网回程报告" loading="lazy" />
+    </div>
+  </article>
+
+  <!-- 3. FlawlessNode 9929 -->
+  <article id="flawless-9929" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇺🇸 FlawlessNode（完美节点）· 洛杉矶 LAX Pro 三网 9929 回程</h3>
+        <p class="rx-sub">实测日期：2026-11-18 晚高峰 · 节点区域：美西加州洛杉矶 · 虚拟化：KVM（Debian 13 双栈）</p>
+      </div>
+      <span class="rx-badge rx-badge-info">联通 / 移动 0% 重传利器</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">三网强制 10099→9929 回程</span>
+      <span class="rx-badge rx-badge-ok">联通单线程 265–276 Mbps</span>
+      <span class="rx-badge rx-badge-ok">移动单线程 233–253 Mbps</span>
+      <span class="rx-badge">EPYC-Rome · GB5 796 / 791</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>AMD EPYC-Rome 1C / 929 MB / 9.7G · GB5 单核 <code>796</code> / 多核 <code>791</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与脱敏网段</span>
+        <div><code>AS402665</code> · <code>68.166.*.*</code> · LAX Pro 300Mbps 流量型</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">三网回程表现（TQ）</span>
+        <div>京沪粤三网统一回程 <code>9929</code>；联通与移动全程 <code>0%</code> 丢包（沪联 <code>137ms</code>），电信跨网晚高峰有重传</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">晚高峰单线程测速（TQ）</span>
+        <div>沪联 <code>276.2M</code> / 京联 <code>271.2M</code> / 粤联 <code>265.0M</code> / 京移 <code>252.9M</code> / 沪移 <code>251.6M</code>（重传全 0.00%）</div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>联通与移动晚高峰满分表现</strong>：在 300 Mbps 端口规格下，京沪粤联通与移动六个方向晚高峰单线程达到 <strong>233–276 Mbps 且重传率全部为 0.00%</strong>；电信用户在晚高峰存在约 11%–12% 跨网互联重传，建议电信走 DC9 / PPFlight，联通与移动优先调度本机。</li>
+      <li><strong>双栈与解锁</strong>：IPv4/IPv6 双栈均通（IPv6 联通同样回程 <code>10099→9929</code>），IPv4 全绿解锁 TikTok、Disney+、Netflix、YouTube、ChatGPT。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn rx-btn-tq" href="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H" target="_blank" rel="noopener noreferrer">⚡ TcpQuality 完整报告 ↗</a>
+      <a class="rx-btn" href="https://nodequality.com/r/g1pe4F2QV9BD2J8IpqveHgac4eDBocUr" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="完美节点 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=ipv4" data-alt="FlawlessNode 9929 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
+      <button type="button" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=speedtest" data-alt="FlawlessNode 9929 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/375JKWT97.svg" data-alt="FlawlessNode 9929 Check.Place IPv4网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/31V8XYIMT.svg" data-alt="FlawlessNode 9929 Check.Place IPv4回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/18N4ZYB1V.svg" data-alt="FlawlessNode 9929 Check.Place IPv4质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/1361MPH24.svg" data-alt="FlawlessNode 9929 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=ipv4" alt="FlawlessNode 9929 TcpQuality IPv4三网回程报告" loading="lazy" />
+    </div>
+  </article>
+
+  <div class="rx-sec-head">
+    <h2>🏡 二、家宽 / 机房落地机（NQ 全维体检）</h2>
+    <span>重点考察：五大库原生住宅 ISP 属性、欺诈风控分值、AI 与流媒体解锁、配合中转出口稳定性</span>
+  </div>
+
+  <!-- 4. ATTVPS -->
   <article id="attvps-standard" class="rx-card">
     <div class="rx-head">
       <div>
-        <h2 class="rx-title">🇺🇸 ATTVPS · 美国加州洛杉矶 AT&amp;T 静态家宽 标准版（4C8G / 50G NVMe）</h2>
-        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美西加州洛杉矶（Los Angeles 90043） · 虚拟化：KVM（Debian 12）</p>
+        <h3 class="rx-title">🇺🇸 ATTVPS · 美国加州洛杉矶 AT&amp;T 静态家宽 标准版（4C8G / 50G NVMe）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美西加州洛杉矶（Los Angeles） · 虚拟化：KVM（Debian 12）</p>
       </div>
-      <span class="rx-badge rx-badge-ok">主力在用 · 四库全 0 分极净家宽</span>
+      <span class="rx-badge rx-badge-ok">主力落地 · 四库全 0 分极净家宽</span>
     </div>
 
     <div class="rx-badges">
       <span class="rx-badge rx-badge-info">AS7018 · AT&amp;T Enterprises</span>
       <span class="rx-badge rx-badge-ok">五库使用类型全绿「家宽」</span>
-      <span class="rx-badge rx-badge-ok">Scamalytics 0 | 四库全 0 零风险</span>
-      <span class="rx-badge rx-badge-ok">ChatGPT / TikTok / Disney+ 原生解锁</span>
-      <span class="rx-badge">4C8G-50G NVMe · 独享带宽无限流量</span>
+      <span class="rx-badge rx-badge-ok">四库全 0 零风险</span>
+      <span class="rx-badge rx-badge-ok">GB5 853 / 2464 · 7.8G 内存</span>
+      <span class="rx-badge rx-badge-ok">ChatGPT / TikTok / Netflix 全解锁</span>
     </div>
 
     <div class="rx-grid">
       <div class="rx-box">
         <span class="rx-label">实测硬件规格</span>
-        <div>4 vCPU / 8 GiB 内存（实测 7.8 GiB）/ 50 GB NVMe / 独享带宽无限流量</div>
+        <div>4 vCPU / 7.8 GiB 内存 / 50 GB NVMe · GB5 单核 <code>853</code> / 多核 <code>2464</code></div>
       </div>
       <div class="rx-box">
         <span class="rx-label">ASN 与原生属性</span>
-        <div><code>AS7018</code> AT&amp;T Enterprises, LLC · <code>162.225.*.*</code> · 洛杉矶原生静态家宽</div>
+        <div><code>AS7018</code> AT&amp;T Enterprises · <code>162.225.*.*</code> · 洛杉矶原生静态家宽</div>
       </div>
       <div class="rx-box">
         <span class="rx-label">欺诈与风控评分（满分极净）</span>
-        <div>Scamalytics <code>0</code> / IP2Location <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.00%</code>；风险因子全「否」</div>
+        <div>Scamalytics <code>0</code> / IP2Location <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.00%</code>；风险项全「否」</div>
       </div>
       <div class="rx-box">
         <span class="rx-label">流媒体与 AI 解锁</span>
-        <div>TikTok、Disney+、YouTube、AmazonPV、ChatGPT 全原生 US 解锁；Netflix DNS 解锁</div>
+        <div>TikTok、Disney+、Netflix、YouTube、AmazonPV、ChatGPT 全绿解锁</div>
       </div>
     </div>
 
     <ul class="rx-notes">
-      <li><strong>IP 纯净度天花板表现</strong>：五大库「使用类型」全绿识别为<strong>家宽</strong>，且 <strong>Scamalytics、IP2Location、AbuseIPDB、ipapi 四大风控库全部为 0 分极低风险</strong>，代理 / Tor / VPN / 服务器 / 滥用 / 机器人全项「否」，适合高敏感度 AI 开发（Claude / ChatGPT）长期固定出口。</li>
-      <li><strong>硬件与运行状态</strong>：4 核 8G 大内存给足无缩水（<code>7.8 GiB</code> 可用），内核默认开启 <code>BBR + fq</code>，长期承载远程开发与容器任务非常稳健。</li>
+      <li><strong>IP 纯净度天花板表现</strong>：五大库「使用类型」全绿识别为<strong>家宽</strong>，四大风控库全部为 <code>0</code> 分极低风险，长期作为 Claude / ChatGPT 与远程开发高敏固定出口极其稳健。</li>
+      <li><strong>整机性能充沛</strong>：7.8 GiB 真实内存无缩水，多核 GB5 达 <code>2464</code>，兼顾开发容器常驻与高品质美西家宽落地。</li>
     </ul>
 
     <div class="rx-actions">
-      <a class="rx-btn" href="https://Report.Check.Place/ip/SISEM2MGE.svg" target="_blank" rel="noopener noreferrer">
-        📄 打开 Check.Place IP 质量报告原图（SISEM2MGE.svg）↗
-      </a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#attvps">
-        📚 查看站内《上卷 · ATTVPS 商家档案》
-      </a>
+      <a class="rx-btn" href="https://nodequality.com/r/lyqWtHWiv1kG9TLVBKv5SgaMpFidh7MN" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="https://Report.Check.Place/ip/SISEM2MGE.svg" target="_blank" rel="noopener noreferrer">📄 初测 IP 原图（SISEM2MGE.svg）↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#attvps">📚 站内商家档案</a>
     </div>
 
+    <div class="rx-tabs" role="tablist" aria-label="ATTVPS 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/7CJBJ1AWN.svg" data-alt="ATTVPS Check.Place IP质量体检报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/6N53WRQB3.svg" data-alt="ATTVPS Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3BLZMUK9K.svg" data-alt="ATTVPS Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/R9IWSFC2Z.svg" data-alt="ATTVPS Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
     <div class="rx-svg-wrap">
-      <img
-        src="https://Report.Check.Place/ip/SISEM2MGE.svg"
-        alt="ATTVPS 美国加州洛杉矶 AT&T静态家宽 Check.Place IP质量体检报告 (SISEM2MGE)"
-        loading="lazy"
-      />
+      <img src="https://Report.Check.Place/ip/7CJBJ1AWN.svg" alt="ATTVPS Check.Place IP质量体检报告" loading="lazy" />
     </div>
   </article>
 
+  <!-- 5. 干杯Cloud -->
   <article id="usvps24-att-pro9" class="rx-card">
     <div class="rx-head">
       <div>
-        <h2 class="rx-title">🇺🇸 干杯Cloud · AT&amp;T 商业宽带 PRO-9线（美西洛杉矶 · Rosemead）</h2>
-        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美西加州洛杉矶圈（Rosemead / Glendale 91206） · 虚拟化：KVM（Debian 12）</p>
+        <h3 class="rx-title">🇺🇸 干杯Cloud · AT&amp;T 商业宽带 PRO-9线（美西洛杉矶 · Rosemead）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美西加州洛杉矶圈（Rosemead / Glendale） · 虚拟化：KVM（Debian 12）</p>
       </div>
-      <span class="rx-badge rx-badge-ok">自购在用 · 200M 大带宽家宽</span>
+      <span class="rx-badge rx-badge-ok">200M 家宽落地 · BBRv3 已调优</span>
     </div>
 
     <div class="rx-badges">
       <span class="rx-badge rx-badge-info">AS7018 · AT&amp;T Enterprises</span>
       <span class="rx-badge rx-badge-ok">五库使用类型全绿「家宽」</span>
-      <span class="rx-badge rx-badge-ok">ipapi 0.00% 极低风险</span>
-      <span class="rx-badge rx-badge-ok">ChatGPT / TikTok / Disney+ 原生解锁</span>
-      <span class="rx-badge">2C2G-20G · 200 Mbps · 不限量*</span>
+      <span class="rx-badge rx-badge-ok">ipapi 0.00% / AbuseIPDB 0</span>
+      <span class="rx-badge rx-badge-ok">GB5 741 / 1393</span>
+      <span class="rx-badge">200 Mbps · 不限量*</span>
     </div>
 
     <div class="rx-grid">
       <div class="rx-box">
-        <span class="rx-label">套餐标称规格</span>
-        <div>2 vCPU / 2048 MB 内存 / 20 GB 磁盘 / 200 Mbps 带宽（不限量*）</div>
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>Xeon Skylake 2 vCPU / 20G 磁盘 / 2G Swap · GB5 单核 <code>741</code> / 多核 <code>1393</code></div>
       </div>
       <div class="rx-box">
         <span class="rx-label">ASN 与原生属性</span>
-        <div><code>AS7018</code> AT&amp;T Enterprises, LLC · <code>107.197.*.*</code> · 原生美西 IP</div>
+        <div><code>AS7018</code> AT&amp;T Enterprises · <code>107.197.*.*</code> · 原生美西宽带 IP</div>
       </div>
       <div class="rx-box">
         <span class="rx-label">欺诈与风控评分</span>
@@ -352,34 +658,333 @@ html.dark #rx-reviews .rx-svg-wrap {
       </div>
       <div class="rx-box">
         <span class="rx-label">流媒体与 AI 解锁</span>
-        <div>TikTok、Disney+、YouTube、AmazonPV、ChatGPT 全原生 US 解锁；Netflix DNS 解锁</div>
+        <div>TikTok、Disney+、Netflix、YouTube、AmazonPV、ChatGPT 全绿解锁</div>
       </div>
     </div>
 
     <ul class="rx-notes">
-      <li><strong>IP 纯净度表现</strong>：IPinfo、ipregistry、ipapi、IP2Location、AbuseIPDB 五大库「使用类型」全部识别为<strong>家宽</strong>（公司类型四库家宽、仅 ipapi 标商业），无代理/Tor/VPN/服务器标签，兼顾 200 Mbps 峰值带宽与美西原生住宅属性。</li>
-      <li><strong>上机调优方案</strong>：通过科技lion脚本升级至 <code>XanMod 6.18-x64v3</code> 内核开启 <strong>BBRv3 + fq</strong>，挂载 2 GiB Swap，并补齐跨境长连接 <code>tcp_slow_start_after_idle=0</code> 参数。</li>
-      <li><strong>实测排坑提醒</strong>：网卡默认会通过 SLAAC 自动拿到 <code>2600:1700:...</code> 的 IPv6 地址，但上游网关未放通 IPv6 出站（100% 丢包），上机后务必在 <code>/etc/gai.conf</code> 开启<strong>全局 IPv4 优先</strong>，避免访问双栈站点首包卡超时。</li>
+      <li><strong>上机调优方案</strong>：通过科技lion脚本升级至 <code>XanMod 6.18-x64v3</code> 内核开启 <strong>BBRv3 + fq</strong>，挂载 2 GiB Swap，并配置 <code>tcp_slow_start_after_idle=0</code> 长连接优化。</li>
+      <li><strong>实测排坑提醒</strong>：网卡默认通过 SLAAC 自动拿到 <code>2600:1700:...</code> IPv6 地址，但上游网关未放通 IPv6 出站（100% 丢包），务必在 <code>/etc/gai.conf</code> 开启<strong>全局 IPv4 优先</strong>。</li>
     </ul>
 
     <div class="rx-actions">
-      <a class="rx-btn" href="https://Report.Check.Place/ip/1PBAA6I6S.svg" target="_blank" rel="noopener noreferrer">
-        📄 打开 Check.Place IP 质量报告原图（1PBAA6I6S.svg）↗
-      </a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#干杯云-usvps24">
-        📚 查看站内《上卷 · 干杯云商家档案》
-      </a>
-      <a class="rx-btn rx-btn-ghost" href="https://usvps24.com" target="_blank" rel="noopener noreferrer">
-        🔗 商家官网（干杯Cloud）↗
-      </a>
+      <a class="rx-btn" href="https://nodequality.com/r/dHAib6K2PAHVlXEhpIYwLiOeWfsXdh5v" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="https://Report.Check.Place/ip/1PBAA6I6S.svg" target="_blank" rel="noopener noreferrer">📄 初测 IP 原图（1PBAA6I6S.svg）↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#干杯云-usvps24">📚 站内商家档案</a>
     </div>
 
+    <div class="rx-tabs" role="tablist" aria-label="干杯Cloud 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/1PBAA6I6S.svg" data-alt="干杯Cloud Check.Place IP质量报告 (1PBAA6I6S)">初测 · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/102HNUD12.svg" data-alt="干杯Cloud NQ IP质量体检报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3J3Z4OFC1.svg" data-alt="干杯Cloud Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/2PJUALC5A.svg" data-alt="干杯Cloud Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/20WTZ0562.svg" data-alt="干杯Cloud Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
     <div class="rx-svg-wrap">
-      <img
-        src="https://Report.Check.Place/ip/1PBAA6I6S.svg"
-        alt="干杯Cloud AT&T商业宽带PRO-9线 Check.Place IP质量体检报告 (1PBAA6I6S)"
-        loading="lazy"
-      />
+      <img src="https://Report.Check.Place/ip/1PBAA6I6S.svg" alt="干杯Cloud AT&T商业宽带PRO-9线 Check.Place IP质量体检报告 (1PBAA6I6S)" loading="lazy" />
     </div>
   </article>
+
+  <!-- 6. NMCloud HiNet -->
+  <article id="nmcloud-hinet" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇹🇼 NMCloud · 台湾中华电信 HiNet 原生家宽</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：中国台湾 · 虚拟化：KVM（Debian 13）</p>
+      </div>
+      <span class="rx-badge rx-badge-ok">满绿双家宽 · 亚太低延迟解锁</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">AS3462 · 中华电信 HiNet</span>
+      <span class="rx-badge rx-badge-ok">使用类型 + 公司类型全满绿「家宽」</span>
+      <span class="rx-badge rx-badge-ok">Scamalytics 0 / AbuseIPDB 0</span>
+      <span class="rx-badge rx-badge-ok">台湾全流媒体 + ChatGPT 原生解锁</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>Xeon E5-2696 v3 1C / 373 MB / 4.7G · GB5 单核 <code>556</code> / 多核 <code>552</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与原生属性</span>
+        <div><code>AS3462</code> 中华电信 HiNet · <code>111.253.*.*</code> · 台湾原生住宅宽带</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">欺诈与风控评分</span>
+        <div>Scamalytics <code>0</code> / IP2Location <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.03%</code>（满绿双家宽）</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">流媒体与 AI 解锁</span>
+        <div>台湾区巴哈姆特动画疯、TikTok、Disney+、Netflix、YouTube、ChatGPT 全原生解锁</div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>纯血 HiNet 满绿住宅标签</strong>：不仅五大库「使用类型」全为家宽，连四库「公司类型」也全部识别为<strong>家宽</strong>，Scamalytics 与 AbuseIPDB 双 <code>0</code> 分，解锁台湾本土流媒体与繁中 AI 服务无可挑剔。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn" href="https://nodequality.com/r/DITExDDRhFOpcMQ9p5MvMANaPUIA9CX9" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="NMCloud HiNet 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/14K5TZIOP.svg" data-alt="NMCloud 台湾HiNet Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3QCVEGI37.svg" data-alt="NMCloud 台湾HiNet Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/138916D0Z.svg" data-alt="NMCloud 台湾HiNet Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/14RB18RJC.svg" data-alt="NMCloud 台湾HiNet Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://Report.Check.Place/ip/14K5TZIOP.svg" alt="NMCloud 台湾HiNet Check.Place IP质量报告" loading="lazy" />
+    </div>
+  </article>
+
+  <!-- 7. ZoroCloud SG -->
+  <article id="zorocloud-sg" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇸🇬 ZoroCloud · 新加坡 SPTel 原生固网家宽（SG-RES-Plus）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：新加坡 · 虚拟化：KVM（Ubuntu 22.04）</p>
+      </div>
+      <span class="rx-badge rx-badge-ok">新加坡满绿双家宽 · 移动直连友好</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">AS139883 · SPTel 固网 ISP</span>
+      <span class="rx-badge rx-badge-ok">使用类型 + 公司类型全满绿「家宽」</span>
+      <span class="rx-badge rx-badge-ok">Scamalytics 1 / ipapi 0.00%</span>
+      <span class="rx-badge rx-badge-ok">Xeon Gold 5318Y · GB5 829</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>Intel Xeon Gold 5318Y 1C / 956 MB / 20G · GB5 单核 <code>829</code> / 多核 <code>822</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与原生属性</span>
+        <div><code>AS139883</code> SPTel · <code>61.13.*.*</code> · 新加坡本土固网宽带</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">欺诈与风控评分</span>
+        <div>IP2Location <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.00%</code> / Scamalytics <code>1</code>（满绿双家宽）</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">解锁与链路表现</span>
+        <div>TikTok、Disney+、Netflix、YouTube、ChatGPT 新加坡区全解锁；移动 CMI 延迟约 <code>103ms</code></div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>极其稀缺的新加坡满绿双家宽</strong>：新加坡机房 IP 普遍风控较高，而本机搭载 <code>AS139883</code> SPTel 本土运营商段，使用类型与公司类型全满绿家宽、Scamalytics 仅 <code>1</code> 分，且移动方向 CMI 回程延迟仅百毫秒出头。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn" href="https://nodequality.com/r/4b8QuQFOERa6JVJxVKWeSObHvd7cfYvU" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#zorocloud">📚 站内商家档案</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="ZoroCloud 新加坡 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/3SA3NUNKP.svg" data-alt="ZoroCloud 新加坡 Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/11HNKHO0Y.svg" data-alt="ZoroCloud 新加坡 Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/17HE8RB7W.svg" data-alt="ZoroCloud 新加坡 Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/34YBJ5V1N.svg" data-alt="ZoroCloud 新加坡 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://Report.Check.Place/ip/3SA3NUNKP.svg" alt="ZoroCloud 新加坡 Check.Place IP质量报告" loading="lazy" />
+    </div>
+  </article>
+
+  <!-- 8. NovixLink LAX -->
+  <article id="novix-lax" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇺🇸 NovixLink · 美国洛杉矶 LAX-BGP Lite（CAD$5.99/月）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美西加州洛杉矶 · 虚拟化：KVM（Ubuntu 26.04）</p>
+      </div>
+      <span class="rx-badge rx-badge-ok">四库全 0 零风险 · 高性价比美西落地</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">AS174 · Cogent ISP 段</span>
+      <span class="rx-badge rx-badge-ok">五库使用类型全绿「家宽」</span>
+      <span class="rx-badge rx-badge-ok">Scamalytics 0 / 四库全 0</span>
+      <span class="rx-badge">CAD$5.99/月 · 1Gbps / 1TB</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>Xeon E5-2699 v4 1C / 709 MB / 8.7G · GB5 单核 <code>348</code> / 多核 <code>319</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与原生属性</span>
+        <div><code>AS174</code> · <code>38.67.*.*</code> · 五库使用类型全绿「家宽」</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">欺诈与风控评分</span>
+        <div>Scamalytics <code>0</code> / IP2Location <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.00%</code>（四库满分零风险）</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">流媒体与 AI 解锁</span>
+        <div>TikTok、Disney+、Netflix、AmazonPV、ChatGPT 原生 US 解锁（YouTube 定位送中需分流）</div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>百元内极净风控小钢炮</strong>：月付仅 CAD$5.99（约 ¥31），却拿到五大库使用类型全绿家宽 + 四大风控库全 <code>0</code> 分零风险，与洛杉矶同城 DC9 / PPFlight / 9929 线路机内网级低延迟拉链速度极快。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn" href="https://nodequality.com/r/Hl4xt8PyW4VDsl3123Bjz7yNgGlAtPMF" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="NovixLink 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/303KJKXF1.svg" data-alt="NovixLink LAX Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/2DDD0LA88.svg" data-alt="NovixLink LAX Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/1TDZ225P0.svg" data-alt="NovixLink LAX Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/1AR6HP92I.svg" data-alt="NovixLink LAX Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://Report.Check.Place/ip/303KJKXF1.svg" alt="NovixLink LAX Check.Place IP质量报告" loading="lazy" />
+    </div>
+  </article>
+
+  <!-- 9. 云优 4837 -->
+  <article id="yunyou-4837" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇺🇸 云悠（云优）· 美国洛杉矶 US4 Mini</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美西加州洛杉矶 · 虚拟化：KVM（Debian 12）</p>
+      </div>
+      <span class="rx-badge rx-badge-ok">Scamalytics 0 · 全流媒体 US 解锁</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">AS2914 · NTT America</span>
+      <span class="rx-badge rx-badge-ok">四库使用类型「家宽」</span>
+      <span class="rx-badge rx-badge-ok">Scamalytics 0 / AbuseIPDB 0</span>
+      <span class="rx-badge rx-badge-ok">全绿美区流媒体 + ChatGPT 解锁</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>Xeon Gold 6138 1C / 973 MB / 9.7G · GB5 单核 <code>455</code> / 多核 <code>455</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与原生属性</span>
+        <div><code>AS2914</code> · <code>216.167.*.*</code> · 四库识别家宽属性</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">欺诈与风控评分</span>
+        <div>Scamalytics <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.03%</code> / IP2Location <code>3</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">流媒体与 AI 解锁</span>
+        <div>TikTok、Disney+、Netflix、YouTube、AmazonPV、ChatGPT 无死角全解锁</div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>全能美西解锁落地</strong>：相比 NovixLink 的 YouTube 送中问题，云优这台在 YouTube、TikTok、Netflix、Disney+ 与 ChatGPT 上全部原生美区解锁，配合洛杉矶同城线路机延迟不到 2ms。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn" href="https://nodequality.com/r/E6lZhaYowb2bAEc3BZiTBYdnAGAXMhOs" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#云悠-yunyoo">📚 站内商家档案</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="云悠 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/3CDXLE6JS.svg" data-alt="云悠 US4 Mini Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3K5G2HMXE.svg" data-alt="云悠 US4 Mini Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3OZCW8X9M.svg" data-alt="云悠 US4 Mini Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/3QBYPFWZM.svg" data-alt="云悠 US4 Mini Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://Report.Check.Place/ip/3CDXLE6JS.svg" alt="云悠 US4 Mini Check.Place IP质量报告" loading="lazy" />
+    </div>
+  </article>
+
+  <!-- 10. Taipei101 TEX1 -->
+  <article id="taipei101-tex1" class="rx-card">
+    <div class="rx-head">
+      <div>
+        <h3 class="rx-title">🇺🇸 Taipei101 · 美国得克萨斯 TEX1（US$2.25/月 · 4.5TB 大流量）</h3>
+        <p class="rx-sub">实测日期：2026-11-18 · 节点区域：美国中部得州（Texas） · 虚拟化：KVM（Debian 13 双栈）</p>
+      </div>
+      <span class="rx-badge rx-badge-ok">$2.25/月 4.5TB · Scamalytics 0</span>
+    </div>
+
+    <div class="rx-badges">
+      <span class="rx-badge rx-badge-info">AS59730 · 双栈 IPv4/IPv6</span>
+      <span class="rx-badge rx-badge-ok">Scamalytics 0 / ipapi 0.00%</span>
+      <span class="rx-badge rx-badge-ok">IPv4 全流媒体 + ChatGPT 解锁</span>
+      <span class="rx-badge">US$2.25/月 · 4500 GB 双向流量</span>
+    </div>
+
+    <div class="rx-grid">
+      <div class="rx-box">
+        <span class="rx-label">实测硬件与跑分</span>
+        <div>KVM 1C / 967 MB / 9.2G · GB5 单核 <code>552</code> / 多核 <code>541</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">ASN 与脱敏网段</span>
+        <div><code>AS59730</code> · <code>23.149.*.*</code> · 美中得州原生双栈段</div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">欺诈与风控评分</span>
+        <div>Scamalytics <code>0</code> / AbuseIPDB <code>0</code> / ipapi <code>0.00%</code> / IP2Location <code>3</code></div>
+      </div>
+      <div class="rx-box">
+        <span class="rx-label">流媒体与 AI 解锁</span>
+        <div>IPv4 下 TikTok、Disney+、Netflix、YouTube、AmazonPV、ChatGPT 全绿解锁</div>
+      </div>
+    </div>
+
+    <ul class="rx-notes">
+      <li><strong>白菜价海量流量下载/日常出口</strong>：仅 US$2.25/月给足 4.5 TB 流量，IPv4 风控分值极低且美区主流流媒体与 AI 全绿解锁；注意 IPv6 侧 TikTok/AmazonPV 受限，日常作为落地出口建议优先走 IPv4 栈。</li>
+    </ul>
+
+    <div class="rx-actions">
+      <a class="rx-btn" href="https://nodequality.com/r/pm5Fh4vFDStRSNVngm3KUHSAjEpMKUJn" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2#taipei101">📚 站内商家档案</a>
+    </div>
+
+    <div class="rx-tabs" role="tablist" aria-label="Taipei101 TEX1 报告切换">
+      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/2YVWAZPI6.svg" data-alt="Taipei101 TEX1 Check.Place IPv4质量报告">NQ · IPv4质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/K7SV7C5YO.svg" data-alt="Taipei101 TEX1 Check.Place IPv6质量报告">NQ · IPv6质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/ENU06B4RE.svg" data-alt="Taipei101 TEX1 Check.Place IPv4网络质量报告">NQ · 网络质量</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/1S9QLDFVN.svg" data-alt="Taipei101 TEX1 Check.Place IPv4回程路由报告">NQ · 回程路由</button>
+      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/2ZCHDX2AA.svg" data-alt="Taipei101 TEX1 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+    </div>
+    <div class="rx-svg-wrap">
+      <img src="https://Report.Check.Place/ip/2YVWAZPI6.svg" alt="Taipei101 TEX1 Check.Place IPv4质量报告" loading="lazy" />
+    </div>
+  </article>
+
+<script>
+(function () {
+  var root = document.getElementById('rx-reviews');
+  if (!root) return;
+  root.addEventListener('click', function (ev) {
+    var btn = ev.target && ev.target.closest ? ev.target.closest('.rx-tab') : null;
+    if (!btn) return;
+    var card = btn.closest('.rx-card');
+    if (!card) return;
+    var img = card.querySelector('.rx-svg-wrap img');
+    var src = btn.getAttribute('data-src');
+    var alt = btn.getAttribute('data-alt') || '';
+    if (img && src) {
+      img.setAttribute('src', src);
+      img.setAttribute('alt', alt);
+    }
+    var tabs = card.querySelectorAll('.rx-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle('is-active', tabs[i] === btn);
+    }
+  });
+})();
+</script>
 </div>

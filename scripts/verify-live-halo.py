@@ -42,7 +42,10 @@ PAGE_URLS = [
     f"{BASE}/upload/relay-and-egress-guide-cover.png",
     f"{BASE}/upload/mihomo-chain-and-fallback-cover.png",
     f"{BASE}/upload/first-post-cover.png",
+    f"{BASE}/upload/site-hero-banner.png",
     f"{QA_BASE}/assets/favicon.png",
+    f"{QA_BASE}/sitemap.xml",
+    f"{QA_BASE}/feed.rss",
     f"{BASE}/categories/vps",
     f"{BASE}/categories/ai",
     f"{BASE}/categories/fsae",
@@ -57,7 +60,7 @@ def http_fetch(req, timeout=20, retries=3):
     for att in range(retries):
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                return r.status, r.read()
+                return r.status, r.read(), dict(r.headers)
         except Exception as e:
             last_err = e
             time.sleep(0.8 * (att + 1))
@@ -74,7 +77,7 @@ def check_halo_nickname_search():
             headers={"Content-Type": "application/json; charset=utf-8", "User-Agent": "Mozilla/5.0"},
             method="POST",
         )
-        _, raw = http_fetch(req, timeout=15)
+        _, raw, _ = http_fetch(req, timeout=15)
         res = json.loads(raw.decode("utf-8"))
         hits = res.get("hits") or []
         titles = [h.get("title", "") for h in hits]
@@ -88,7 +91,7 @@ def check_flarum_vps_guide():
         f"{QA_BASE}/api/discussions?include=tags",
         headers={"Accept": "application/vnd.api+json", "User-Agent": "Mozilla/5.0"},
     )
-    _, raw = http_fetch(req, timeout=15)
+    _, raw, _ = http_fetch(req, timeout=15)
     data = json.loads(raw.decode("utf-8"))
     vps_guides = [
         d for d in data.get("data", [])
@@ -98,7 +101,7 @@ def check_flarum_vps_guide():
     g = vps_guides[0]
     print(f"  Found Flarum VPS Guide ID={g['id']} | sticky={g['attributes'].get('isSticky')} | title={g['attributes']['title']}")
     assert g["attributes"].get("isSticky") is True
-    _, qa_raw = http_fetch(urllib.request.Request(f"{QA_BASE}/", headers={"User-Agent": "Mozilla/5.0"}), timeout=15)
+    _, qa_raw, _ = http_fetch(urllib.request.Request(f"{QA_BASE}/", headers={"User-Agent": "Mozilla/5.0"}), timeout=15)
     qa_html = qa_raw.decode("utf-8", errors="replace")
     assert "assets/favicon.png" in qa_html, "Flarum missing favicon.png link"
     assert "117 家商家测评" in qa_html, "Flarum missing updated forum_description / header"
@@ -106,14 +109,23 @@ def check_flarum_vps_guide():
     assert "https://blog.mycampusmail.com/my-reviews" in qa_html, "Flarum header missing /my-reviews direct link"
     assert "/vps/first-post/" not in qa_html, "Flarum header still has legacy /vps/first-post/ link"
     print("  Flarum HTML Head & Top Banner : favicon.png=True | /my-reviews=True | /tools=True | legacy_links=0")
+    try:
+        urllib.request.urlopen(urllib.request.Request(f"{QA_BASE}/sync-admin.php", headers={"User-Agent": "Mozilla/5.0"}), timeout=10)
+        raise AssertionError("sync-admin.php should return 404 after archiving!")
+    except urllib.error.HTTPError as e:
+        assert e.code == 404, f"Expected 404 for archived sync-admin.php, got {e.code}"
+        print("  Legacy sync-admin.php         : HTTP 404 (archived safely outside webroot)")
 
 
 def main():
     for u in PAGE_URLS + POST_URLS:
         req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Cache-Control": "no-cache"})
-        status, b = http_fetch(req, timeout=20)
+        status, b, hdrs = http_fetch(req, timeout=20)
         print(f"[HTTP {status}] {len(b):9,d} bytes | {u}")
         assert status == 200
+        assert hdrs.get("X-Content-Type-Options") == "nosniff", f"Missing nosniff on {u}: {hdrs}"
+        if "/upload/" in u:
+            assert "max-age=604800" in hdrs.get("Cache-Control", ""), f"Missing immutable cache on {u}: {hdrs}"
 
     check_halo_nickname_search()
     check_flarum_vps_guide()
@@ -185,6 +197,10 @@ def main():
           const hasVol2Cover = coversFound === 6;
           const hasMyReviewsNav = Array.from(document.querySelectorAll('header a[href="/my-reviews"]')).length > 0;
           const hasToolsNav = Array.from(document.querySelectorAll('header a[href="/tools"]')).length > 0;
+          const htmlSrc = document.documentElement.outerHTML;
+          const hasHeroBanner = htmlSrc.includes('site-hero-banner.png') && !htmlSrc.includes('default-background-2023-10-12.jpeg');
+          const footerHrefs = Array.from(document.querySelectorAll('footer a')).map(a => a.getAttribute('href') || '');
+          const hasFooterLinks = ['/privacy-policy', '/user-agreement', '/rss.xml', '/sitemap.xml'].every(p => footerHrefs.some(h => h.includes(p)));
           const bodyTxt = document.body.innerText;
           const stubsPresent = ['AI 分区开篇', '资源分区开篇', 'RoboMaster 分区开篇', '车队的第一篇记录'].filter(t => bodyTxt.includes(t));
           return JSON.stringify({
@@ -194,7 +210,7 @@ def main():
             hasVol2Cover,
             hasMyReviewsNav,
             hasToolsNav,
-            stubsPresent,
+            stubsPresent, hasHeroBanner, hasFooterLinks,
             sw: document.documentElement.scrollWidth,
             iw: window.innerWidth
           });
@@ -213,6 +229,9 @@ def main():
         assert home_res["hasVol1Cover"] is True and home_res["hasVol2Cover"] is True
         assert home_res["hasMyReviewsNav"] is True
         assert home_res["hasToolsNav"] is True
+        assert home_res["hasHeroBanner"] is True, "Homepage still using default landscape hero background"
+        assert home_res["hasFooterLinks"] is True, "Footer missing legal/RSS/sitemap menu links"
+        print(f"  Hero Banner & Footer Menu     : customHero={home_res['hasHeroBanner']}, footerMenu={home_res['hasFooterLinks']}")
         assert home_res["stubsPresent"] == [], f"Welcome stubs still visible: {home_res['stubsPresent']}"
         assert home_res["sw"] <= home_res["iw"]
 

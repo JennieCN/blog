@@ -11,9 +11,22 @@ const postSchema = z.object({
   cover: z.string().optional(),
 });
 
+// Wrap Astro 5 glob() so existing cached entries with updated digests are deleted before re-parse
+// (suppresses false-positive `Duplicate id` warnings in Astro 5.18 glob-loader).
+function cleanGlob(options: Parameters<typeof glob>[0]) {
+  const inner = glob(options);
+  return {
+    ...inner,
+    async load(ctx: Parameters<typeof inner.load>[0]) {
+      ctx.store.clear();
+      return inner.load(ctx);
+    },
+  };
+}
+
 const makeCollection = (name: string) =>
   defineCollection({
-    loader: glob({ pattern: '**/*.md', base: `./src/content/${name}` }),
+    loader: cleanGlob({ pattern: '**/*.md', base: `./src/content/${name}` }),
     schema: postSchema,
   });
 
@@ -34,7 +47,7 @@ export const collections = {
   ai: makeCollection('ai'),
   resources: makeCollection('resources'),
   qa: defineCollection({
-    loader: glob({ pattern: '**/*.md', base: './src/content/qa' }),
+    loader: cleanGlob({ pattern: '**/*.md', base: './src/content/qa' }),
     schema: qaSchema,
   }),
 };
