@@ -7,7 +7,7 @@ tags: [VPS, Mihomo, 链式代理, 源码]
 
 配置能加载、节点能测速，并不代表请求真的经过预想的前置，也不代表失败时一定拒绝连接。
 
-这篇对照 **Mihomo 官方发布标签 `v1.19.34`** 的实现，讲三个容易混淆的分支。它不表示所有客户端或旧版本都有相同行为。拓扑选择见[线路与落地搭配](/vps/relay-and-egress-guide/)，测速判断见[测评与成本](/vps/reading-vps-reviews/)。
+这篇对照 **Mihomo 官方发布标签 `v1.19.34`** 的实现，讲三个容易混淆的分支。它不表示所有客户端或旧版本都有相同行为。拓扑选择见[线路与落地搭配](/archives/relay-and-egress-guide)，测速判断见[测评与成本](/archives/reading-vps-reviews)。
 
 ## 陷阱一：把 dialer-proxy 写在策略组上
 
@@ -69,3 +69,10 @@ empty-fallback: REJECT
 同样，自动切换也不自动保存原有会话，更不等于带宽叠加。出口 IP 改变后，应用连接可能需要重新建立。
 
 采用论坛配置时，先核对客户端核心版本和字段语义，再确认生效路径。一次 YAML 检查或测速成功，只证明它实际检查的那一部分，不能代替链路与失败分支验证。
+
+## 延伸：链式代理前置与落地机型选型参考
+
+配置好 `dialer-proxy` 与 `empty-fallback: REJECT` 后，若需要按地区挑选稳定的**前置拨号线路机**与高纯净度的**落地家宽/原生出口**，可查阅站内按猫猫博客口径整理的 117 家商家双卷测评库：
+
+- **[上卷 · NodeSeek 商家测评汇总：61 家新收录与转正商家的产品线与 NQ/TQ 原文](/archives/nodeseek-merchant-reviews-2026h2)**
+- **[下卷 · MeowVPS 正式收录 56 家主力商家与皇冠标杆汇总](/archives/meowvps-official-merchants-2026h2)**

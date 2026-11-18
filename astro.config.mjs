@@ -7,7 +7,7 @@ export default defineConfig({
   output: 'static',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/yjcnb'),
+      filter: (page) => !page.includes('/yjcnb') && !page.includes('/archives/'),
     }),
   ],
   vite: {

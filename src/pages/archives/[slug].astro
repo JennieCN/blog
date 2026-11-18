@@ -1,0 +1,48 @@
+---
+import { SECTIONS } from '../../config';
+import { getCollection } from 'astro:content';
+import { filterDrafts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const paths = [];
+  const seen = new Set<string>();
+
+  for (const s of SECTIONS) {
+    const entries = filterDrafts(await getCollection(s.key));
+    for (const e of entries) {
+      let archiveSlug = e.id === 'welcome' ? `${s.key}-${e.id}` : e.id;
+      if (seen.has(archiveSlug)) {
+        archiveSlug = `${s.key}-${e.id}`;
+      }
+      seen.add(archiveSlug);
+      paths.push({
+        params: { slug: archiveSlug },
+        props: {
+          target: `/${s.key}/${e.id}/`,
+          title: e.data.title,
+        },
+      });
+    }
+  }
+  return paths;
+}
+
+const { target, title } = Astro.props;
+const canonicalUrl = new URL(target, Astro.site ?? 'https://blog.mycampusmail.com').toString();
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <script is:inline define:vars={{ target }}>
+      window.location.replace(target + (window.location.hash || ''));
+    </script>
+  </head>
+  <body data-pagefind-ignore="all">
+    <p>正在跳转至 <a href={target}>{title}</a>…</p>
+  </body>
+</html>
