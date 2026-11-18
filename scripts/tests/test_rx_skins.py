@@ -446,5 +446,180 @@ class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
             self.assertLessEqual(info["scrollW"], info["innerW"], f"Horizontal overflow on Halo 390px in {sk}: {info}")
 
 
+FLARUM_NATIVE_STYLE = """
+:root, [data-theme^=light] {
+  --primary-color: #4d698e;
+  --secondary-color: #4d698e;
+  --body-bg: #ffffff;
+  --text-color: #111111;
+  --header-bg: #ffffff;
+  --header-color: #4d698e;
+  --button-primary-bg: #4d698e;
+  --button-primary-color: #ffffff;
+  --hero-bg: #e8ecf3;
+  --hero-color: #4d698e;
+}
+[data-theme^=dark] {
+  --primary-color: #4d698e;
+  --body-bg: #1b2028;
+  --text-color: #dddddd;
+  --header-bg: #14191f;
+  --button-primary-bg: #4d698e;
+}
+body { margin: 0; background: var(--body-bg); color: var(--text-color); }
+.App-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--header-bg); box-sizing: border-box; }
+.Header-controls { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.Button--primary { background: var(--button-primary-bg); color: var(--button-primary-color); border: 0; padding: 6px 12px; }
+"""
+
+FLARUM_APP_BODY = """
+<div id="app" class="App">
+  <header class="App-header">
+    <div class="Header-primary"><a class="Header-title" href="/">融夕问答社区</a></div>
+    <div class="Header-secondary">
+      <ul class="Header-controls">
+        <li class="item-search"><button class="Button" type="button">搜索</button></li>
+        <li class="item-logIn"><button class="Button" type="button">登录</button></li>
+      </ul>
+    </div>
+  </header>
+  <main class="App-content">
+    <header class="Hero WelcomeHero">
+      <div class="container">
+        <h1 class="Hero-title">融夕问答社区</h1>
+        <div class="Hero-subtitle">VPS 线路实测、赛车电控、机器人与 AI 交流</div>
+      </div>
+    </header>
+    <div class="container" style="max-width:1150px;margin:16px auto;padding:0 12px;box-sizing:border-box">
+      <nav class="IndexPage-nav sideNav">
+        <ul><li class="item-newDiscussion"><button class="Button Button--primary" type="button">发布主题</button></li></ul>
+      </nav>
+      <div class="DiscussionList">
+        <ul class="DiscussionList-discussions" style="list-style:none;padding:0;margin:12px 0">
+          <li class="DiscussionListItem DiscussionListItem--sticky" style="padding:12px">
+            <a class="DiscussionListItem-main" href="/d/1"><h2 class="DiscussionListItem-title">【置顶】117 家 VPS 测评索引</h2></a>
+            <span class="TagLabel">VPS 交流</span>
+          </li>
+          <li class="DiscussionListItem" style="padding:12px;margin-top:8px">
+            <a class="DiscussionListItem-main" href="/d/2"><h2 class="DiscussionListItem-title">CN2 GIA 晚高峰延迟对比</h2></a>
+          </li>
+        </ul>
+      </div>
+      <article class="CommentPost Post" style="padding:16px">
+        <div class="Post-body"><p>社区讨论正文段落</p><pre><code>ping -c 4 1.1.1.1</code></pre></div>
+      </article>
+    </div>
+  </main>
+</div>
+"""
+
+
+class TestRxFlarumAdapter(ChromeHarnessMixin, unittest.TestCase):
+    def _load_flarum(self, width: int = 1280):
+        header_path = SKINS_DIR / "flarum-custom-header.html"
+        self.assertTrue(header_path.is_file(), f"Missing {header_path}")
+        self.assertTrue((SKINS_DIR / "rx-flarum.css").is_file(), "Missing rx-flarum.css")
+        custom_header = re.sub(r"\?v=[^\"']+", "", header_path.read_text(encoding="utf-8"))
+        doc = (
+            "<!doctype html><html lang='zh-CN' data-theme='light'><head>"
+            "<meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+            f"<style>{FLARUM_NATIVE_STYLE}</style></head><body>{custom_header}{FLARUM_APP_BODY}</body></html>"
+        )
+        self.open_fixture("flarum-fixture.html", doc, width=width)
+
+    def test_flarum_four_skins_override_cold_blue_and_style_crossbar(self):
+        self._load_flarum(1280)
+        snaps = self.eval_js("""
+        (() => {
+          const out = {};
+          const btn = document.querySelector('.Button--primary');
+          const cross = document.querySelector('.rx-qa-crossbar');
+          const strip = document.querySelector('.rx-qa-strip');
+          if (!cross || !strip) return { error: 'missing .rx-qa-crossbar or .rx-qa-strip' };
+          for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+            for (const dk of [false, true]) {
+              document.documentElement.dataset.rxSkin = sk;
+              document.documentElement.classList.toggle('rx-dark', dk);
+              document.documentElement.setAttribute('data-theme', dk ? 'dark' : 'light');
+              const rcs = getComputedStyle(document.documentElement);
+              const bcs = getComputedStyle(btn);
+              const xcs = getComputedStyle(cross);
+              const scs = getComputedStyle(strip);
+              out[sk + ':' + (dk ? 'dark' : 'light')] = {
+                primaryVar: rcs.getPropertyValue('--primary-color').trim().toLowerCase(),
+                btnBg: bcs.backgroundColor,
+                crossBg: xcs.backgroundColor,
+                stripBg: scs.backgroundColor,
+                bodyBg: getComputedStyle(document.body).backgroundColor
+              };
+            }
+          }
+          return out;
+        })()
+        """)
+        self.assertNotIn("error", snaps, f"Missing crossbar/strip elements: {snaps}")
+        for key, st in snaps.items():
+            self.assertNotEqual(st["primaryVar"], "#4d698e", f"--primary-color still cold blue in {key}")
+            self.assertNotEqual(st["btnBg"], "rgb(77, 105, 142)", f".Button--primary still cold blue in {key}")
+        self.assertNotEqual(snaps["pop:light"]["crossBg"], snaps["ink:light"]["crossBg"])
+        self.assertNotEqual(snaps["pop:light"]["stripBg"], snaps["plain:light"]["stripBg"])
+        self.assertNotEqual(snaps["pop:light"]["bodyBg"], snaps["pop:dark"]["bodyBg"])
+
+    def test_flarum_preserved_checkin_and_captcha_hooks(self):
+        self._load_flarum(1280)
+        hooks = self.eval_js("""
+        ({
+          hasCheckinBtn: !!document.getElementById('rx-checkin-btn'),
+          hasPoints: !!document.getElementById('rx-points'),
+          hasCaptchaFloat: !!document.getElementById('rx-captcha-float'),
+          hasCaptchaInput: !!document.getElementById('rx-captcha-input'),
+          hasSendMailBtn: !!document.getElementById('rx-send-mail-code'),
+          fnCheckin: typeof window.__rxCheckin,
+          fnSendEmail: typeof window.__rxSendEmailCode,
+          fnRefresh: typeof window.__rxRefreshCaptcha,
+          hasReviewsLink: !!document.querySelector('a[href="https://blog.mycampusmail.com/my-reviews"]'),
+          hasToolsLink: !!document.querySelector('a[href="https://blog.mycampusmail.com/tools"]'),
+        })
+        """)
+        self.assertTrue(hooks["hasCheckinBtn"])
+        self.assertTrue(hooks["hasPoints"])
+        self.assertTrue(hooks["hasCaptchaFloat"])
+        self.assertTrue(hooks["hasCaptchaInput"])
+        self.assertTrue(hooks["hasSendMailBtn"])
+        self.assertEqual(hooks["fnCheckin"], "function")
+        self.assertEqual(hooks["fnSendEmail"], "function")
+        self.assertEqual(hooks["fnRefresh"], "function")
+        self.assertTrue(hooks["hasReviewsLink"])
+        self.assertTrue(hooks["hasToolsLink"])
+
+    def test_flarum_mobile_390px_zero_overflow(self):
+        self._load_flarum(390)
+        overflow = self.eval_js("""
+        (() => {
+          const res = {};
+          for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+            document.documentElement.dataset.rxSkin = sk;
+            const sb = document.getElementById('rx-skin-toggle');
+            const tb = document.getElementById('rx-theme-toggle');
+            res[sk] = {
+              scrollW: document.documentElement.scrollWidth,
+              innerW: window.innerWidth,
+              hasSkinBtn: !!sb,
+              hasThemeBtn: !!tb,
+              skinRight: sb ? sb.getBoundingClientRect().right : 9999,
+              themeRight: tb ? tb.getBoundingClientRect().right : 9999,
+            };
+          }
+          return res;
+        })()
+        """)
+        for sk, info in overflow.items():
+            self.assertTrue(info["hasSkinBtn"], f"Missing #rx-skin-toggle on Flarum 390px in {sk}")
+            self.assertTrue(info["hasThemeBtn"], f"Missing #rx-theme-toggle on Flarum 390px in {sk}")
+            self.assertLessEqual(info["scrollW"], info["innerW"], f"Horizontal overflow on Flarum 390px in {sk}: {info}")
+            self.assertLessEqual(info["skinRight"], info["innerW"], f"#rx-skin-toggle overflows 390px in {sk}: {info}")
+            self.assertLessEqual(info["themeRight"], info["innerW"], f"#rx-theme-toggle overflows 390px in {sk}: {info}")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,224 @@
+<!-- 融夕问答社区 · CC 四套皮肤跨站同步引导 + 跨站顶栏 + 书币签到 + 验证码挂件 -->
+<script>
+(function () {
+  var p = String(window.__RX_TEST_PATH || location.pathname || '');
+  if (/^\/(console|uc|admin)(\/|$)/.test(p)) return;
+  var VALID = { pop: 1, ink: 1, luxe: 1, plain: 1 };
+  function rc(k) {
+    var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + k + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+  var skin = rc('rx_skin');
+  if (!VALID[skin]) {
+    try { skin = localStorage.getItem('rx_skin') || localStorage.getItem('rx-skin') || ''; } catch (e) {}
+  }
+  if (!VALID[skin]) skin = 'pop';
+
+  var th = rc('rx_theme');
+  if (th !== 'dark' && th !== 'light') {
+    try {
+      var hs = localStorage.getItem('rx_theme') || localStorage.getItem('rx-theme') || localStorage.getItem('color-scheme') || '';
+      if (hs === 'dark' || hs === 'light') th = hs;
+    } catch (e) {}
+  }
+  var root = document.documentElement;
+  var dt = root.getAttribute('data-theme') || '';
+  var isDark = th === 'dark'
+    ? true
+    : th === 'light'
+      ? false
+      : dt.indexOf('dark') === 0
+        ? true
+        : dt.indexOf('light') === 0
+          ? false
+          : root.classList.contains('dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  root.setAttribute('data-rx-skin', skin);
+  root.classList.toggle('rx-dark', !!isDark);
+  if (dt) {
+    root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  } else if (th === 'dark' || th === 'light') {
+    root.classList.toggle('dark', isDark);
+    try { localStorage.setItem('color-scheme', isDark ? 'dark' : 'light'); } catch (e) {}
+  }
+})();
+</script>
+<link rel="stylesheet" href="/rx-skins/rx-tokens.css?v=20261119a">
+<link rel="stylesheet" href="/rx-skins/rx-flarum.css?v=20261119a">
+<script defer src="/rx-skins/rx-switcher.js?v=20261119a"></script>
+
+<div class="rx-qa-crossbar">
+  <div class="rx-qa-inner">
+    <div class="rx-qa-links">
+      <a href="https://blog.mycampusmail.com/" class="rx-qa-brand">📖 融夕的书 · 主站</a>
+      <a href="https://blog.mycampusmail.com/categories/vps">VPS 科普</a>
+      <a href="https://blog.mycampusmail.com/my-reviews" class="rx-qa-em">⭐ 我的测评</a>
+      <a href="https://blog.mycampusmail.com/tools" class="rx-qa-ok">🧰 实用工具箱</a>
+      <a href="https://blog.mycampusmail.com/categories/fsae">FSAE 赛车</a>
+      <a href="https://blog.mycampusmail.com/categories/rm">RoboMaster</a>
+      <a href="https://blog.mycampusmail.com/categories/ai">AI</a>
+      <a href="https://blog.mycampusmail.com/categories/resources">资源</a>
+      <a href="https://blog.mycampusmail.com/archives">归档</a>
+    </div>
+    <div class="rx-qa-actions">
+      <span id="rx-points" class="rx-points-text"></span>
+      <button type="button" id="rx-checkin-btn" class="rx-checkin-pill" onclick="window.__rxCheckin&&window.__rxCheckin()">🎁 每日签到</button>
+      <button type="button" id="rx-skin-toggle-m" class="rx-icon-btn rx-qa-mobile-btn" onclick="window.RXSkins&&window.RXSkins.setSkin(window.RXSkins.nextSkin(),this)" aria-label="切换皮肤风格"></button>
+      <button type="button" id="rx-theme-toggle-m" class="rx-icon-btn rx-qa-mobile-btn" onclick="window.RXSkins&&window.RXSkins.toggleTheme(this)" aria-label="切换深浅模式"></button>
+    </div>
+  </div>
+</div>
+
+<div class="rx-qa-strip">
+  <div class="rx-qa-inner">
+    <div class="rx-qa-strip-links">
+      <strong>🔥 专栏与工具直达：</strong>
+      <a href="https://blog.mycampusmail.com/archives/nodeseek-merchant-reviews-2026h2">《117 家商家测评 · 上卷（61 家）》</a>
+      <a href="https://blog.mycampusmail.com/archives/meowvps-official-merchants-2026h2">《56 家主力与皇冠标杆 · 下卷》</a>
+      <a href="https://blog.mycampusmail.com/tools">VPS 剩余价值 / 电池组计算 / IP 分流与延迟测速</a>
+    </div>
+    <a href="https://blog.mycampusmail.com/" class="rx-qa-back">返回博客首页 →</a>
+  </div>
+</div>
+
+<div id="rx-captcha-float" style="display:none;position:fixed;z-index:10001;box-sizing:border-box">
+  <div style="display:flex;gap:6px;align-items:center">
+    <input id="rx-captcha-input" class="FormControl" type="text" maxlength="6" placeholder="6 位数字验证码" style="flex:1;height:38px" />
+    <button type="button" id="rx-send-mail-code" class="rx-captcha-btn" onclick="window.__rxSendEmailCode()">发送邮箱码</button>
+    <img id="rx-captcha-img" alt="验证码" title="点击刷新图形码" onclick="window.__rxRefreshCaptcha()" style="height:38px;border-radius:6px;cursor:pointer" />
+  </div>
+  <p id="rx-captcha-tip" class="rx-captcha-tip">验证码 10 分钟内有效，最多输错 5 次（可填右侧图形码或点「发送邮箱码」）</p>
+</div>
+
+<script>
+(function(){
+  function uid(){try{return flarum.core.app.session.user.id();}catch(e){return "";}}
+  function csrf(){try{return flarum.core.app.session.csrfToken;}catch(e){return "";}}
+  function render(d){
+    var p=document.getElementById("rx-points");
+    var b=document.getElementById("rx-checkin-btn");
+    if(p&&typeof d.points==="number"){p.textContent="书币："+d.points+" · 连续 "+d.streak+" 天";}
+    if(b&&d.checkedToday){
+      b.textContent="✓ 今日已签";
+      b.classList.add("is-checked");
+    }
+  }
+  window.__rxCheckin=function(){
+    var u=uid();
+    if(!u){
+      var loginBtn=Array.from(document.querySelectorAll("button")).find(function(x){return /登录|Log In/.test(x.textContent||"");});
+      if(loginBtn)loginBtn.click();
+      return;
+    }
+    var btn=document.getElementById("rx-checkin-btn");
+    var wasChecked=btn&&btn.classList.contains("is-checked");
+    fetch("/me.php?action=checkin&sync_uid="+u,{method:"POST",credentials:"same-origin",headers:{"X-CSRF-Token":csrf()}})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        render(d);
+        if(!wasChecked&&d&&d.checkedToday&&window.RXFX&&window.RXFX.confetti){
+          window.RXFX.confetti(btn);
+        }
+      });
+  };
+  setTimeout(function(){
+    var u=uid();
+    if(u){
+      fetch("/me.php?sync_uid="+u,{credentials:"same-origin",headers:{"X-CSRF-Token":csrf()}})
+        .then(function(r){return r.json();})
+        .then(render);
+    }
+  },1200);
+
+  window.__rxCaptchaToken = "";
+  function syncCodeCookie(){
+    var inp = document.getElementById("rx-captcha-input");
+    var val = inp ? inp.value.trim() : "";
+    document.cookie = "rx_captcha_code=" + encodeURIComponent(val) + "; path=/; SameSite=Lax";
+  }
+  var capInp = document.getElementById("rx-captcha-input");
+  if(capInp){
+    capInp.addEventListener("input", syncCodeCookie);
+    capInp.addEventListener("change", syncCodeCookie);
+  }
+  function loadCaptcha(){
+    fetch("/captcha.php", {credentials:"same-origin"}).then(function(r){return r.json();}).then(function(d){
+      window.__rxCaptchaToken = d.token || "";
+      document.cookie = "rx_captcha_token=" + encodeURIComponent(window.__rxCaptchaToken) + "; path=/; SameSite=Lax";
+      var img = document.getElementById("rx-captcha-img");
+      if(img) img.src = d.svg;
+    });
+  }
+  window.__rxRefreshCaptcha = loadCaptcha;
+
+  window.__rxSendEmailCode = function(){
+    var emailEl = document.querySelector(".SignUpModal input[name=email]");
+    var tip = document.getElementById("rx-captcha-tip");
+    var btn = document.getElementById("rx-send-mail-code");
+    var email = emailEl ? emailEl.value.trim() : "";
+    if(!email){
+      if(tip){ tip.style.color="var(--rx-danger, #dc2626)"; tip.textContent="请先在上方填写邮箱地址，再点发送邮箱码"; }
+      return;
+    }
+    if(btn) btn.disabled = true;
+    fetch("/send-email-code.php", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({email: email})
+    }).then(function(r){return r.json().then(function(d){return {ok:r.ok, d:d};});}).then(function(res){
+      if(res.ok && res.d.token){
+        window.__rxCaptchaToken = res.d.token;
+        document.cookie = "rx_captcha_token=" + encodeURIComponent(res.d.token) + "; path=/; SameSite=Lax";
+        if(tip){ tip.style.color="var(--rx-ok, #059669)"; tip.textContent=res.d.message; }
+        var sec = 60;
+        var timer = setInterval(function(){
+          sec--;
+          if(sec <= 0){ clearInterval(timer); if(btn){btn.disabled=false;btn.textContent="发送邮箱码";} }
+          else if(btn){ btn.textContent = sec + "s"; }
+        }, 1000);
+      } else {
+        if(btn) btn.disabled = false;
+        if(tip){ tip.style.color="var(--rx-danger, #dc2626)"; tip.textContent=(res.d && res.d.error) || "发送失败"; }
+      }
+    });
+  };
+
+  var wasOpen = false;
+  setInterval(function(){
+    var ghFloat = document.getElementById("rx-github-float");
+    var authForm = document.querySelector(".LogInModal .Form, .SignUpModal .Form");
+    if(authForm && ghFloat){
+      authForm.style.marginTop = "48px";
+      var fRect = authForm.getBoundingClientRect();
+      ghFloat.style.display = "block";
+      ghFloat.style.width = fRect.width + "px";
+      ghFloat.style.left = fRect.left + "px";
+      ghFloat.style.top = (fRect.top - 48) + "px";
+    } else if(ghFloat){
+      ghFloat.style.display = "none";
+    }
+
+    var floatEl = document.getElementById("rx-captcha-float");
+    var subGroup = document.querySelector(".SignUpModal .Form .Form-group:last-child");
+    if(subGroup && floatEl){
+      if(!wasOpen){
+        wasOpen = true;
+        var inp = document.getElementById("rx-captcha-input");
+        if(inp) inp.value = "";
+        document.cookie = "rx_captcha_code=; path=/; SameSite=Lax";
+        loadCaptcha();
+      }
+      subGroup.style.marginTop = "72px";
+      var rect = subGroup.getBoundingClientRect();
+      floatEl.style.display = "block";
+      floatEl.style.width = rect.width + "px";
+      floatEl.style.left = rect.left + "px";
+      floatEl.style.top = (rect.top - 64) + "px";
+    } else if(floatEl){
+      wasOpen = false;
+      floatEl.style.display = "none";
+    }
+  }, 150);
+})();
+</script>

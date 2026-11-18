@@ -1,0 +1,786 @@
+/* ==========================================================================
+   融夕问答社区 · Flarum 2.0 四套皮肤视觉适配层 (rx-flarum.css)
+   仅在 html[data-rx-skin] 激活时生效（/admin 路由跳过，零影响）
+   ========================================================================== */
+
+/* ---------------- 1. 全面接管 Flarum 2.0 原生 CSS 自定义属性 ---------------- */
+
+html[data-rx-skin],
+html[data-rx-skin][data-theme^="light"],
+html[data-rx-skin][data-theme^="dark"],
+html.rx-dark[data-rx-skin] {
+  --primary-color: var(--rx-accent);
+  --secondary-color: var(--rx-text-2);
+  --body-bg: var(--rx-bg);
+  --body-bg-shaded: var(--rx-surface-2);
+  --body-bg-light: var(--rx-surface);
+  --body-bg-faded: var(--rx-glass);
+  --text-color: var(--rx-text);
+  --heading-color: var(--rx-text);
+  --muted-color: var(--rx-text-3);
+  --muted-color-light: var(--rx-text-3);
+  --muted-color-dark: var(--rx-text-2);
+  --link-color: var(--rx-accent);
+  --discussion-title-color: var(--rx-text);
+  --control-bg: var(--rx-surface-2);
+  --control-bg-light: var(--rx-surface);
+  --control-bg-shaded: var(--rx-surface-3);
+  --control-color: var(--rx-text-2);
+  --header-bg: var(--rx-surface);
+  --header-color: var(--rx-text);
+  --header-control-bg: var(--rx-surface-2);
+  --header-control-color: var(--rx-text-2);
+  --header-colored-color: var(--rx-text);
+  --header-colored-control-color: var(--rx-text-2);
+  --header-colored-control-bg: var(--rx-surface-2);
+  --header-colored-control-bg-shaded: var(--rx-surface-3);
+  --header-colored-control-bg-fadedin: var(--rx-surface-2);
+  --hero-bg: var(--rx-surface);
+  --hero-color: var(--rx-text);
+  --button-color: var(--rx-text);
+  --button-bg: var(--rx-surface-2);
+  --button-bg-hover: var(--rx-surface-3);
+  --button-primary-bg: var(--rx-accent);
+  --button-primary-bg-hover: var(--rx-accent-hover);
+  --button-primary-color: var(--rx-accent-ink);
+  --code-bg: var(--rx-code-bg);
+  --code-color: var(--rx-code-text);
+  --border-radius: var(--rx-radius-sm);
+  overflow-x: clip;
+  font-family: var(--rx-font-sans);
+}
+
+/* pop 主按钮采用柠檬黄贴纸色 */
+html[data-rx-skin="pop"],
+html[data-rx-skin="pop"][data-theme^="light"],
+html[data-rx-skin="pop"][data-theme^="dark"] {
+  --button-primary-bg: var(--rx-pop-yellow);
+  --button-primary-bg-hover: #ffe07a;
+  --button-primary-color: #15121c;
+}
+
+/* ink 主按钮采用焦墨底 + 纸白字，悬停变朱砂 */
+html[data-rx-skin="ink"],
+html[data-rx-skin="ink"][data-theme^="light"],
+html[data-rx-skin="ink"][data-theme^="dark"] {
+  --button-primary-bg: var(--rx-ink-jiao);
+  --button-primary-bg-hover: var(--rx-cinnabar);
+  --button-primary-color: var(--rx-bg);
+}
+
+/* plain 主按钮采用 Primer 绿 */
+html[data-rx-skin="plain"],
+html[data-rx-skin="plain"][data-theme^="light"] {
+  --button-primary-bg: #1f883d;
+  --button-primary-bg-hover: #1c8139;
+  --button-primary-color: #ffffff;
+}
+html.rx-dark[data-rx-skin="plain"],
+html[data-rx-skin="plain"][data-theme^="dark"] {
+  --button-primary-bg: #238636;
+  --button-primary-bg-hover: #29903b;
+  --button-primary-color: #ffffff;
+}
+
+/* ---------------- 2. 页面背景底纹层 (穿透 .App-content 不透明背景) ---------------- */
+
+html[data-rx-skin] body {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background-color: var(--rx-bg) !important;
+  color: var(--rx-text) !important;
+  font-family: var(--rx-font-sans);
+}
+html[data-rx-skin="ink"] body {
+  font-family: var(--rx-font-serif);
+}
+
+html[data-rx-skin] .App,
+html[data-rx-skin] .App-content {
+  background: transparent !important;
+  border-top: 0 !important;
+}
+
+/* pop 波点网格 */
+html[data-rx-skin="pop"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(21, 18, 28, .13) 1.2px, transparent 1.6px) 0 0 / 22px 22px;
+}
+html.rx-dark[data-rx-skin="pop"] body::before {
+  background: radial-gradient(circle, rgba(255, 255, 255, .07) 1.2px, transparent 1.6px) 0 0 / 22px 22px;
+}
+html[data-rx-skin="pop"] body::after {
+  display: none;
+}
+
+/* ink 宣纸暗角 + 水墨远山 + 纤维颗粒 */
+html[data-rx-skin="ink"] body {
+  background-image: radial-gradient(120% 90% at 50% 35%, transparent 55%, rgba(122, 92, 48, .13) 100%);
+  background-attachment: fixed;
+}
+html.rx-dark[data-rx-skin="ink"] body {
+  background-image: radial-gradient(120% 90% at 50% 35%, transparent 55%, rgba(0, 0, 0, .45) 100%);
+}
+html[data-rx-skin="ink"] body::before {
+  content: "";
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 28vh;
+  z-index: -2;
+  pointer-events: none;
+  opacity: .34;
+  background: url("ink-mountains.svg") center bottom / 100% 100% no-repeat;
+}
+html.rx-dark[data-rx-skin="ink"] body::before {
+  filter: invert(1);
+  opacity: .16;
+}
+html[data-rx-skin="ink"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .12;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8 .2' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 1.3 -.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.rx-dark[data-rx-skin="ink"] body::after {
+  mix-blend-mode: screen;
+  opacity: .05;
+}
+
+/* luxe 流动夕照极光 + 纸纹 */
+html[data-rx-skin="luxe"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(46vmax 36vmax at 16% 10%, var(--rx-aurora-1), transparent 64%),
+    radial-gradient(40vmax 32vmax at 88% 6%, var(--rx-aurora-2), transparent 64%),
+    radial-gradient(50vmax 38vmax at 74% 92%, var(--rx-aurora-3), transparent 64%),
+    radial-gradient(34vmax 28vmax at 8% 88%, var(--rx-aurora-2), transparent 66%);
+  animation: rx-flarum-aurora 42s var(--rx-ease-out) infinite alternate;
+}
+html[data-rx-skin="luxe"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .065;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes rx-flarum-aurora {
+  0% { opacity: .92; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.04); }
+}
+
+/* plain 关闭装饰层 */
+html[data-rx-skin="plain"] body::before,
+html[data-rx-skin="plain"] body::after {
+  display: none !important;
+}
+
+/* ---------------- 3. 跨站顶部导航条 (.rx-qa-crossbar & .rx-qa-strip) ---------------- */
+
+.rx-qa-crossbar {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 13px;
+  background: var(--rx-surface, #ffffff);
+  color: var(--rx-text, #18181b);
+  border-bottom: var(--rx-bw, 1px) solid var(--rx-line, #e4e4e7);
+}
+
+html[data-rx-skin="pop"] .rx-qa-crossbar {
+  background: var(--rx-surface-2);
+  border-bottom: 2.5px solid var(--rx-line);
+}
+html[data-rx-skin="ink"] .rx-qa-crossbar {
+  background: var(--rx-surface);
+  border-bottom: 1px solid var(--rx-line-strong);
+  font-family: var(--rx-font-serif);
+}
+html[data-rx-skin="luxe"] .rx-qa-crossbar {
+  background: var(--rx-glass-strong);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid var(--rx-hairline);
+}
+html[data-rx-skin="plain"] .rx-qa-crossbar {
+  background: var(--rx-surface-2);
+  border-bottom: 1px solid var(--rx-line);
+}
+
+.rx-qa-inner {
+  max-width: 1150px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.rx-qa-links,
+.rx-qa-strip-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  min-width: 0;
+}
+
+.rx-qa-links a {
+  color: var(--rx-text-2);
+  text-decoration: none;
+  font-weight: 500;
+}
+.rx-qa-links a:hover {
+  color: var(--rx-accent);
+  text-decoration: underline;
+}
+.rx-qa-links a.rx-qa-brand {
+  color: var(--rx-text);
+  font-weight: 800;
+}
+.rx-qa-links a.rx-qa-em {
+  color: var(--rx-accent);
+  font-weight: 700;
+}
+.rx-qa-links a.rx-qa-ok {
+  color: var(--rx-ok);
+  font-weight: 700;
+}
+
+.rx-qa-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rx-points-text {
+  color: var(--rx-text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rx-checkin-pill {
+  padding: 5px 11px;
+  border-radius: var(--rx-radius-sm, 8px);
+  border: var(--rx-bw, 1px) solid var(--rx-line, transparent);
+  background: var(--button-primary-bg, var(--rx-accent));
+  color: var(--button-primary-color, #fff);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+html[data-rx-skin="pop"] .rx-checkin-pill {
+  border: 2px solid var(--rx-line);
+  box-shadow: 2px 2px 0 var(--rx-line);
+  font-weight: 800;
+}
+html.rx-dark[data-rx-skin="pop"] .rx-checkin-pill {
+  box-shadow: 2px 2px 0 #000;
+}
+html[data-rx-skin="ink"] .rx-checkin-pill {
+  border-radius: 0;
+  border: 1.5px solid var(--rx-ink-jiao);
+  font-family: var(--rx-font-serif);
+  letter-spacing: .06em;
+}
+.rx-checkin-pill.is-checked {
+  background: var(--rx-surface-3) !important;
+  color: var(--rx-text-2) !important;
+  box-shadow: none !important;
+}
+
+/* 桌面端隐藏 .rx-qa-mobile-btn（桌面端由 .App-header 内的 #rx-skin-toggle / #rx-theme-toggle 提供） */
+@media (min-width: 768px) {
+  .rx-qa-mobile-btn {
+    display: none !important;
+  }
+}
+
+/* 第二栏专栏快捷条 (.rx-qa-strip) */
+.rx-qa-strip {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px 16px;
+  font-size: 12px;
+  background: var(--rx-accent-soft, #fff0bf);
+  color: var(--rx-text, #18181b);
+  border-bottom: var(--rx-bw, 1px) solid var(--rx-line, #e4e4e7);
+}
+html[data-rx-skin="ink"] .rx-qa-strip {
+  background: var(--rx-surface-2);
+  border-bottom: 1px solid var(--rx-line);
+  font-family: var(--rx-font-serif);
+}
+html[data-rx-skin="luxe"] .rx-qa-strip {
+  background: color-mix(in srgb, var(--rx-accent-soft) 72%, var(--rx-surface));
+  border-bottom: 1px solid var(--rx-hairline);
+}
+html[data-rx-skin="plain"] .rx-qa-strip {
+  background: var(--rx-surface);
+  border-bottom: 1px solid var(--rx-line);
+}
+.rx-qa-strip a {
+  color: var(--rx-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+html[data-rx-skin="pop"] .rx-qa-strip a {
+  color: var(--rx-text);
+  text-decoration: underline;
+  text-decoration-color: var(--rx-pop-yellow);
+  text-decoration-thickness: 2px;
+}
+.rx-qa-strip a:hover {
+  text-decoration: underline;
+}
+.rx-qa-strip .rx-qa-back {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------------- 4. Flarum 顶栏 (.App-header) 与移动端抽屉 (.App-drawer) ---------------- */
+
+html[data-rx-skin] .App-header,
+html[data-rx-skin] .App-navigation {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border-bottom: var(--rx-bw) solid var(--rx-line) !important;
+  box-shadow: none !important;
+}
+
+html[data-rx-skin="pop"] .App-header,
+html[data-rx-skin="pop"] .App-navigation {
+  border-bottom: 2.5px solid var(--rx-line) !important;
+}
+html[data-rx-skin="pop"] .Header-title a,
+html[data-rx-skin="pop"] a.Header-title {
+  font-family: var(--rx-font-display);
+  font-weight: 900;
+}
+
+html[data-rx-skin="ink"] .App-header {
+  background: color-mix(in srgb, var(--rx-bg) 94%, transparent) !important;
+  border-bottom: 0 !important;
+}
+html[data-rx-skin="ink"] .App-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 8px;
+  pointer-events: none;
+  background: var(--rx-ink-jiao);
+  -webkit-mask: var(--rx-stroke) center / 100% 100% no-repeat;
+  mask: var(--rx-stroke) center / 100% 100% no-repeat;
+}
+html[data-rx-skin="ink"] .Header-title a,
+html[data-rx-skin="ink"] a.Header-title {
+  font-family: var(--rx-font-brush);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+html[data-rx-skin="luxe"] .App-header,
+html[data-rx-skin="luxe"] .App-navigation {
+  background: color-mix(in srgb, var(--rx-bg) 68%, transparent) !important;
+  backdrop-filter: saturate(1.6) blur(20px);
+  -webkit-backdrop-filter: saturate(1.6) blur(20px);
+  border-bottom: 1px solid var(--rx-hairline) !important;
+  box-shadow: 0 8px 24px -18px rgba(60, 30, 15, .32) !important;
+}
+
+html[data-rx-skin="plain"] .App-header,
+html[data-rx-skin="plain"] .App-navigation {
+  background: var(--rx-surface-2) !important;
+  border-bottom: 1px solid var(--rx-line) !important;
+}
+
+html[data-rx-skin] .App-header a:not(.Button--primary),
+html[data-rx-skin] .App-header .Button--link,
+html[data-rx-skin] .App-drawer a:not(.Button--primary) {
+  color: var(--rx-text) !important;
+}
+
+html[data-rx-skin] .App-drawer {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+}
+
+/* ---------------- 5. 社区欢迎横幅 / 板块横幅 (.Hero / .WelcomeHero) ---------------- */
+
+html[data-rx-skin] .Hero {
+  position: relative;
+  box-sizing: border-box;
+  width: min(1150px, calc(100% - 24px));
+  max-width: 1150px;
+  margin: 18px auto 8px;
+  padding: 28px 28px;
+  overflow: hidden;
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: var(--rx-bw) solid var(--rx-line);
+  border-radius: var(--rx-radius);
+  box-shadow: var(--rx-shadow);
+  text-align: left;
+}
+html[data-rx-skin] .Hero .container {
+  position: relative;
+  z-index: 2;
+  padding: 0;
+}
+html[data-rx-skin] .Hero .Hero-title {
+  color: var(--rx-text) !important;
+  margin: 0 0 6px;
+  font-size: clamp(24px, 3.6vw, 36px);
+}
+html[data-rx-skin] .Hero .Hero-subtitle {
+  color: var(--rx-text-2) !important;
+  font-size: 14.5px;
+}
+
+/* pop Hero */
+html[data-rx-skin="pop"] .Hero {
+  border: 2.5px solid var(--rx-line);
+  border-radius: 20px;
+  box-shadow: var(--rx-shadow-lg);
+}
+html[data-rx-skin="pop"] .Hero::before {
+  content: "";
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--rx-pop-yellow);
+  border: 2.5px solid var(--rx-line);
+  box-shadow: 5px 5px 0 var(--rx-line);
+  z-index: 1;
+  pointer-events: none;
+}
+html.rx-dark[data-rx-skin="pop"] .Hero::before {
+  box-shadow: 5px 5px 0 #000;
+}
+html[data-rx-skin="pop"] .Hero .Hero-title {
+  font-family: var(--rx-font-display);
+  font-weight: 900;
+}
+
+/* ink Hero：水墨远山画卷 + 行楷标题 + 「融夕」朱砂印 */
+html[data-rx-skin="ink"] .Hero {
+  background: transparent !important;
+  border: 0;
+  border-bottom: 1.5px solid var(--rx-line-strong);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 26px 12px 22px;
+}
+html[data-rx-skin="ink"] .Hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 26%;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("ink-landscape.svg") right bottom / auto 100% no-repeat;
+}
+html.rx-dark[data-rx-skin="ink"] .Hero::after {
+  filter: invert(.88) sepia(.15);
+  opacity: .55;
+}
+html[data-rx-skin="ink"] .Hero .Hero-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--rx-font-brush);
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--rx-ink-jiao) !important;
+}
+html[data-rx-skin="ink"] .Hero .Hero-title::after {
+  content: "融夕";
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  writing-mode: vertical-rl;
+  font: 700 11px/1 var(--rx-font-serif);
+  letter-spacing: 0;
+  color: #fbf0e0;
+  background: var(--rx-cinnabar);
+  border-radius: 3px;
+  transform: rotate(-4deg);
+  box-shadow: inset 0 0 0 1.5px var(--rx-cinnabar), inset 0 0 0 2.5px #fbf0e0;
+}
+html[data-rx-skin="ink"] .Hero .Hero-subtitle {
+  font-family: var(--rx-font-serif);
+  letter-spacing: .05em;
+}
+
+/* luxe Hero */
+html[data-rx-skin="luxe"] .Hero {
+  border-radius: 24px;
+  border: 1px solid var(--rx-hairline);
+  background:
+    radial-gradient(120% 140% at 100% 0%, var(--rx-aurora-1), transparent 56%),
+    linear-gradient(160deg, var(--rx-glass-strong), var(--rx-glass)) !important;
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: var(--rx-shadow-lg);
+}
+html[data-rx-skin="luxe"] .Hero .Hero-title {
+  font-weight: 800;
+}
+
+/* plain Hero */
+html[data-rx-skin="plain"] .Hero {
+  background: var(--rx-surface-2) !important;
+  border: 1px solid var(--rx-line);
+  border-radius: 6px;
+  box-shadow: none !important;
+}
+html[data-rx-skin="plain"] .Hero .Hero-title {
+  font-weight: 600;
+}
+
+/* ---------------- 6. 主题列表、标签、按钮、帖子流与弹窗 ---------------- */
+
+html[data-rx-skin] .DiscussionListItem {
+  background: var(--rx-surface);
+  border: var(--rx-bw) solid var(--rx-line);
+  border-radius: var(--rx-radius);
+  box-shadow: var(--rx-shadow);
+  margin-bottom: 10px;
+}
+
+html[data-rx-skin="pop"] .DiscussionListItem {
+  border: 2.5px solid var(--rx-line);
+  transition: transform .2s var(--rx-ease-spring), box-shadow .2s var(--rx-ease-spring);
+}
+html[data-rx-skin="pop"] .DiscussionListItem:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--rx-shadow-lg);
+}
+html[data-rx-skin="pop"] .DiscussionListItem--sticky {
+  background: color-mix(in srgb, var(--rx-pop-yellow) 18%, var(--rx-surface));
+}
+html[data-rx-skin="pop"] .DiscussionListItem-title {
+  font-weight: 800;
+}
+
+html[data-rx-skin="ink"] .DiscussionListItem {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rx-line);
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+html[data-rx-skin="ink"] .DiscussionListItem--sticky {
+  background: radial-gradient(70% 160% at 0% 50%, color-mix(in srgb, var(--rx-cinnabar) 9%, transparent), transparent 72%);
+}
+html[data-rx-skin="ink"] .DiscussionListItem-title {
+  font-family: var(--rx-font-serif);
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+html[data-rx-skin="ink"] .DiscussionListItem:hover .DiscussionListItem-title {
+  color: var(--rx-cinnabar);
+}
+
+html[data-rx-skin="luxe"] .DiscussionListItem {
+  background: linear-gradient(160deg, var(--rx-glass-strong), var(--rx-glass));
+  border: 1px solid var(--rx-hairline);
+  backdrop-filter: blur(14px) saturate(1.25);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  transition: transform .28s var(--rx-ease-out), box-shadow .28s var(--rx-ease-out);
+}
+html[data-rx-skin="luxe"] .DiscussionListItem:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--rx-shadow-lg);
+}
+html[data-rx-skin="luxe"] .DiscussionListItem--sticky {
+  background: linear-gradient(100deg, color-mix(in srgb, var(--rx-accent-soft) 80%, transparent), var(--rx-glass));
+}
+
+html[data-rx-skin="plain"] .DiscussionListItem {
+  border: 1px solid var(--rx-line);
+  border-radius: 6px;
+  box-shadow: none;
+}
+html[data-rx-skin="plain"] .DiscussionListItem:hover {
+  background: var(--rx-surface-2);
+}
+
+/* 按钮 (.Button / .Button--primary) */
+html[data-rx-skin] .Button--primary {
+  background: var(--button-primary-bg) !important;
+  color: var(--button-primary-color) !important;
+  border-radius: var(--rx-radius-sm);
+  font-weight: 700;
+}
+html[data-rx-skin="pop"] .Button--primary {
+  border: 2.5px solid var(--rx-line) !important;
+  box-shadow: 3px 3px 0 var(--rx-line);
+  font-weight: 800;
+}
+html.rx-dark[data-rx-skin="pop"] .Button--primary {
+  box-shadow: 3px 3px 0 #000;
+}
+html[data-rx-skin="ink"] .Button--primary {
+  border-radius: 0;
+  letter-spacing: .1em;
+  font-family: var(--rx-font-serif);
+}
+html[data-rx-skin="luxe"] .Button--primary {
+  background: var(--rx-dusk) !important;
+  color: var(--rx-accent-ink) !important;
+  border: 0 !important;
+}
+html[data-rx-skin="plain"] .Button--primary {
+  border: 1px solid rgba(31, 35, 40, .15) !important;
+  box-shadow: none !important;
+}
+
+/* 标签 (.TagLabel / .TagTile) */
+html[data-rx-skin="pop"] .TagLabel {
+  border: 1.5px solid var(--rx-line);
+  border-radius: 999px;
+  font-weight: 700;
+}
+html[data-rx-skin="ink"] .TagLabel {
+  border-radius: 0;
+  border: 1px solid var(--rx-line-strong);
+  background: transparent !important;
+  color: var(--rx-text-2) !important;
+  font-family: var(--rx-font-serif);
+}
+html[data-rx-skin="plain"] .TagLabel {
+  border-radius: 999px;
+}
+
+/* 帖子流卡片、编辑器、弹窗与下拉框 */
+html[data-rx-skin] .CommentPost,
+html[data-rx-skin] .Composer,
+html[data-rx-skin] .Modal-content,
+html[data-rx-skin] .Dropdown-menu {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: var(--rx-bw) solid var(--rx-line);
+  border-radius: var(--rx-radius);
+  box-shadow: var(--rx-shadow);
+}
+html[data-rx-skin="luxe"] .CommentPost,
+html[data-rx-skin="luxe"] .Modal-content,
+html[data-rx-skin="luxe"] .Dropdown-menu {
+  background: linear-gradient(160deg, var(--rx-glass-strong), var(--rx-glass)) !important;
+  border-color: var(--rx-hairline);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+}
+html[data-rx-skin="plain"] .CommentPost,
+html[data-rx-skin="plain"] .Modal-content {
+  box-shadow: none;
+}
+
+/* 帖子内代码块深底高对比保护 */
+html[data-rx-skin] .Post-body pre {
+  background: var(--rx-code-bg, #0f172a) !important;
+  color: var(--rx-code-text, #e2e8f0) !important;
+  border: var(--rx-bw) solid var(--rx-line);
+  border-radius: var(--rx-radius-sm);
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: var(--rx-font-mono);
+}
+
+/* 验证码悬浮框皮肤适配 */
+html[data-rx-skin] #rx-captcha-float .FormControl {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: var(--rx-bw) solid var(--rx-line) !important;
+}
+.rx-captcha-btn {
+  height: 38px;
+  padding: 0 10px;
+  border-radius: var(--rx-radius-sm, 6px);
+  border: var(--rx-bw, 1px) solid var(--rx-accent, #2563eb);
+  background: var(--rx-accent-soft, #eff6ff);
+  color: var(--rx-text, #18181b);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#rx-captcha-img {
+  border: 1px solid var(--rx-line, #d4d4d8);
+}
+.rx-captcha-tip {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--rx-text-3, #71717a);
+  text-align: left;
+}
+
+/* ---------------- 7. 移动端 390px 防溢出紧凑规则 ---------------- */
+
+@media (max-width: 640px) {
+  .rx-qa-crossbar {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .rx-qa-links {
+    gap: 4px 10px;
+  }
+  .rx-qa-strip {
+    padding: 5px 10px;
+    font-size: 11.5px;
+  }
+  html[data-rx-skin] .Hero {
+    padding: 18px 16px;
+    margin-top: 12px;
+  }
+  html[data-rx-skin="pop"] .Hero::before {
+    width: 48px;
+    height: 48px;
+    right: 12px;
+    top: 14px;
+    transform: none;
+    opacity: .8;
+  }
+  html[data-rx-skin="ink"] .Hero::after {
+    left: 10%;
+    opacity: .42;
+  }
+  html[data-rx-skin] .App-header {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  html[data-rx-skin] .Header-controls {
+    gap: 4px;
+  }
+}
