@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-End-to-end live verification for https://blog.mycampusmail.com:
-  1. HTTP 200 across homepage, /tools, /about, all category pages, tag page, and all 6 published VPS posts
-  2. Homepage pinned order (#1 Vol. 1, #2 Vol. 2), /tools in primary menu, and 0 placeholder welcome stubs
-  3. Zero broken #anchors, zero stale /vps/ links, denoised sidebar TOC (.toc a <= 280)
-  4. Zero blurred <pre> blocks (plugin-shiki blur(10px) regression check) even after expanding all <details>
-  5. Light Mode vs Dark Mode (html.dark) computed styles on #vps-quick-toolbar, pre.vps-raw-report & /tools
-  6. Zero horizontal overflow on both 1280px desktop and 390px mobile viewports
+End-to-end live verification for https://blog.mycampusmail.com & https://qa.mycampusmail.com:
+  1. HTTP 200 across homepage, /my-reviews, /tools, /about, /privacy-policy, /user-agreement,
+     uploaded favicon & dual-volume cover PNGs, category/tag pages, and all 6 published VPS posts
+  2. Homepage pinned order (#1 Vol. 1, #2 Vol. 2), favicon=/upload/favicon.png, dual-volume cover cards,
+     /my-reviews & /tools in primary menu, and 0 placeholder welcome stubs
+  3. /privacy-policy & /user-agreement legal SinglePages (zero default placeholder text, Light/Dark card styles)
+  4. Halo Lucene Search API hits for colloquial vendor nicknames (大妈, 瓦工, 御坂, 丽萨, 小秘书)
+  5. Flarum qa.mycampusmail.com sticky official VPS guide thread under Tag 1 (VPS 科普)
+  6. Zero broken #anchors, zero stale /vps/ links, denoised sidebar TOC (.toc a <= 280),
+     #vps-vendor-wall (61 / 56 vendor jump pills), slang filter expansion, and zero blurred <pre> blocks
+  7. Light Mode vs Dark Mode (html.dark) computed styles and zero horizontal overflow on 1280px & 390px viewports
 """
 import itertools, json, shutil, subprocess, tempfile, time, urllib.request
 import websocket
 
 PORT = 9242
 BASE = "https://blog.mycampusmail.com"
+QA_BASE = "https://qa.mycampusmail.com"
 
 POST_URLS = [
     f"{BASE}/archives/nodeseek-merchant-reviews-2026h2",
@@ -25,8 +30,14 @@ POST_URLS = [
 ]
 PAGE_URLS = [
     f"{BASE}/",
+    f"{BASE}/my-reviews",
     f"{BASE}/tools",
     f"{BASE}/about",
+    f"{BASE}/privacy-policy",
+    f"{BASE}/user-agreement",
+    f"{BASE}/upload/favicon.png",
+    f"{BASE}/upload/vps-vol1-cover.png",
+    f"{BASE}/upload/vps-vol2-cover.png",
     f"{BASE}/categories/vps",
     f"{BASE}/categories/ai",
     f"{BASE}/categories/fsae",
@@ -36,13 +47,63 @@ PAGE_URLS = [
 ]
 
 
+def http_fetch(req, timeout=20, retries=3):
+    last_err = None
+    for att in range(retries):
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.status, r.read()
+        except Exception as e:
+            last_err = e
+            time.sleep(0.8 * (att + 1))
+    raise last_err
+
+
+def check_halo_nickname_search():
+    print("\n=== HALO LUCENE NICKNAME SEARCH AUDIT ===")
+    for kw in ["大妈", "瓦工", "御坂", "丽萨", "小秘书"]:
+        payload = json.dumps({"keyword": kw, "limit": 5, "includeTypes": ["post.content.halo.run"]}, ensure_ascii=False).encode("utf-8")
+        req = urllib.request.Request(
+            f"{BASE}/apis/api.halo.run/v1alpha1/indices/-/search",
+            data=payload,
+            headers={"Content-Type": "application/json; charset=utf-8", "User-Agent": "Mozilla/5.0"},
+            method="POST",
+        )
+        _, raw = http_fetch(req, timeout=15)
+        res = json.loads(raw.decode("utf-8"))
+        hits = res.get("hits") or []
+        titles = [h.get("title", "") for h in hits]
+        print(f"  keyword={kw:4s} -> hits={len(hits)} | {titles[:2]}")
+        assert len(hits) >= 1, f"Halo search returned 0 hits for colloquial nickname: {kw}"
+
+
+def check_flarum_vps_guide():
+    print("\n=== FLARUM QA COMMUNITY AUDIT ===")
+    req = urllib.request.Request(
+        f"{QA_BASE}/api/discussions?include=tags",
+        headers={"Accept": "application/vnd.api+json", "User-Agent": "Mozilla/5.0"},
+    )
+    _, raw = http_fetch(req, timeout=15)
+    data = json.loads(raw.decode("utf-8"))
+    vps_guides = [
+        d for d in data.get("data", [])
+        if "【VPS 交流】" in d.get("attributes", {}).get("title", "")
+    ]
+    assert len(vps_guides) >= 1, "Missing 【VPS 交流】 official guide thread on qa.mycampusmail.com"
+    g = vps_guides[0]
+    print(f"  Found Flarum VPS Guide ID={g['id']} | sticky={g['attributes'].get('isSticky')} | title={g['attributes']['title']}")
+    assert g["attributes"].get("isSticky") is True
+
+
 def main():
     for u in PAGE_URLS + POST_URLS:
         req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Cache-Control": "no-cache"})
-        with urllib.request.urlopen(req, timeout=20) as r:
-            b = r.read()
-            print(f"[HTTP {r.status}] {len(b):9,d} bytes | {u}")
-            assert r.status == 200
+        status, b = http_fetch(req, timeout=20)
+        print(f"[HTTP {status}] {len(b):9,d} bytes | {u}")
+        assert status == 200
+
+    check_halo_nickname_search()
+    check_flarum_vps_guide()
 
     tmp_prof = tempfile.mkdtemp(prefix="cdp-verify-")
     chrome_proc = subprocess.Popen(
@@ -86,7 +147,7 @@ def main():
         call("Network.enable")
         call("Network.setCacheDisabled", cacheDisabled=True)
 
-        # 1. Verify Homepage Pinned Order, /tools Nav Item & Zero Stub Posts
+        # 1. Verify Homepage Pinned Order, Favicon, Cover Images, /my-reviews & /tools Nav Items & Zero Stub Posts
         call("Emulation.setDeviceMetricsOverride", width=1280, height=900, deviceScaleFactor=1, mobile=False)
         call("Page.navigate", url=f"{BASE}/?_t={int(time.time())}")
         time.sleep(2.5)
@@ -99,11 +160,20 @@ def main():
           for (const l of links) {
             if (!seen.some(s => s.href === l.href)) seen.push(l);
           }
+          const iconHref = document.querySelector('link[rel*="icon"]')?.getAttribute('href') || '';
+          const imgs = Array.from(document.querySelectorAll('img')).map(i => i.getAttribute('src') || '');
+          const hasVol1Cover = imgs.some(s => s.includes('vps-vol1-cover.png'));
+          const hasVol2Cover = imgs.some(s => s.includes('vps-vol2-cover.png'));
+          const hasMyReviewsNav = Array.from(document.querySelectorAll('header a[href="/my-reviews"]')).length > 0;
           const hasToolsNav = Array.from(document.querySelectorAll('header a[href="/tools"]')).length > 0;
           const bodyTxt = document.body.innerText;
           const stubsPresent = ['AI 分区开篇', '资源分区开篇', 'RoboMaster 分区开篇', '车队的第一篇记录'].filter(t => bodyTxt.includes(t));
           return JSON.stringify({
             archiveCards: seen,
+            iconHref,
+            hasVol1Cover,
+            hasVol2Cover,
+            hasMyReviewsNav,
             hasToolsNav,
             stubsPresent,
             sw: document.documentElement.scrollWidth,
@@ -115,15 +185,53 @@ def main():
         print("\n=== HOMEPAGE AUDIT ===")
         for idx, c in enumerate(home_res["archiveCards"]):
             print(f"  #{idx+1}: {c['href']} -> {c['text']}")
-        print(f"  Header has /tools: {home_res['hasToolsNav']} | Stubs: {home_res['stubsPresent']} | Width: {home_res['sw']}<={home_res['iw']}")
+        print(f"  Favicon={home_res['iconHref']} | Covers: vol1={home_res['hasVol1Cover']}, vol2={home_res['hasVol2Cover']}")
+        print(f"  Header has /my-reviews={home_res['hasMyReviewsNav']}, /tools={home_res['hasToolsNav']} | Stubs: {home_res['stubsPresent']} | Width: {home_res['sw']}<={home_res['iw']}")
         assert len(home_res["archiveCards"]) >= 6
         assert home_res["archiveCards"][0]["href"].endswith("/archives/nodeseek-merchant-reviews-2026h2")
         assert home_res["archiveCards"][1]["href"].endswith("/archives/meowvps-official-merchants-2026h2")
+        assert "favicon.png" in home_res["iconHref"]
+        assert home_res["hasVol1Cover"] is True and home_res["hasVol2Cover"] is True
+        assert home_res["hasMyReviewsNav"] is True
         assert home_res["hasToolsNav"] is True
         assert home_res["stubsPresent"] == [], f"Welcome stubs still visible: {home_res['stubsPresent']}"
         assert home_res["sw"] <= home_res["iw"]
 
+        # 1b. Audit /my-reviews SinglePage
+        call("Emulation.setDeviceMetricsOverride", width=1280, height=900, deviceScaleFactor=1, mobile=False)
+        call("Page.navigate", url=f"{BASE}/my-reviews?_t={int(time.time())}")
+        time.sleep(2.5)
+        reviews_js = r"""
+        (() => {
+          document.documentElement.classList.remove('dark');
+          const box = document.getElementById('rx-reviews');
+          const card = box ? box.querySelector('.rx-card') : null;
+          const lightCardBg = card ? getComputedStyle(card).backgroundColor : '';
+          document.documentElement.classList.add('dark');
+          const darkCardBg = card ? getComputedStyle(card).backgroundColor : '';
+          document.documentElement.classList.remove('dark');
+          const hasCheckPlace = Array.from(document.querySelectorAll('a[href*="1PBAA6I6S.svg"], img[src*="1PBAA6I6S.svg"]')).length >= 2;
+          return JSON.stringify({
+            exists: !!box, lightCardBg, darkCardBg, hasCheckPlace,
+            sw: document.documentElement.scrollWidth, iw: window.innerWidth
+          });
+        })()
+        """
+        reviews_res = json.loads(call("Runtime.evaluate", expression=reviews_js, returnByValue=True)["result"]["value"])
+        call("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True)
+        time.sleep(0.5)
+        reviews_mob = json.loads(call("Runtime.evaluate", expression="JSON.stringify({sw: document.documentElement.scrollWidth, iw: window.innerWidth})", returnByValue=True)["result"]["value"])
+        print("\n=== /my-reviews SINGLEPAGE AUDIT ===")
+        print(f"  Cards Light/Dark : {reviews_res['lightCardBg']} -> {reviews_res['darkCardBg']} | CheckPlace={reviews_res['hasCheckPlace']}")
+        print(f"  Responsive       : 1280px ({reviews_res['sw']}<={reviews_res['iw']}), 390px ({reviews_mob['sw']}<={reviews_mob['iw']})")
+        assert reviews_res["exists"] is True
+        assert reviews_res["lightCardBg"] == "rgb(255, 255, 255)"
+        assert reviews_res["darkCardBg"] == "rgb(30, 41, 59)"
+        assert reviews_res["hasCheckPlace"] is True
+        assert reviews_res["sw"] <= reviews_res["iw"] and reviews_mob["sw"] <= reviews_mob["iw"]
+
         # 2. Audit /tools Interactive SinglePage
+        call("Emulation.setDeviceMetricsOverride", width=1280, height=900, deviceScaleFactor=1, mobile=False)
         call("Page.navigate", url=f"{BASE}/tools?_t={int(time.time())}")
         time.sleep(2.5)
         tools_js = r"""
@@ -162,7 +270,41 @@ def main():
         assert tools_res["blurredPres"] == 0
         assert tools_res["sw"] <= tools_res["iw"] and tools_mob["sw"] <= tools_mob["iw"]
 
-        # 3. Audit All 6 VPS Posts + Zero Blurred Pre Blocks + Light/Dark Styles
+        # 2b. Audit /privacy-policy & /user-agreement Legal SinglePages
+        for slug in ["privacy-policy", "user-agreement"]:
+            call("Emulation.setDeviceMetricsOverride", width=1280, height=900, deviceScaleFactor=1, mobile=False)
+            call("Page.navigate", url=f"{BASE}/{slug}?_t={int(time.time())}")
+            time.sleep(2.0)
+            legal_js = r"""
+            (() => {
+              document.documentElement.classList.remove('dark');
+              const box = document.querySelector('.rx-legal');
+              const card = box ? box.querySelector('.rx-legal-meta') : null;
+              const lightCardBg = card ? getComputedStyle(card).backgroundColor : '';
+              document.documentElement.classList.add('dark');
+              const darkCardBg = card ? getComputedStyle(card).backgroundColor : '';
+              document.documentElement.classList.remove('dark');
+              const hasPlaceholder = document.body.innerText.includes('请在此处添加');
+              return JSON.stringify({
+                exists: !!box, lightCardBg, darkCardBg, hasPlaceholder,
+                sw: document.documentElement.scrollWidth, iw: window.innerWidth
+              });
+            })()
+            """
+            legal_res = json.loads(call("Runtime.evaluate", expression=legal_js, returnByValue=True)["result"]["value"])
+            call("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True)
+            time.sleep(0.4)
+            legal_mob = json.loads(call("Runtime.evaluate", expression="JSON.stringify({sw: document.documentElement.scrollWidth, iw: window.innerWidth})", returnByValue=True)["result"]["value"])
+            print(f"\n=== /{slug} LEGAL SINGLEPAGE AUDIT ===")
+            print(f"  Cards Light/Dark : {legal_res['lightCardBg']} -> {legal_res['darkCardBg']} | hasPlaceholder={legal_res['hasPlaceholder']}")
+            print(f"  Responsive       : 1280px ({legal_res['sw']}<={legal_res['iw']}), 390px ({legal_mob['sw']}<={legal_mob['iw']})")
+            assert legal_res["exists"] is True
+            assert legal_res["hasPlaceholder"] is False
+            assert legal_res["lightCardBg"] == "rgb(248, 250, 252)"
+            assert legal_res["darkCardBg"] == "rgb(30, 41, 59)"
+            assert legal_res["sw"] <= legal_res["iw"] and legal_mob["sw"] <= legal_mob["iw"]
+
+        # 3. Audit All 6 VPS Posts + Vendor Wall + Slang Filter + Zero Blurred Pre Blocks + Light/Dark Styles
         JS_POST_AUDIT = r"""
         (() => {
           document.documentElement.classList.remove('dark');
@@ -175,10 +317,12 @@ def main():
             .map(a => a.getAttribute('href'))
             .filter(h => h && h.startsWith('/vps/'));
           const tocLinks = document.querySelectorAll('.toc a').length;
-          const detailsAll = Array.from(md.querySelectorAll('details'));
+          const detailsAll = Array.from(md.querySelectorAll('details:not(#vps-vendor-wall)'));
           const defaultOpen = detailsAll.filter(d => d.open).length;
+          const vendorWall = document.getElementById('vps-vendor-wall');
+          const vendorPillCount = vendorWall ? vendorWall.querySelectorAll('.vps-vendor-pill').length : 0;
 
-          // Temporarily open first 5 details (or all if no toolbar) to verify zero blurred <pre>!
+          // Temporarily open first 5 details to verify zero blurred <pre>!
           detailsAll.slice(0, 5).forEach(d => { d.open = true; });
           const visibleBlurredPres = Array.from(md.querySelectorAll('pre')).filter(p => {
             const cs = getComputedStyle(p);
@@ -214,6 +358,12 @@ def main():
             document.documentElement.classList.remove('dark');
             if (activeChip) activeChip.style.transition = '';
 
+            const slangTerm = location.pathname.includes('meowvps-official-merchants') ? '大妈' : '御坂';
+            input.value = slangTerm;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            const statusAfterSlang = statusEl ? statusEl.textContent : '';
+            clearBtn.click();
+
             input.value = '9929';
             input.dispatchEvent(new Event('input', { bubbles: true }));
             const statusAfterFilter = statusEl ? statusEl.textContent : '';
@@ -225,7 +375,7 @@ def main():
 
             toolbarCheck = {
               lightBg, lightChipBg, darkBg, darkInputBg, darkChipBg, darkSubHeadColor,
-              statusAfterFilter, openAfterExpand, openAfterCollapse
+              slangTerm, statusAfterSlang, statusAfterFilter, openAfterExpand, openAfterCollapse
             };
           }
 
@@ -236,6 +386,7 @@ def main():
             tocLinks,
             detailsTotal: detailsAll.length,
             defaultOpen,
+            vendorPillCount,
             visibleBlurredPres,
             rawPreLightBg,
             rawPreDarkBg,
@@ -257,19 +408,27 @@ def main():
             mob = json.loads(call("Runtime.evaluate", expression="JSON.stringify({sw: document.documentElement.scrollWidth, iw: window.innerWidth})", returnByValue=True)["result"]["value"])
 
             print(f"\n=== POST AUDIT: {u} ===")
-            print(f"  Anchors={res['hashLinkCount']} (broken={res['brokenAnchorCount']}), stale=/vps/={res['staleVpsLinkCount']}, TOC={res['tocLinks']}, details={res['detailsTotal']}, blurredPre={res['visibleBlurredPres']}")
+            print(f"  Anchors={res['hashLinkCount']} (broken={res['brokenAnchorCount']}), stale=/vps/={res['staleVpsLinkCount']}, TOC={res['tocLinks']}, vendorPills={res['vendorPillCount']}, details={res['detailsTotal']}, blurredPre={res['visibleBlurredPres']}")
             if res["rawPreLightBg"]:
                 print(f"  Raw <pre> Bg     : light={res['rawPreLightBg']} -> dark={res['rawPreDarkBg']}")
                 assert res["rawPreLightBg"] == "rgb(248, 250, 252)", res["rawPreLightBg"]
                 assert res["rawPreDarkBg"] == "rgb(15, 23, 42)", res["rawPreDarkBg"]
+            if u.endswith("nodeseek-merchant-reviews-2026h2"):
+                assert res["vendorPillCount"] == 61, res["vendorPillCount"]
+                assert res["detailsTotal"] == 319, res["detailsTotal"]
+            elif u.endswith("meowvps-official-merchants-2026h2"):
+                assert res["vendorPillCount"] == 56, res["vendorPillCount"]
+                assert res["detailsTotal"] == 137, res["detailsTotal"]
             if res["toolbarCheck"]:
                 tc = res["toolbarCheck"]
                 print(f"  Light vs Dark TB : light={tc['lightBg']} / chip={tc['lightChipBg']} -> dark={tc['darkBg']} / input={tc['darkInputBg']} / chip={tc['darkChipBg']}")
-                print(f"  Filter & Details : {tc['statusAfterFilter']} | expand={tc['openAfterExpand']} -> collapse={tc['openAfterCollapse']}")
+                print(f"  Slang & Filter   : [{tc['slangTerm']}] -> {tc['statusAfterSlang']} | [9929] -> {tc['statusAfterFilter']}")
+                print(f"  Details Toggle   : expand={tc['openAfterExpand']} -> collapse={tc['openAfterCollapse']}")
                 assert tc["lightBg"] == "rgb(248, 250, 252)", tc
                 assert tc["darkBg"] == "rgb(30, 41, 59)", tc
                 assert tc["darkInputBg"] == "rgb(15, 23, 42)", tc
                 assert tc["darkChipBg"] == "rgb(56, 189, 248)", tc
+                assert "匹配 0" not in tc["statusAfterSlang"], tc["statusAfterSlang"]
                 assert tc["openAfterExpand"] == res["detailsTotal"] and tc["openAfterCollapse"] == 0
             print(f"  Responsive       : 1280px ({res['scrollWidth']}<={res['innerWidth']}), 390px ({mob['sw']}<={mob['iw']})")
             assert res["brokenAnchorCount"] == 0
@@ -280,7 +439,7 @@ def main():
             assert mob["sw"] <= mob["iw"]
 
         ws.close()
-        print("\nALL HOMEPAGE PINNING, /tools SINGLEPAGE, ZERO-BLUR PRE, DARK MODE, ANCHORS, TOC & MOBILE CHECKS PASSED 100%!")
+        print("\nALL HOMEPAGE PINNING, FAVICON, COVERS, LEGAL PAGES, VENDOR WALL, NICKNAME SEARCH, FLARUM GUIDE, ZERO-BLUR PRE, DARK MODE & MOBILE CHECKS PASSED 100%!")
     finally:
         chrome_proc.terminate()
         shutil.rmtree(tmp_prof, ignore_errors=True)

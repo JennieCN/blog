@@ -134,6 +134,7 @@ def publish_post_item(item):
     TAG_SPECS = item.get("tag_specs", [])
     PINNED = item.get("pinned")
     PRIORITY = item.get("priority")
+    COVER = item.get("cover")
 
     tag_names = []
     for disp, tname in TAG_SPECS:
@@ -167,7 +168,7 @@ def publish_post_item(item):
                     "title": TITLE,
                     "slug": SLUG,
                     "template": "",
-                    "cover": "",
+                    "cover": COVER or "",
                     "deleted": False,
                     "publish": False,
                     "pinned": bool(PINNED) if PINNED is not None else False,
@@ -196,6 +197,8 @@ def publish_post_item(item):
             cur_post["spec"]["title"] = TITLE
             cur_post["spec"]["slug"] = SLUG
             cur_post["spec"]["excerpt"] = {"autoGenerate": False, "raw": EXCERPT}
+            if COVER is not None:
+                cur_post["spec"]["cover"] = COVER
             if PINNED is not None:
                 cur_post["spec"]["pinned"] = bool(PINNED)
             if PRIORITY is not None:
@@ -380,6 +383,7 @@ def build_item_from_spec(spec):
         "description": meta["description"],
         "categories": cats,
         "tag_specs": parse_tag_specs(spec.get("tags", "")),
+        "cover": spec.get("cover"),
         "pinned": spec.get("pinned"),
         "priority": spec.get("priority"),
         "raw_md": body,
@@ -397,6 +401,7 @@ def main():
     ap.add_argument("--html", default="")
     ap.add_argument("--categories", default="cat-vps")
     ap.add_argument("--tags", default="")
+    ap.add_argument("--cover", default=None)
     ap.add_argument("--pinned", action=argparse.BooleanOptionalAction, default=None)
     ap.add_argument("--priority", type=int, default=None)
     ap.add_argument("--single-page", action="store_true")
@@ -452,6 +457,7 @@ def main():
             "html": args.html,
             "categories": args.categories,
             "tags": args.tags,
+            "cover": args.cover,
             "pinned": args.pinned,
             "priority": args.priority,
         })

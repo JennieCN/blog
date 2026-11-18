@@ -8,7 +8,8 @@
  *      - Plaintext / language-text <pre><code> unwrapped to <pre class="vps-raw-report"> so Halo plugin-shiki
  *        neither blurs them (pre:has(code) { filter: blur(10px) }) nor mounts 300+ Shadow DOM Web Components
  *      - Styled <details>/<summary> collapsible benchmark blocks
- *      - Optional progressive interactive filter + expand/collapse toolbar (--inject-toolbar) with Light & Dark (html.dark) support
+ *      - Optional progressive interactive filter + A-Z vendor jump wall + expand/collapse toolbar (--inject-toolbar)
+ *        with Light & Dark (html.dark) support and colloquial nickname expansion
  *      - Strict 0-broken-anchor & <details> balance verification
  */
 import fs from 'node:fs';
@@ -50,8 +51,92 @@ function parseArgs(argv) {
   return opts;
 }
 
-// Emit IDs only on h1..h3 so Halo theme-earth's tocbot sidebar doesn't index 450+ h4 review sub-items!
 const HEADING_TAGS_WITH_ID = new Set(['h1', 'h2', 'h3']);
+
+const STRUCTURAL_H2_PREFIXES = [
+  '👑 猫猫钦点',
+  '选机分类体系总览',
+  '一、',
+  '二、',
+  '三、',
+  '四、',
+  '商家与产品线总览',
+  '56 家正式商家与产品线总览',
+  '猫猫博客非目录特殊家宽留档',
+  '测评区没有对应帖子的商家',
+  '收录方法与口径',
+  '上下卷联动与选机延伸阅读',
+];
+
+const CROWN_VENDORS = new Set([
+  'DMIT',
+  '搬瓦工(BWH)',
+  'Boil の家裡雲(港仔)',
+  'qqpw(夏威夷家宽)',
+  'netcup',
+  'DigitalFyre',
+]);
+
+// Colloquial community nicknames -> canonical search keywords
+const VENDOR_ALIASES = {
+  'DMIT': '大妈 dmit coronado lax.pro',
+  '搬瓦工(BWH)': '瓦工 bandwagon bandwagonhost bwh megabox the plan',
+  'Boil の家裡雲(港仔)': '港仔 家里云 家裡雲 boil network',
+  'qqpw(夏威夷家宽)': '夏威夷 qqpw drr hawaii',
+  'netcup': 'nc 德鸡 rs1000 vps1000',
+  'DigitalFyre': 'df digitalfyre',
+  'GreenCloud(绿云)': '绿云 greencloud gc',
+  'V.PS(小秘书)': '小秘书 xtom vps',
+  'RFCHOST(花卷科技)': '花卷 rfchost rfc',
+  'SaltyFish(咸鱼云)': '咸鱼 咸鱼云 saltyfish',
+  'BageVM': '八哥 bage',
+  'BestVM(富婆)': '富婆 bestvm',
+  'BUG NET(虫网)': '虫网 bugnet',
+  'Evoxt(益沃斯)': '益沃斯 evoxt',
+  'FacHost(工厂云)': '工厂云 fachost',
+  'Gomami(狗妈咪)': '狗妈咪 gomami',
+  'HostDare': 'hd hostdare',
+  'LeiKwan Host(利群主机)': '利群 leikwan',
+  'Neburst(奶爸)': '奶爸 neburst',
+  'NMCloud(牛马云)': '牛马 牛马云 nmcloud',
+  'NovixLink(诺联主机)': '诺联 novixlink',
+  'PittQiao(PQS)': '彼得巧 pqs pittqiao',
+  'RivenCloud(极云)': '极云 rivencloud',
+  'VIRCS(威尔克斯)': '威尔克斯 vircs',
+  'WireCat(维猫)': '维猫 wirecat',
+  'Yinnet(荫云)': '荫云 yinnet',
+  'YUNYOO(云悠)': '云悠 yunyoo',
+  'ZoroCloud(索隆云)': '索隆 索隆云 zorocloud',
+  '六六云 666Clouds': '666 666clouds 六六云',
+  '干杯云 USVPS24': '干杯 usvps24',
+  'wawo（哇沃主机）': '哇沃 wawo',
+  'BreadCloud（面包云）': '面包 面包云 breadcloud',
+  'CloudSilk（白丝云）': '白丝 白丝云 cloudsilk',
+  'GoodlyCloud（吉云）': '吉云 goodlycloud',
+  'LazyCatCloud（懒猫云）': '懒猫 懒猫云 lazycat',
+  'LisaHost（丽萨主机）': '丽萨 丽萨主机 lisahost',
+  'Misaka': '御坂 御坂网络 misaka',
+  'BuyVM': '卢森堡 frantech buyvm',
+  'RackNerd': 'rn racknerd',
+  'WePC（车库云）': '车库 车库云 wepc',
+  '艾云 iaClouds（破云 / Brea.cloud）': '艾云 破云 iaclouds brea',
+};
+
+function escapeAttr(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function shortVendorLabel(h2Txt) {
+  return h2Txt
+    .replace(/（近半年公开帖为.*$/, '')
+    .replace(/（已于.*$/, ' ⚠️停运')
+    .replace(/（已被标记.*$/, ' ⚠️跑路')
+    .replace(/（破云 \/ Brea\.cloud）/, '');
+}
 
 function textOf(node) {
   if (!node) return '';
@@ -150,7 +235,8 @@ html.dark .vps-review-subheading {
   font-weight: 500;
 }
 #vps-quick-toolbar .vps-tb-btn:hover,
-#vps-quick-toolbar .vps-tb-chip:hover {
+#vps-quick-toolbar .vps-tb-chip:hover,
+#vps-quick-toolbar .vps-vendor-pill:hover {
   border-color: #94a3b8;
 }
 #vps-quick-toolbar .vps-tb-chip {
@@ -175,6 +261,43 @@ html.dark .vps-review-subheading {
   font-size: 12.5px;
   color: #64748b;
 }
+#vps-quick-toolbar #vps-vendor-wall {
+  margin: 10px 0 0 !important;
+  padding: 8px 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+}
+#vps-quick-toolbar #vps-vendor-wall > summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  user-select: none;
+}
+#vps-quick-toolbar .vps-vendor-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+#vps-quick-toolbar .vps-vendor-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #1e293b !important;
+  font-size: 12px;
+  line-height: 1.45;
+  text-decoration: none !important;
+}
+#vps-quick-toolbar .vps-vendor-pill.is-crown {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e !important;
+  font-weight: 600;
+}
 html.dark #vps-quick-toolbar {
   background: #1e293b;
   border-color: #334155;
@@ -197,7 +320,8 @@ html.dark #vps-quick-toolbar .vps-tb-btn-primary {
   color: #f8fafc;
 }
 html.dark #vps-quick-toolbar .vps-tb-btn:hover,
-html.dark #vps-quick-toolbar .vps-tb-chip:hover {
+html.dark #vps-quick-toolbar .vps-tb-chip:hover,
+html.dark #vps-quick-toolbar .vps-vendor-pill:hover {
   border-color: #64748b;
 }
 html.dark #vps-quick-toolbar .vps-tb-chip {
@@ -212,12 +336,66 @@ html.dark #vps-quick-toolbar .vps-tb-chip.is-active {
 }
 html.dark #vps-quick-toolbar #vps-filter-status {
   color: #94a3b8;
+}
+html.dark #vps-quick-toolbar #vps-vendor-wall {
+  background: #0f172a;
+  border-color: #334155;
+}
+html.dark #vps-quick-toolbar #vps-vendor-wall > summary {
+  color: #e2e8f0;
+}
+html.dark #vps-quick-toolbar .vps-vendor-pill {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0 !important;
+}
+html.dark #vps-quick-toolbar .vps-vendor-pill.is-crown {
+  background: #451a03;
+  border-color: #b45309;
+  color: #fde68a !important;
 }`.trim();
 
   return `<div class="vps-style-carrier"><style>\n${baseCss}\n${toolbarCss}\n</style></div>`;
 }
 
-function buildInteractiveToolbarHtml(detailsCount) {
+function collectVendorEntries(h2Map) {
+  const list = [];
+  for (const [txt, id] of h2Map.entries()) {
+    if (STRUCTURAL_H2_PREFIXES.some((p) => txt.startsWith(p))) continue;
+    const isCrown = CROWN_VENDORS.has(txt);
+    const label = (isCrown ? '👑 ' : '') + shortVendorLabel(txt);
+    const alias = VENDOR_ALIASES[txt] || '';
+    const canon = txt.split(/[（(]/)[0].trim();
+    list.push({
+      sortKey: txt.replace(/^[^A-Za-z0-9\u4e00-\u9fa5]+/, ''),
+      label,
+      href: `#${id}`,
+      canon,
+      searchHay: `${txt} ${label} ${alias}`.toLowerCase(),
+      isCrown,
+    });
+  }
+  if (h2Map.has('测评区没有对应帖子的商家')) {
+    const noPostId = h2Map.get('测评区没有对应帖子的商家');
+    for (const np of ['CoffeeHost', '筋斗云']) {
+      list.push({
+        sortKey: np,
+        label: `${np} (暂无帖)`,
+        href: `#${noPostId}`,
+        canon: np,
+        searchHay: `${np} 暂无帖`.toLowerCase(),
+        isCrown: false,
+      });
+    }
+  }
+  list.sort((a, b) => {
+    if (a.isCrown !== b.isCrown) return a.isCrown ? -1 : 1;
+    return a.sortKey.localeCompare(b.sortKey, 'en', { sensitivity: 'base' });
+  });
+  return list;
+}
+
+function buildInteractiveToolbarHtml(detailsCount, vendorEntries) {
   const chips = [
     ['全部', ''],
     ['👑 皇冠/推荐', '皇冠'],
@@ -240,11 +418,18 @@ function buildInteractiveToolbarHtml(detailsCount) {
     )
     .join('');
 
+  const vendorPills = vendorEntries
+    .map(
+      (v) =>
+        `<a href="${v.href}" class="vps-vendor-pill${v.isCrown ? ' is-crown' : ''}" data-vendor-hay="${escapeAttr(v.searchHay)}" data-vendor-canon="${escapeAttr(v.canon.toLowerCase())}">${escapeAttr(v.label)}</a>`
+    )
+    .join('');
+
   return `
 <div id="vps-quick-toolbar">
   <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
     <div style="flex:1 1 260px;display:flex;gap:8px;align-items:center;">
-      <input id="vps-filter-input" class="vps-tb-input" type="search" placeholder="快速筛选分类表机型（如：9929、AT&T、台湾、9950X、NAT、DMIT…）" />
+      <input id="vps-filter-input" class="vps-tb-input" type="search" placeholder="筛选机型或搜俗称（如：9929、AT&T、大妈、瓦工、御坂、PQS、RN…）" />
       <button id="vps-filter-clear" class="vps-tb-btn" type="button">清空</button>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
@@ -253,6 +438,10 @@ function buildInteractiveToolbarHtml(detailsCount) {
     </div>
   </div>
   <div id="vps-chip-bar" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">${chipBtns}</div>
+  <details id="vps-vendor-wall">
+    <summary id="vps-vendor-wall-summary">🏪 按商家名 A–Z 速查直达墙（本卷共 ${vendorEntries.length} 家，支持上方输入框按店名或俗称联动检索）</summary>
+    <div class="vps-vendor-grid">${vendorPills}</div>
+  </details>
   <div id="vps-filter-status">当前显示全部分类机型条目（支持多关键词空格组合筛选，点击商家或机型直接跳转测评）</div>
 </div>
 <script>
@@ -265,7 +454,18 @@ function buildInteractiveToolbarHtml(detailsCount) {
   var statusEl = document.getElementById('vps-filter-status');
   var expandBtn = document.getElementById('vps-expand-all');
   var collapseBtn = document.getElementById('vps-collapse-all');
+  var vendorWall = document.getElementById('vps-vendor-wall');
+  var vendorPills = Array.prototype.slice.call(toolbar.querySelectorAll('.vps-vendor-pill'));
   var chips = Array.prototype.slice.call(toolbar.querySelectorAll('[data-vps-chip]'));
+
+  var SLANG_MAP = {
+    '大妈': 'dmit', '瓦工': '搬瓦工', 'bwh': '搬瓦工', 'bandwagon': '搬瓦工',
+    '港仔': 'boil', '家里云': 'boil', '绿云': 'greencloud', '小秘书': 'v.ps', 'xtom': 'v.ps',
+    '花卷': 'rfchost', '咸鱼': 'saltyfish', '八哥': 'bagevm', '富婆': 'bestvm',
+    '奶爸': 'neburst', 'pqs': 'pittqiao', '彼得巧': 'pittqiao', '御坂': 'misaka',
+    '卢森堡': 'buyvm', 'frantech': 'buyvm', 'rn': 'racknerd', 'hd': 'hostdare',
+    '丽萨': 'lisahost', '白丝': 'cloudsilk', '车库': 'wepc', '破云': '艾云', '云悠': 'yunyoo'
+  };
 
   function getTaxonomyTables() {
     var tables = [];
@@ -300,9 +500,28 @@ function buildInteractiveToolbarHtml(detailsCount) {
       if (regexMode) {
         try { rx = new RegExp(q, 'i'); } catch (e) { rx = null; }
       } else {
-        terms = q.toLowerCase().split(/\\s+/).filter(Boolean);
+        terms = q.toLowerCase().split(/\\s+/).filter(Boolean).map(function(t) {
+          return SLANG_MAP[t] || t;
+        });
       }
     }
+    var matchedVendors = 0;
+    vendorPills.forEach(function(pill) {
+      var vhay = pill.getAttribute('data-vendor-hay') || '';
+      var vok = true;
+      if (q && !regexMode) {
+        var rawTerms = q.toLowerCase().split(/\\s+/).filter(Boolean);
+        vok = rawTerms.every(function(rt) {
+          return vhay.indexOf(rt) !== -1 || (SLANG_MAP[rt] && vhay.indexOf(SLANG_MAP[rt]) !== -1);
+        });
+      }
+      pill.style.display = vok ? '' : 'none';
+      if (vok) matchedVendors += 1;
+    });
+    if (vendorWall && !regexMode) {
+      if (q && matchedVendors > 0 && matchedVendors <= 12) vendorWall.open = true;
+    }
+
     items.forEach(function(item) {
       var rows = Array.prototype.slice.call(item.table.querySelectorAll('tbody tr'));
       var visibleInTable = 0;
@@ -322,9 +541,9 @@ function buildInteractiveToolbarHtml(detailsCount) {
       if (item.regionP) item.regionP.style.display = showTbl ? '' : 'none';
     });
     if (!q) {
-      statusEl.textContent = '当前显示全部分类表共 ' + total + ' 条机型记录（支持空格多词组合筛选，点击商家或机型直接跳转测评）';
+      statusEl.textContent = '当前显示全部分类表共 ' + total + ' 条机型记录（支持空格多词组合或俗称筛选，如：大妈、美国 家宽、香港 9929）';
     } else {
-      statusEl.textContent = '筛选「' + q.replace(/\\|/g, ' / ') + '」：匹配 ' + matched + ' / ' + total + ' 条分类机型记录';
+      statusEl.textContent = '筛选「' + q.replace(/\\|/g, ' / ') + '」：匹配 ' + matched + ' / ' + total + ' 条分类机型记录' + (!regexMode ? ('（匹配商家直达卡 ' + matchedVendors + ' 家）') : '');
     }
   }
 
@@ -340,6 +559,7 @@ function buildInteractiveToolbarHtml(detailsCount) {
   });
   clearBtn.addEventListener('click', function() {
     input.value = '';
+    if (vendorWall) vendorWall.open = false;
     highlightChip(chips[0]);
     applyFilter('', false);
   });
@@ -357,12 +577,12 @@ function buildInteractiveToolbarHtml(detailsCount) {
     });
   });
   expandBtn.addEventListener('click', function() {
-    var ds = root.querySelectorAll('details');
+    var ds = Array.prototype.slice.call(root.querySelectorAll('details')).filter(function(d) { return d.id !== 'vps-vendor-wall'; });
     for (var i = 0; i < ds.length; i++) ds[i].open = true;
     statusEl.textContent = '已展开全部 ' + ds.length + ' 份终端测评报告原文';
   });
   collapseBtn.addEventListener('click', function() {
-    var ds = root.querySelectorAll('details');
+    var ds = Array.prototype.slice.call(root.querySelectorAll('details')).filter(function(d) { return d.id !== 'vps-vendor-wall'; });
     for (var i = 0; i < ds.length; i++) ds[i].open = false;
     statusEl.textContent = '已收起全部 ' + ds.length + ' 份终端测评报告原文';
   });
@@ -472,8 +692,6 @@ function rehypeAddSlugsAndVerify() {
         node.properties.id = id;
         emittedIds.add(id);
       } else if (node.type === 'element' && (node.tagName === 'h4' || node.tagName === 'h5' || node.tagName === 'h6')) {
-        // Convert h4..h6 to accessible styled div[role="heading"] so Halo theme-earth's tocbot
-        // never auto-indexes 450+ forum review sub-cards into the sidebar TOC!
         const lvl = node.tagName.slice(1);
         node.tagName = 'div';
         node.properties = {
@@ -516,12 +734,14 @@ if (opts.expectedDetails !== null && rawDetailsOpen !== opts.expectedDetails) {
   throw new Error(`Expected ${opts.expectedDetails} <details> pairs, got ${rawDetailsOpen}`);
 }
 
+const vendorEntries = collectVendorEntries(h2Map);
+
 if (opts.injectToolbar) {
   const markerRx = /(<h2 id="[^"]*">选机分类体系总览（猫猫博客口径）<\/h2>)/;
   if (!markerRx.test(htmlStr)) {
     throw new Error('Could not find 选机分类体系总览 heading to inject interactive toolbar!');
   }
-  const toolbarHtml = buildInteractiveToolbarHtml(rawDetailsOpen);
+  const toolbarHtml = buildInteractiveToolbarHtml(rawDetailsOpen, vendorEntries);
   htmlStr = htmlStr.replace(markerRx, `$1\n${toolbarHtml}`);
 }
 
@@ -532,5 +752,5 @@ if (opts.injectToolbar || rawReportPreCount > 0 || subheadingCount > 0) {
 fs.writeFileSync(opts.outHtml, htmlStr, 'utf8');
 
 console.log(
-  `[render-halo-markdown] OK: headingIDs=${emittedIds.size} (h1-h3 only), anchors=${internalHrefs.length} (0 broken), details=${rawDetailsOpen}, rawPre=${rawReportPreCount}, toolbar=${opts.injectToolbar}, mdBytes=${Buffer.byteLength(finalMd, 'utf8').toLocaleString()}, htmlBytes=${Buffer.byteLength(htmlStr, 'utf8').toLocaleString()}`
+  `[render-halo-markdown] OK: headingIDs=${emittedIds.size} (h1-h3 only), anchors=${internalHrefs.length} (0 broken), vendors=${vendorEntries.length}, details=${rawDetailsOpen}, rawPre=${rawReportPreCount}, toolbar=${opts.injectToolbar}, mdBytes=${Buffer.byteLength(finalMd, 'utf8').toLocaleString()}, htmlBytes=${Buffer.byteLength(htmlStr, 'utf8').toLocaleString()}`
 );

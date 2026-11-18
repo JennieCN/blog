@@ -23,8 +23,8 @@
 | `scripts/generators/taxonomy_guide.py` | 输出统一的「猫猫博客选机分类体系总览（`大类 → 细分小类 → 地区 → 机型`）」索引模块。 |
 | `scripts/render-halo-markdown.mjs` | 将 Markdown 渲染为 Halo 专用 HTML：仅对 `h1-h3` 生成目录 ID（避免 `tocbot` 爆表）、将纯文本终端报告转为 `<pre class="vps-raw-report">`（规避 `plugin-shiki` 高斯模糊与数百个 Web Component 开销）、可选注入亮/暗双色交互筛选工具栏（`--inject-toolbar`），并执行 0 断链与 `<details>` 闭合校验。 |
 | `scripts/publish-halo.py` | 通过 SSH 隧道向 `vps8`（`127.0.0.1:8091`）发布或更新文章（Post）、独立页面（SinglePage）、置顶权重、下架占位稿及维护顶部主导航菜单。管理凭据仅从 `../private/gatewave-halo-admin.txt` 或环境变量读取，**严禁硬编码**。 |
-| `scripts/halo-pages/tools.html` | Halo 独立页面 `/tools`（实用工具箱）源码，原生适配亮/暗模式。 |
-| `scripts/verify-live-halo.py` | 启动无头 Chrome（CDP）对线上首页置顶顺序、全部分类页、上下卷及指南页进行 HTTP 200、0 断链、0 模糊终端块（`blur`）、亮/暗模式工具栏配色与桌面/移动端零横向溢出全量断言。 |
+| `scripts/halo-pages/*.html` | Halo 独立页面源码（`my-reviews.html` 我的自用测评、`tools.html` 实用工具箱、`privacy-policy.html` 隐私政策、`user-agreement.html` 用户协议与免责声明），统一适配亮/暗模式。 |
+| `scripts/verify-live-halo.py` | 启动无头 Chrome（CDP）对线上主站与 Flarum 问答社区执行 HTTP 200、Favicon/封面图、俗称检索（Lucene + 工具栏 A–Z 商家直达墙）、0 断链、0 模糊终端块（`blur`）、亮/暗模式及桌面/移动端零横向溢出全量断言。 |
 
 ---
 

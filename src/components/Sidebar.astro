@@ -35,6 +35,12 @@ const isCurrent = (prefix: string, exact = false) =>
         </a>
       </li>
       <li>
+        <a href="/my-reviews/" class="side-link" aria-current={isCurrent('/my-reviews/') ? 'page' : undefined}>
+          <Fragment set:html={svgIcon('server')} />
+          <span class="side-label">我的测评</span>
+        </a>
+      </li>
+      <li>
         <a href="/qa/" class="side-link" aria-current={isCurrent('/qa/') ? 'page' : undefined}>
           <Fragment set:html={svgIcon('chat')} />
           <span class="side-label">社区大厅</span>

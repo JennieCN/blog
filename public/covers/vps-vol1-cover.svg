@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="55%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+    <pattern id="grid1" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#38bdf8" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg1)"/>
+  <rect width="1200" height="630" fill="url(#grid1)"/>
+  <circle cx="1050" cy="120" r="240" fill="#38bdf8" fill-opacity="0.10"/>
+  <circle cx="140" cy="540" r="200" fill="#2563eb" fill-opacity="0.12"/>
+
+  <rect x="72" y="68" width="248" height="42" rx="21" fill="#0284c7" fill-opacity="0.28" stroke="#38bdf8" stroke-opacity="0.55" stroke-width="1.5"/>
+  <text x="196" y="95" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="18" font-weight="700" fill="#7dd3fc">VPS 实测档案库 · 上卷</text>
+
+  <text x="72" y="195" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="52" font-weight="800" fill="#f8fafc">61 家新晋与转正商家测评全库</text>
+  <text x="72" y="262" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="30" font-weight="500" fill="#cbd5e1">按「线路机 / 落地机 / 性能独服 → 细分小类 → 地区」全景归类</text>
+
+  <g transform="translate(72, 326)">
+    <rect width="290" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="28" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="40" font-weight="800" fill="#38bdf8">61 家</text>
+    <text x="28" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="19" fill="#94a3b8">193 项细分产品线</text>
+  </g>
+  <g transform="translate(386, 326)">
+    <rect width="330" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="28" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="40" font-weight="800" fill="#34d399">457 条</text>
+    <text x="28" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="19" fill="#94a3b8">NodeSeek 实测 + 66 篇猫猫专测</text>
+  </g>
+  <g transform="translate(740, 326)">
+    <rect width="388" height="118" rx="16" fill="#0f172a" fill-opacity="0.72" stroke="#334155" stroke-width="1.5"/>
+    <text x="28" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="40" font-weight="800" fill="#a78bfa">319 份</text>
+    <text x="28" y="92" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="19" fill="#94a3b8">可展开 NodeQuality / TQ 终端原文</text>
+  </g>
+
+  <text x="72" y="542" font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif" font-size="21" font-weight="600" fill="#94a3b8">融夕的书 · blog.mycampusmail.com</text>
+  <text x="1128" y="542" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="600" fill="#7dd3fc">9929 · CN2 · CMIN2 · 真家宽 · NAT · 双ISP</text>
+</svg>
