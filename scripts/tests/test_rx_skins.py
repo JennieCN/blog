@@ -5,6 +5,7 @@ import http.server
 import itertools
 import json
 import os
+import re
 import shutil
 import socket
 import socketserver
@@ -27,6 +28,17 @@ def _free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(("127.0.0.1", 0))
         return s.getsockname()[1]
+
+
+def _rgb_luminance(rgb_str: str) -> float:
+    nums = [int(x) for x in re.findall(r"\d+", rgb_str)[:3]]
+    if len(nums) < 3:
+        return 0.0
+    vals = []
+    for c in nums:
+        v = c / 255.0
+        vals.append(v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * vals[0] + 0.7152 * vals[1] + 0.0722 * vals[2]
 
 
 class _SilentHandler(http.server.SimpleHTTPRequestHandler):
@@ -203,7 +215,6 @@ class TestRxSkinsCore(ChromeHarnessMixin, unittest.TestCase):
               firstToast = t ? t.textContent : '';
             }
           }
-          // Also verify synchronous rapid bursts advance state without race
           const burst = [window.RXSkins.getSkin()];
           for (let j = 0; j < 4; j++) {
             btn.click();
@@ -296,6 +307,143 @@ class TestRxSkinsCore(ChromeHarnessMixin, unittest.TestCase):
         self.assertEqual(remount["beforeTheme"], 1)
         self.assertEqual(remount["afterSkin"], 1)
         self.assertEqual(remount["afterTheme"], 1)
+
+
+HALO_FIXTURE_BODY = """
+<header id="header-menu" class="sticky top-0 z-10 flex h-16 bg-white py-3 shadow-sm dark:bg-gray-800" style="display:flex;justify-content:space-between;align-items:center;padding:0 16px">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Logo" style="width:28px;height:28px"></a>
+    <ul style="display:flex;gap:12px;list-style:none;margin:0;padding:0"><li><a href="/">首页</a></li></ul>
+  </div>
+  <div>
+    <ul style="display:flex;gap:8px;list-style:none;margin:0;padding:0;align-items:center">
+      <li><a href="#">Search</a></li>
+    </ul>
+  </div>
+  <nav style="display:none"><ul><li><a href="/">首页</a></li></ul></nav>
+</header>
+<section class="rx-hero-wrap">
+  <div class="bg-cover bg-center bg-no-repeat h-96" style="height:240px;display:flex;align-items:center;justify-content:center">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <span class="text-5xl" style="color:#ffffff">融夕的书</span>
+      <span class="text-sm font-light" style="color:#ffffff">VPS、赛车、机器人、AI 与资源笔记</span>
+    </div>
+  </div>
+</section>
+<section style="max-width:1200px;margin:16px auto;padding:0 12px">
+  <ul id="filters" style="display:flex;gap:8px;list-style:none;padding:0"><li><a href="/" class="rounded px-3">全部</a></li></ul>
+  <article id="sample-card" class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800" style="padding:16px;margin-top:12px">
+    <h2><a href="/archives/test">117 家 VPS 测评归档</a></h2>
+    <p>路线与网络质量汇总</p>
+  </article>
+  <div class="rounded-xl bg-white p-4 dark:bg-slate-800" style="margin-top:16px">
+    <article id="post-content" class="markdown-body">
+      <h2>水墨与贴纸二级标题</h2>
+      <blockquote>这是一段引用说明</blockquote>
+      <div class="vps-summary-panel">摘要面板</div>
+      <div id="vps-vendor-wall"><a class="vps-vendor-pill" href="#v1">DMIT</a></div>
+      <pre class="vps-raw-report">========== NodeQuality Benchmark Raw Output ==========
+ASN: AS54574 | Route: CN2 GIA | Loss: 0.0%</pre>
+      <div class="rx-legal-meta">隐私条款摘要卡片</div>
+    </article>
+  </div>
+</section>
+<footer class="mt-10 bg-white py-8 dark:bg-slate-800" style="padding:16px">Footer</footer>
+"""
+
+
+class TestRxHaloAdapter(ChromeHarnessMixin, unittest.TestCase):
+    def _load_halo(self, width: int = 1280):
+        head_path = SKINS_DIR / "halo-global-head.html"
+        self.assertTrue(head_path.is_file(), f"Missing {head_path}")
+        self.assertTrue((SKINS_DIR / "rx-halo.css").is_file(), "Missing rx-halo.css")
+        head_html = re.sub(r"\?v=[^\"']+", "", head_path.read_text(encoding="utf-8"))
+        doc = f"<!doctype html><html lang='zh-CN'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>{head_html}</head><body style='margin:0'>{HALO_FIXTURE_BODY}</body></html>"
+        self.open_fixture("halo-fixture.html", doc, width=width)
+
+    def test_halo_four_skins_distinct_backgrounds_and_cards(self):
+        self._load_halo(1280)
+        snaps = self.eval_js("""
+        (() => {
+          const out = {};
+          const card = document.getElementById('sample-card');
+          for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+            window.RXSkins.setSkin(sk);
+            document.documentElement.dataset.rxSkin = sk;
+            const bcs = getComputedStyle(document.body);
+            const ccs = getComputedStyle(card);
+            out[sk] = {
+              bodyBg: bcs.backgroundColor,
+              cardRadius: parseFloat(ccs.borderTopLeftRadius || '0'),
+              cardBorderW: parseFloat(ccs.borderTopWidth || '0'),
+              cardShadow: ccs.boxShadow,
+              cardFilter: ccs.backdropFilter || ccs.webkitBackdropFilter || 'none'
+            };
+          }
+          return out;
+        })()
+        """)
+        self.assertEqual(snaps["pop"]["bodyBg"], "rgb(255, 247, 232)")
+        self.assertGreaterEqual(snaps["pop"]["cardBorderW"], 2.0)
+        self.assertNotEqual(snaps["pop"]["cardShadow"], "none")
+
+        self.assertEqual(snaps["ink"]["bodyBg"], "rgb(239, 231, 214)")
+        self.assertLessEqual(snaps["ink"]["cardRadius"], 4.0)
+
+        self.assertEqual(snaps["luxe"]["bodyBg"], "rgb(246, 241, 233)")
+        self.assertIn("blur", snaps["luxe"]["cardFilter"])
+
+        self.assertEqual(snaps["plain"]["bodyBg"], "rgb(255, 255, 255)")
+        self.assertEqual(snaps["plain"]["cardBorderW"], 1.0)
+
+    def test_halo_raw_report_never_blurred_and_high_contrast_in_plain(self):
+        self._load_halo(1280)
+        matrix = self.eval_js("""
+        (() => {
+          const pre = document.querySelector('pre.vps-raw-report');
+          const out = {};
+          for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+            for (const dk of [false, true]) {
+              document.documentElement.dataset.rxSkin = sk;
+              document.documentElement.classList.toggle('rx-dark', dk);
+              document.documentElement.classList.toggle('dark', dk);
+              const cs = getComputedStyle(pre);
+              out[sk + ':' + (dk ? 'dark' : 'light')] = {
+                filter: cs.filter,
+                bg: cs.backgroundColor,
+                fg: cs.color
+              };
+            }
+          }
+          return out;
+        })()
+        """)
+        for key, st in matrix.items():
+            self.assertEqual(st["filter"], "none", f"pre.vps-raw-report blurred in {key}: {st}")
+            bg_lum = _rgb_luminance(st["bg"])
+            fg_lum = _rgb_luminance(st["fg"])
+            self.assertLess(bg_lum, 0.12, f"Expected dark code bg in {key}, got {st['bg']} (lum={bg_lum:.3f})")
+            self.assertGreater(fg_lum, 0.65, f"Expected bright code fg in {key}, got {st['fg']} (lum={fg_lum:.3f})")
+
+    def test_halo_mobile_390px_zero_overflow(self):
+        self._load_halo(390)
+        overflow = self.eval_js("""
+        (() => {
+          const res = {};
+          for (const sk of ['pop', 'ink', 'luxe', 'plain']) {
+            document.documentElement.dataset.rxSkin = sk;
+            res[sk] = {
+              scrollW: document.documentElement.scrollWidth,
+              innerW: window.innerWidth,
+              hasBtn: !!document.getElementById('rx-skin-toggle')
+            };
+          }
+          return res;
+        })()
+        """)
+        for sk, info in overflow.items():
+            self.assertTrue(info["hasBtn"], f"Missing #rx-skin-toggle on 390px in {sk}")
+            self.assertLessEqual(info["scrollW"], info["innerW"], f"Horizontal overflow on Halo 390px in {sk}: {info}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,852 @@
+/* ==========================================================================
+   融夕的书 · Halo 2.27 (theme-earth) 四套皮肤视觉适配层 (rx-halo.css)
+   仅在 html[data-rx-skin] 激活时生效（/console 与 /uc 由 bootstrap 跳过，零影响）
+   ========================================================================== */
+
+html[data-rx-skin] {
+  overflow-x: clip;
+  color: var(--rx-text);
+  font-family: var(--rx-font-sans);
+}
+
+html[data-rx-skin] body {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background-color: var(--rx-bg) !important;
+  color: var(--rx-text) !important;
+  font-family: var(--rx-font-sans);
+}
+
+html[data-rx-skin="ink"] body {
+  font-family: var(--rx-font-serif);
+}
+
+/* ---------------- 1. 页面背景底纹层 (Backdrop Layers) ---------------- */
+
+/* pop：奶油底 + 波点网格 */
+html[data-rx-skin="pop"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(21, 18, 28, .13) 1.2px, transparent 1.6px) 0 0 / 22px 22px;
+}
+html.rx-dark[data-rx-skin="pop"] body::before {
+  background: radial-gradient(circle, rgba(255, 255, 255, .07) 1.2px, transparent 1.6px) 0 0 / 22px 22px;
+}
+html[data-rx-skin="pop"] body::after {
+  display: none;
+}
+
+/* ink：宣纸暗角 + 底部水墨远山 + 纸张纤维噪点 */
+html[data-rx-skin="ink"] body {
+  background-image: radial-gradient(120% 90% at 50% 35%, transparent 55%, rgba(122, 92, 48, .13) 100%);
+  background-attachment: fixed;
+}
+html.rx-dark[data-rx-skin="ink"] body {
+  background-image: radial-gradient(120% 90% at 50% 35%, transparent 55%, rgba(0, 0, 0, .45) 100%);
+}
+html[data-rx-skin="ink"] body::before {
+  content: "";
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 28vh;
+  z-index: -2;
+  pointer-events: none;
+  opacity: .34;
+  background: url("ink-mountains.svg") center bottom / 100% 100% no-repeat;
+}
+html.rx-dark[data-rx-skin="ink"] body::before {
+  filter: invert(1);
+  opacity: .16;
+}
+html[data-rx-skin="ink"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .12;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8 .2' numOctaves='3' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 1.3 -.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+html.rx-dark[data-rx-skin="ink"] body::after {
+  mix-blend-mode: screen;
+  opacity: .05;
+}
+
+/* luxe：流动夕照极光 + 细微颗粒 */
+html[data-rx-skin="luxe"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(46vmax 36vmax at 16% 10%, var(--rx-aurora-1), transparent 64%),
+    radial-gradient(40vmax 32vmax at 88% 6%, var(--rx-aurora-2), transparent 64%),
+    radial-gradient(50vmax 38vmax at 74% 92%, var(--rx-aurora-3), transparent 64%),
+    radial-gradient(34vmax 28vmax at 8% 88%, var(--rx-aurora-2), transparent 66%);
+  animation: rx-halo-aurora 42s var(--rx-ease-out) infinite alternate;
+}
+html[data-rx-skin="luxe"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .065;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes rx-halo-aurora {
+  0% { opacity: .92; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.04); }
+}
+
+/* plain：纯色极简，关闭装饰伪元素 */
+html[data-rx-skin="plain"] body::before,
+html[data-rx-skin="plain"] body::after {
+  display: none !important;
+}
+
+/* ---------------- 2. 顶部导航栏 (#header-menu) ---------------- */
+
+html[data-rx-skin] header#header-menu {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border-bottom: var(--rx-bw) solid var(--rx-line);
+  box-shadow: none !important;
+}
+
+html[data-rx-skin] header#header-menu a,
+html[data-rx-skin] header#header-menu button,
+html[data-rx-skin] header#header-menu span,
+html[data-rx-skin] header#header-menu li {
+  color: var(--rx-text);
+}
+
+html[data-rx-skin] header#header-menu a:hover {
+  color: var(--rx-accent) !important;
+}
+
+html[data-rx-skin] header#header-menu #rx-skin-toggle {
+  color: var(--rx-text);
+}
+html[data-rx-skin="pop"] header#header-menu #rx-skin-toggle {
+  color: #15121c !important;
+}
+
+/* pop 顶栏 */
+html[data-rx-skin="pop"] header#header-menu {
+  background: var(--rx-surface) !important;
+  border-bottom: 2.5px solid var(--rx-line) !important;
+}
+html[data-rx-skin="pop"] header#header-menu ul li a {
+  font-weight: 700;
+}
+
+/* ink 顶栏：宣纸半透 + 底部飞白墨刷横条 */
+html[data-rx-skin="ink"] header#header-menu {
+  background: color-mix(in srgb, var(--rx-bg) 94%, transparent) !important;
+  border-bottom: 0 !important;
+}
+html[data-rx-skin="ink"] header#header-menu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 8px;
+  pointer-events: none;
+  background: var(--rx-ink-jiao);
+  -webkit-mask: var(--rx-stroke) center / 100% 100% no-repeat;
+  mask: var(--rx-stroke) center / 100% 100% no-repeat;
+}
+html[data-rx-skin="ink"] header#header-menu ul li a {
+  font-family: var(--rx-font-serif);
+  font-weight: 600;
+  letter-spacing: .06em;
+}
+
+/* luxe 顶栏：毛玻璃 + 落日细线 */
+html[data-rx-skin="luxe"] header#header-menu {
+  background: color-mix(in srgb, var(--rx-bg) 68%, transparent) !important;
+  backdrop-filter: saturate(1.6) blur(20px);
+  -webkit-backdrop-filter: saturate(1.6) blur(20px);
+  border-bottom: 1px solid var(--rx-hairline) !important;
+  box-shadow: 0 8px 24px -18px rgba(60, 30, 15, .32) !important;
+}
+html[data-rx-skin="luxe"] header#header-menu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(240, 128, 72, .55), rgba(194, 69, 107, .5), transparent);
+}
+
+/* plain 顶栏：Primer 浅灰栏 */
+html[data-rx-skin="plain"] header#header-menu {
+  background: var(--rx-surface-2) !important;
+  border-bottom: 1px solid var(--rx-line) !important;
+}
+
+/* 移动端抽屉与下拉菜单 */
+html[data-rx-skin] header#header-menu nav,
+html[data-rx-skin] header#header-menu ul ul {
+  background: var(--rx-surface) !important;
+  border-color: var(--rx-line) !important;
+  color: var(--rx-text) !important;
+}
+
+/* ---------------- 3. 首页 Hero 横幅 (section > div.bg-cover.h-96) ---------------- */
+
+html[data-rx-skin] section > div.bg-cover.h-96 {
+  position: relative;
+  box-sizing: border-box;
+  width: min(1248px, calc(100% - 24px));
+  max-width: 1248px;
+  height: auto !important;
+  min-height: 210px;
+  margin: 18px auto 6px;
+  padding: 34px 32px;
+  overflow: hidden;
+  background-image: none !important;
+}
+
+html[data-rx-skin] section > div.bg-cover.h-96::before {
+  inset: auto;
+  background: none;
+}
+
+html[data-rx-skin] section > div.bg-cover.h-96 > div {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+}
+
+html[data-rx-skin] section > div.bg-cover.h-96 span.text-5xl {
+  color: var(--rx-text) !important;
+  font-size: clamp(28px, 4vw, 44px) !important;
+  line-height: 1.2 !important;
+  text-shadow: none !important;
+}
+
+html[data-rx-skin] section > div.bg-cover.h-96 span.text-sm {
+  color: var(--rx-text-2) !important;
+  font-size: 14.5px !important;
+  text-shadow: none !important;
+}
+
+/* pop Hero：撞色贴纸卡片 + 右侧柠檬黄几何太阳贴纸 */
+html[data-rx-skin="pop"] section > div.bg-cover.h-96 {
+  background: var(--rx-surface) !important;
+  border: 2.5px solid var(--rx-line);
+  border-radius: 20px;
+  box-shadow: var(--rx-shadow-lg);
+}
+html[data-rx-skin="pop"] section > div.bg-cover.h-96::before {
+  content: "";
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--rx-pop-yellow);
+  border: 2.5px solid var(--rx-line);
+  box-shadow: 5px 5px 0 var(--rx-line);
+  z-index: 1;
+  pointer-events: none;
+}
+html.rx-dark[data-rx-skin="pop"] section > div.bg-cover.h-96::before {
+  box-shadow: 5px 5px 0 #000;
+}
+html[data-rx-skin="pop"] section > div.bg-cover.h-96 span.text-5xl {
+  font-family: var(--rx-font-display);
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+html[data-rx-skin="pop"] section > div.bg-cover.h-96 span.text-sm {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--rx-line);
+  background: var(--rx-pop-yellow);
+  color: #15121c !important;
+  font-weight: 800;
+}
+
+/* ink Hero：宣纸无框画卷 + 右侧水墨山水 + 行楷题字 + 「融夕」朱砂印 */
+html[data-rx-skin="ink"] section > div.bg-cover.h-96 {
+  background: transparent !important;
+  border: 0;
+  border-bottom: 1.5px solid var(--rx-line-strong);
+  border-radius: 0;
+  box-shadow: none;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding: 30px 16px 26px;
+}
+html[data-rx-skin="ink"] section > div.bg-cover.h-96 > div {
+  align-items: flex-start !important;
+  text-align: left;
+}
+html[data-rx-skin="ink"] section > div.bg-cover.h-96::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 24%;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("ink-landscape.svg") right bottom / auto 100% no-repeat;
+}
+html.rx-dark[data-rx-skin="ink"] section > div.bg-cover.h-96::after {
+  filter: invert(.88) sepia(.15);
+  opacity: .55;
+}
+html[data-rx-skin="ink"] section > div.bg-cover.h-96 span.text-5xl {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--rx-font-brush);
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--rx-ink-jiao) !important;
+}
+html[data-rx-skin="ink"] section > div.bg-cover.h-96 span.text-5xl::after {
+  content: "融夕";
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  writing-mode: vertical-rl;
+  font: 700 11px/1 var(--rx-font-serif);
+  letter-spacing: 0;
+  color: #fbf0e0;
+  background: var(--rx-cinnabar);
+  border-radius: 3px;
+  transform: rotate(-4deg);
+  box-shadow: inset 0 0 0 1.5px var(--rx-cinnabar), inset 0 0 0 2.5px #fbf0e0;
+}
+html[data-rx-skin="ink"] section > div.bg-cover.h-96 span.text-sm {
+  font-family: var(--rx-font-serif);
+  letter-spacing: .06em;
+}
+
+/* luxe Hero：毛玻璃霞光 + 条纹落日圆轮 */
+html[data-rx-skin="luxe"] section > div.bg-cover.h-96 {
+  border-radius: 26px;
+  border: 1px solid var(--rx-hairline);
+  background:
+    radial-gradient(120% 140% at 100% 0%, var(--rx-aurora-1), transparent 56%),
+    linear-gradient(160deg, var(--rx-glass-strong), var(--rx-glass)) !important;
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: var(--rx-shadow-lg);
+}
+html[data-rx-skin="luxe"] section > div.bg-cover.h-96::before {
+  content: "";
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  width: 148px;
+  height: 148px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .7), transparent 26%),
+    linear-gradient(180deg, #ffe0a6 0%, #ffa060 32%, #ea5f62 62%, #8a3f8f 100%);
+  box-shadow: 0 0 70px 8px rgba(255, 130, 80, .28);
+  -webkit-mask: linear-gradient(180deg, #000 0 56%, transparent 56% 60%, #000 60% 67%, transparent 67% 71.5%, #000 71.5% 77%, transparent 77% 81.5%, #000 81.5% 85.5%, transparent 85.5%);
+  mask: linear-gradient(180deg, #000 0 56%, transparent 56% 60%, #000 60% 67%, transparent 67% 71.5%, #000 71.5% 77%, transparent 77% 81.5%, #000 81.5% 85.5%, transparent 85.5%);
+}
+html[data-rx-skin="luxe"] section > div.bg-cover.h-96 span.text-5xl {
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+/* plain Hero：GitHub Primer 素净面板 */
+html[data-rx-skin="plain"] section > div.bg-cover.h-96 {
+  min-height: 164px;
+  padding: 28px 24px;
+  background: var(--rx-surface-2) !important;
+  border: 1px solid var(--rx-line);
+  border-radius: 6px;
+  box-shadow: none !important;
+}
+html[data-rx-skin="plain"] section > div.bg-cover.h-96 span.text-5xl {
+  font-weight: 600;
+  font-size: clamp(24px, 3vw, 32px) !important;
+}
+
+@media (max-width: 640px) {
+  html[data-rx-skin] section > div.bg-cover.h-96 {
+    min-height: 156px;
+    padding: 22px 16px;
+    margin-top: 12px;
+  }
+  html[data-rx-skin="pop"] section > div.bg-cover.h-96::before,
+  html[data-rx-skin="luxe"] section > div.bg-cover.h-96::before {
+    width: 52px;
+    height: 52px;
+    right: 12px;
+    top: 14px;
+    transform: none;
+    opacity: .82;
+  }
+  html[data-rx-skin="ink"] section > div.bg-cover.h-96::after {
+    left: 10%;
+    opacity: .42;
+  }
+}
+
+/* ---------------- 4. 分类筛选栏 (#filters)、文章卡片、侧边栏与页脚 ---------------- */
+
+html[data-rx-skin] ul#filters li a {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--rx-line);
+  border-radius: var(--rx-radius-sm);
+  background: var(--rx-surface) !important;
+  color: var(--rx-text-2) !important;
+  font-weight: 600;
+}
+html[data-rx-skin] ul#filters li a:hover,
+html[data-rx-skin] ul#filters li a.bg-gray-100,
+html[data-rx-skin] ul#filters li a[aria-current="page"] {
+  background: var(--rx-accent-soft) !important;
+  border-color: var(--rx-accent) !important;
+  color: var(--rx-text) !important;
+}
+html[data-rx-skin="pop"] ul#filters li a {
+  border: 2px solid var(--rx-line);
+  box-shadow: 2px 2px 0 var(--rx-line);
+  font-weight: 800;
+}
+html.rx-dark[data-rx-skin="pop"] ul#filters li a {
+  box-shadow: 2px 2px 0 #000;
+}
+html[data-rx-skin="pop"] ul#filters li a:hover,
+html[data-rx-skin="pop"] ul#filters li a.bg-gray-100 {
+  background: var(--rx-pop-yellow) !important;
+  color: #15121c !important;
+}
+html[data-rx-skin="ink"] ul#filters li a {
+  border-radius: 0;
+  border-color: var(--rx-line-strong);
+  background: transparent !important;
+  font-family: var(--rx-font-serif);
+}
+html[data-rx-skin="ink"] ul#filters li a:hover,
+html[data-rx-skin="ink"] ul#filters li a.bg-gray-100 {
+  background: var(--rx-ink-jiao) !important;
+  color: var(--rx-bg) !important;
+  border-color: var(--rx-ink-jiao) !important;
+}
+
+/* 主布局白底卡片容器统一接管 */
+html[data-rx-skin] .group.rounded-xl,
+html[data-rx-skin] section .rounded-xl.bg-white,
+html[data-rx-skin] aside .rounded-xl.bg-white,
+html[data-rx-skin] .w-full.overflow-hidden.rounded-xl.bg-white {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: var(--rx-bw) solid var(--rx-line) !important;
+  border-radius: var(--rx-radius) !important;
+  box-shadow: var(--rx-shadow) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* pop 卡片：粗黑边 + 硬阴影 + 悬停弹起 */
+html[data-rx-skin="pop"] .group.rounded-xl,
+html[data-rx-skin="pop"] section .rounded-xl.bg-white,
+html[data-rx-skin="pop"] aside .rounded-xl.bg-white,
+html[data-rx-skin="pop"] .w-full.overflow-hidden.rounded-xl.bg-white {
+  border: 2.5px solid var(--rx-line) !important;
+  box-shadow: var(--rx-shadow) !important;
+  transition: transform .2s var(--rx-ease-spring), box-shadow .2s var(--rx-ease-spring);
+}
+html[data-rx-skin="pop"] .group.rounded-xl:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--rx-shadow-lg) !important;
+}
+html[data-rx-skin="pop"] .group.rounded-xl h1 a,
+html[data-rx-skin="pop"] .group.rounded-xl h2 a {
+  font-family: var(--rx-font-display);
+  font-weight: 900;
+}
+
+/* ink 卡片：方角宣纸细线 + 宋体标题 */
+html[data-rx-skin="ink"] .group.rounded-xl,
+html[data-rx-skin="ink"] section .rounded-xl.bg-white,
+html[data-rx-skin="ink"] aside .rounded-xl.bg-white,
+html[data-rx-skin="ink"] .w-full.overflow-hidden.rounded-xl.bg-white {
+  border-radius: 3px !important;
+  border: 1px solid var(--rx-line-strong) !important;
+  border-top: 2.5px solid var(--rx-ink-jiao) !important;
+  background: var(--rx-surface) !important;
+}
+html[data-rx-skin="ink"] .group.rounded-xl h1 a,
+html[data-rx-skin="ink"] .group.rounded-xl h2 a {
+  font-family: var(--rx-font-serif);
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+html[data-rx-skin="ink"] .group.rounded-xl:hover h1 a,
+html[data-rx-skin="ink"] .group.rounded-xl:hover h2 a {
+  color: var(--rx-cinnabar) !important;
+}
+
+/* luxe 卡片：磨砂毛玻璃 + 暖调高光抬升 */
+html[data-rx-skin="luxe"] .group.rounded-xl,
+html[data-rx-skin="luxe"] section .rounded-xl.bg-white,
+html[data-rx-skin="luxe"] aside .rounded-xl.bg-white,
+html[data-rx-skin="luxe"] .w-full.overflow-hidden.rounded-xl.bg-white {
+  background: linear-gradient(160deg, var(--rx-glass-strong), var(--rx-glass)) !important;
+  border: 1px solid var(--rx-hairline) !important;
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  transition: transform .3s var(--rx-ease-out), box-shadow .3s var(--rx-ease-out);
+}
+html[data-rx-skin="luxe"] .group.rounded-xl:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--rx-shadow-lg) !important;
+}
+
+/* plain 卡片：1px 边框 + 零阴影 + 零毛玻璃 */
+html[data-rx-skin="plain"] .group.rounded-xl,
+html[data-rx-skin="plain"] section .rounded-xl.bg-white,
+html[data-rx-skin="plain"] aside .rounded-xl.bg-white,
+html[data-rx-skin="plain"] .w-full.overflow-hidden.rounded-xl.bg-white {
+  border: 1px solid var(--rx-line) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 卡片内部标题与摘要颜色修正（覆盖 Tailwind 硬编码 slate） */
+html[data-rx-skin] .group.rounded-xl h1,
+html[data-rx-skin] .group.rounded-xl h2,
+html[data-rx-skin] .group.rounded-xl h1 a,
+html[data-rx-skin] .group.rounded-xl h2 a,
+html[data-rx-skin] section h1,
+html[data-rx-skin] aside h2 {
+  color: var(--rx-text) !important;
+}
+html[data-rx-skin] .group.rounded-xl p,
+html[data-rx-skin] .group.rounded-xl span {
+  color: var(--rx-text-2);
+}
+
+/* 页脚 */
+html[data-rx-skin] footer {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text-2) !important;
+  border-top: var(--rx-bw) solid var(--rx-line);
+}
+html[data-rx-skin="ink"] footer {
+  background: transparent !important;
+  border-top: 1.5px solid var(--rx-line-strong);
+}
+html[data-rx-skin="luxe"] footer {
+  background: var(--rx-glass) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--rx-hairline);
+}
+html[data-rx-skin="plain"] footer {
+  background: var(--rx-surface-2) !important;
+  border-top: 1px solid var(--rx-line);
+}
+html[data-rx-skin] footer a {
+  color: var(--rx-text) !important;
+}
+html[data-rx-skin] footer a:hover {
+  color: var(--rx-accent) !important;
+}
+
+/* ---------------- 5. 文章正文排版 (.markdown-body / #post-content) ---------------- */
+
+html[data-rx-skin] .markdown-body,
+html[data-rx-skin] #post-content {
+  color: var(--rx-text) !important;
+  background: transparent !important;
+}
+
+html[data-rx-skin] .markdown-body h1,
+html[data-rx-skin] .markdown-body h2,
+html[data-rx-skin] .markdown-body h3,
+html[data-rx-skin] .markdown-body h4,
+html[data-rx-skin] .markdown-body strong {
+  color: var(--rx-text) !important;
+}
+
+html[data-rx-skin] .markdown-body p,
+html[data-rx-skin] .markdown-body li,
+html[data-rx-skin] .markdown-body td {
+  color: var(--rx-text-2);
+}
+
+html[data-rx-skin] .markdown-body a:not(.vps-vendor-pill):not(.rx-btn) {
+  color: var(--rx-accent);
+}
+
+/* pop 正文特征：H2 前旋转柠檬黄贴纸方块 + 粗左边框引用块 */
+html[data-rx-skin="pop"] .markdown-body h2 {
+  font-family: var(--rx-font-display);
+  font-weight: 900;
+  border-bottom: 0;
+}
+html[data-rx-skin="pop"] .markdown-body h2::before {
+  content: "";
+  display: inline-block;
+  width: .52em;
+  height: .52em;
+  margin-right: .42em;
+  background: var(--rx-pop-yellow);
+  border: 2px solid var(--rx-line);
+  border-radius: 3px;
+  transform: rotate(12deg);
+  vertical-align: .06em;
+}
+html[data-rx-skin="pop"] .markdown-body blockquote {
+  border: 2.5px solid var(--rx-line);
+  border-left-width: 8px;
+  border-radius: 10px;
+  background: var(--rx-surface-2);
+  color: var(--rx-text-2);
+  padding: 10px 16px;
+}
+
+/* ink 正文特征：行楷 H2 + 飞白墨刷下划线 + 朱砂「引号引用块 */
+html[data-rx-skin="ink"] .markdown-body {
+  font-family: var(--rx-font-serif);
+  line-height: 1.9;
+}
+html[data-rx-skin="ink"] .markdown-body h2 {
+  position: relative;
+  font-family: var(--rx-font-brush);
+  font-weight: 700;
+  letter-spacing: .05em;
+  padding-bottom: 10px;
+  border-bottom: 0;
+}
+html[data-rx-skin="ink"] .markdown-body h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(7em, 75%);
+  height: 7px;
+  background: var(--rx-ink-jiao);
+  opacity: .82;
+  -webkit-mask: var(--rx-stroke) center / 100% 100% no-repeat;
+  mask: var(--rx-stroke) center / 100% 100% no-repeat;
+}
+html[data-rx-skin="ink"] .markdown-body blockquote {
+  position: relative;
+  border: 0;
+  background: transparent;
+  padding: 6px 0 6px 44px;
+  color: var(--rx-text-2);
+  font-family: var(--rx-font-serif);
+}
+html[data-rx-skin="ink"] .markdown-body blockquote::before {
+  content: "「";
+  position: absolute;
+  left: 0;
+  top: -10px;
+  font: 700 44px/1 var(--rx-font-brush);
+  color: var(--rx-cinnabar);
+}
+
+/* luxe 正文特征：霞光左边框引用块 */
+html[data-rx-skin="luxe"] .markdown-body blockquote {
+  background: color-mix(in srgb, var(--rx-surface-2) 72%, transparent);
+  border: 0;
+  border-left: 3px solid var(--rx-accent);
+  border-radius: 0 var(--rx-radius-sm) var(--rx-radius-sm) 0;
+  padding: 10px 16px;
+  color: var(--rx-text-2);
+}
+
+/* plain 正文特征：GitHub Primer 标准底线与灰引线 */
+html[data-rx-skin="plain"] .markdown-body h2 {
+  font-weight: 600;
+  padding-bottom: .3em;
+  border-bottom: 1px solid var(--rx-line);
+}
+html[data-rx-skin="plain"] .markdown-body blockquote {
+  border: 0;
+  border-left: 4px solid var(--rx-line);
+  background: transparent;
+  color: var(--rx-text-3);
+  padding: 2px 16px;
+}
+
+/* 表格适配 */
+html[data-rx-skin] .markdown-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+html[data-rx-skin] .markdown-body th,
+html[data-rx-skin] .markdown-body td {
+  border-color: var(--rx-line) !important;
+  background: var(--rx-surface);
+}
+html[data-rx-skin] .markdown-body tr:nth-child(2n) td,
+html[data-rx-skin] .markdown-body th {
+  background: var(--rx-surface-2);
+}
+
+/* 行内代码（不影响代码块 pre） */
+html[data-rx-skin] .markdown-body :not(pre) > code {
+  background: var(--rx-surface-2) !important;
+  color: var(--rx-text) !important;
+  border: 1px solid var(--rx-line);
+  border-radius: 4px;
+  padding: .15em .4em;
+}
+
+/* ---------------- 6. 代码块与原始测试报告硬性保护 (pre.vps-raw-report) ---------------- */
+/* 无论哪套皮肤（含 plain 浅色模式）或插件 CSS，始终保持无模糊 + 深底高对比暗色终端外观 */
+
+html[data-rx-skin] pre.vps-raw-report,
+html[data-rx-skin] .markdown-body pre.vps-raw-report,
+html[data-rx-skin] .markdown-body pre {
+  filter: none !important;
+  -webkit-filter: none !important;
+  background-color: var(--rx-code-bg, #0f172a) !important;
+  color: var(--rx-code-text, #e2e8f0) !important;
+  border: var(--rx-bw) solid var(--rx-line) !important;
+  border-radius: var(--rx-radius-sm) !important;
+  max-width: 100%;
+  overflow-x: auto;
+  font-family: var(--rx-font-mono);
+}
+
+html[data-rx-skin="pop"] pre.vps-raw-report,
+html[data-rx-skin="pop"] .markdown-body pre.vps-raw-report {
+  border: 2.5px solid #15121c !important;
+  box-shadow: 4px 4px 0 var(--rx-pop-yellow) !important;
+}
+
+html[data-rx-skin="ink"] pre.vps-raw-report,
+html[data-rx-skin="ink"] .markdown-body pre.vps-raw-report {
+  border: 0 !important;
+  border-left: 5px solid var(--rx-cinnabar) !important;
+  border-radius: 0 !important;
+}
+
+/* ---------------- 7. 117 家测评工具栏与自定义单页组件适配 ---------------- */
+
+html[data-rx-skin] .vps-summary-panel,
+html[data-rx-skin] #vps-quick-toolbar,
+html[data-rx-skin] #rx-about .rx-hero,
+html[data-rx-skin] #rx-about .rx-card,
+html[data-rx-skin] #rx-reviews .rx-lead,
+html[data-rx-skin] #rx-reviews .rx-card,
+html[data-rx-skin] #rx-toolbox .rx-lead,
+html[data-rx-skin] #rx-toolbox .rx-card,
+html[data-rx-skin] .rx-legal .rx-legal-meta,
+html[data-rx-skin] .rx-legal-meta {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: var(--rx-bw) solid var(--rx-line) !important;
+  border-radius: var(--rx-radius) !important;
+  box-shadow: var(--rx-shadow) !important;
+}
+
+html[data-rx-skin="plain"] .vps-summary-panel,
+html[data-rx-skin="plain"] #vps-quick-toolbar,
+html[data-rx-skin="plain"] #rx-about .rx-card,
+html[data-rx-skin="plain"] #rx-reviews .rx-card,
+html[data-rx-skin="plain"] #rx-toolbox .rx-card,
+html[data-rx-skin="plain"] .rx-legal .rx-legal-meta,
+html[data-rx-skin="plain"] .rx-legal-meta {
+  box-shadow: none !important;
+}
+
+html[data-rx-skin] #vps-quick-toolbar #vps-vendor-wall,
+html[data-rx-skin] #rx-toolbox .rx-box {
+  background: var(--rx-surface-2) !important;
+  border-color: var(--rx-line) !important;
+  color: var(--rx-text) !important;
+  border-radius: var(--rx-radius-sm) !important;
+}
+
+html[data-rx-skin] #vps-quick-toolbar #vps-vendor-wall > summary,
+html[data-rx-skin] #rx-about h2,
+html[data-rx-skin] #rx-about h3,
+html[data-rx-skin] #rx-reviews .rx-title,
+html[data-rx-skin] #rx-reviews .rx-sec-head h2,
+html[data-rx-skin] #rx-toolbox .rx-title,
+html[data-rx-skin] .vps-review-subheading {
+  color: var(--rx-text) !important;
+}
+
+html[data-rx-skin] #rx-about p,
+html[data-rx-skin] #rx-about li,
+html[data-rx-skin] #rx-reviews,
+html[data-rx-skin] #rx-toolbox,
+html[data-rx-skin] .rx-legal {
+  color: var(--rx-text-2) !important;
+}
+
+html[data-rx-skin] #vps-quick-toolbar .vps-tb-input,
+html[data-rx-skin] #rx-toolbox .rx-input {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: var(--rx-bw) solid var(--rx-line) !important;
+  border-radius: var(--rx-radius-sm) !important;
+}
+
+html[data-rx-skin] #vps-quick-toolbar .vps-tb-btn,
+html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip,
+html[data-rx-skin] #vps-quick-toolbar .vps-vendor-pill,
+html[data-rx-skin] #rx-reviews .rx-jump a {
+  background: var(--rx-surface) !important;
+  color: var(--rx-text) !important;
+  border: 1px solid var(--rx-line) !important;
+}
+
+html[data-rx-skin] #vps-quick-toolbar .vps-tb-chip.is-active {
+  background: var(--rx-accent) !important;
+  border-color: var(--rx-accent) !important;
+  color: var(--rx-accent-ink) !important;
+}
+
+html[data-rx-skin="pop"] #vps-quick-toolbar .vps-tb-chip.is-active {
+  background: var(--rx-pop-yellow) !important;
+  border: 2px solid var(--rx-line) !important;
+  color: #15121c !important;
+}
+
+/* TOC 侧边目录高亮 */
+html[data-rx-skin] .toc-container a {
+  color: var(--rx-text-2) !important;
+}
+html[data-rx-skin] .toc-container a.is-active-link,
+html[data-rx-skin] .toc-container a:hover {
+  color: var(--rx-accent) !important;
+}
