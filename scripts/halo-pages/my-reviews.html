@@ -3,9 +3,16 @@
 #rx-reviews {
   color: #0f172a;
   line-height: 1.65;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#rx-reviews *,
+#rx-reviews *::before,
+#rx-reviews *::after {
+  box-sizing: border-box;
 }
 #rx-reviews .rx-lead {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   padding: 14px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -13,47 +20,261 @@
   color: #334155;
   font-size: 14px;
 }
-#rx-reviews .rx-nav-group {
-  margin: 0 0 16px;
+/* 交互式筛选与视图控制面板 */
+#rx-reviews .rx-toolbar {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: var(--rx-radius, 12px);
+  background: var(--rx-surface, #ffffff);
+  box-shadow: var(--rx-shadow, 0 1px 2px rgba(15, 23, 42, 0.04));
 }
-#rx-reviews .rx-nav-label {
-  display: block;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #475569;
-  margin: 0 0 8px;
-  letter-spacing: 0.02em;
-}
-#rx-reviews .rx-jump {
+#rx-reviews .rx-tb-top {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
-  margin: 0 0 14px;
+  margin-bottom: 10px;
 }
-#rx-reviews .rx-jump a {
+#rx-reviews .rx-search-wrap {
+  position: relative;
+  flex: 1 1 220px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+#rx-reviews .rx-search-input {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 30px 7px 11px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: 8px;
+  background: var(--rx-surface-2, #f8fafc);
+  color: var(--rx-text, #0f172a);
+  font-size: 13px;
+  outline: none;
+}
+#rx-reviews .rx-search-input:focus {
+  border-color: var(--rx-accent, #b8461f);
+}
+#rx-reviews .rx-search-clear {
+  position: absolute;
+  right: 6px;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+#rx-reviews .rx-search-clear[hidden] {
+  display: none !important;
+}
+#rx-reviews .rx-mode-btn {
+  appearance: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #0f172a !important;
-  font-size: 13px;
+  gap: 5px;
+  padding: 7px 12px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: 8px;
+  background: var(--rx-surface-2, #f8fafc);
+  color: var(--rx-text, #0f172a);
+  font-size: 12.5px;
   font-weight: 600;
-  text-decoration: none !important;
+  cursor: pointer;
+  white-space: nowrap;
 }
-#rx-reviews .rx-jump a:hover {
-  background: #f1f5f9;
+#rx-reviews .rx-mode-btn:hover {
   border-color: #64748b;
 }
+#rx-reviews .rx-mode-btn.is-active {
+  background: var(--rx-accent, #b8461f);
+  border-color: var(--rx-accent, #b8461f);
+  color: var(--rx-accent-ink, #ffffff);
+}
+#rx-reviews .rx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#rx-reviews .rx-chip {
+  appearance: none;
+  padding: 4px 11px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: 999px;
+  background: var(--rx-surface-2, #f8fafc);
+  color: var(--rx-text, #334155);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+#rx-reviews .rx-chip:hover {
+  border-color: #64748b;
+}
+#rx-reviews .rx-chip.is-active {
+  background: var(--rx-accent, #0f172a);
+  border-color: var(--rx-accent, #0f172a);
+  color: var(--rx-accent-ink, #ffffff);
+}
+html[data-rx-skin="pop"] #rx-reviews .rx-chip.is-active {
+  background: var(--rx-pop-yellow, #facc15);
+  border: 2px solid var(--rx-line, #15121c);
+  color: #15121c;
+}
+#rx-reviews .rx-tb-status {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* 吸顶横向联动速跳栏（手机端单行丝滑滑动，0 横向溢出） */
+#rx-reviews .rx-sticky-rail {
+  position: sticky;
+  top: 64px;
+  z-index: 32;
+  margin: 0 0 14px;
+  padding: 7px 10px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--rx-surface, #ffffff) 92%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+#rx-reviews .rx-sticky-rail::-webkit-scrollbar {
+  display: none;
+}
+#rx-reviews .rx-rail-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: 999px;
+  background: var(--rx-surface, #ffffff);
+  color: var(--rx-text, #0f172a) !important;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+#rx-reviews .rx-rail-pill:hover {
+  border-color: var(--rx-accent, #b8461f);
+}
+#rx-reviews .rx-rail-pill.is-current {
+  background: var(--rx-accent, #b8461f) !important;
+  border-color: var(--rx-accent, #b8461f) !important;
+  color: var(--rx-accent-ink, #ffffff) !important;
+}
+#rx-reviews .rx-rail-pill.is-filtered-out {
+  opacity: 0.38;
+}
+
+/* 一屏参数横向对比速览折叠面板 */
+#rx-reviews .rx-compare-panel {
+  margin: 0 0 18px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: var(--rx-radius, 12px);
+  background: var(--rx-surface, #ffffff);
+  overflow: hidden;
+}
+#rx-reviews .rx-compare-panel > summary {
+  padding: 11px 15px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--rx-text, #0f172a);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+#rx-reviews .rx-compare-panel > summary::-webkit-details-marker {
+  display: none;
+}
+#rx-reviews .rx-compare-panel > summary::after {
+  content: "展开对比 ▾";
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rx-accent, #b8461f);
+  flex-shrink: 0;
+}
+#rx-reviews .rx-compare-panel[open] > summary {
+  border-bottom: 1px solid var(--rx-line, #e2e8f0);
+}
+#rx-reviews .rx-compare-panel[open] > summary::after {
+  content: "收起 ▴";
+}
+#rx-reviews .rx-compare-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#rx-reviews .rx-compare-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+#rx-reviews .rx-compare-table th,
+#rx-reviews .rx-compare-table td {
+  padding: 8px 11px;
+  border-bottom: 1px solid var(--rx-line, #e2e8f0);
+  vertical-align: middle;
+}
+#rx-reviews .rx-compare-table th {
+  background: var(--rx-surface-2, #f8fafc);
+  color: var(--rx-text, #334155);
+  font-weight: 700;
+  white-space: nowrap;
+}
+#rx-reviews .rx-compare-table tbody tr:hover {
+  background: var(--rx-accent-soft, rgba(184, 70, 31, 0.08));
+}
+#rx-reviews .rx-compare-jump {
+  color: var(--rx-accent, #b8461f) !important;
+  font-weight: 700;
+  text-decoration: none !important;
+  white-space: nowrap;
+}
+#rx-reviews .rx-compare-jump:hover {
+  text-decoration: underline !important;
+}
+
+#rx-reviews .rx-empty-state {
+  padding: 28px 16px;
+  text-align: center;
+  border: 1px dashed var(--rx-line, #cbd5e1);
+  border-radius: 12px;
+  margin-bottom: 18px;
+  color: #64748b;
+  font-size: 14px;
+}
+
 #rx-reviews .rx-sec-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin: 28px 0 14px;
+  margin: 26px 0 14px;
   padding-bottom: 8px;
   border-bottom: 2px solid #e2e8f0;
 }
@@ -68,6 +289,7 @@
   color: #64748b;
 }
 #rx-reviews .rx-card {
+  scroll-margin-top: 118px;
   min-width: 0;
   max-width: 100%;
   padding: 18px 20px;
@@ -76,6 +298,11 @@
   background: #ffffff;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   margin-bottom: 22px;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+#rx-reviews .rx-card.is-hash-target {
+  border-color: var(--rx-accent, #b8461f) !important;
+  box-shadow: 0 0 0 3px var(--rx-accent-soft, rgba(184, 70, 31, 0.24)) !important;
 }
 #rx-reviews .rx-head {
   display: flex;
@@ -84,6 +311,28 @@
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
+}
+#rx-reviews .rx-head-right {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+#rx-reviews .rx-copy-link {
+  appearance: none;
+  padding: 2px 8px;
+  border: 1px solid var(--rx-line, #cbd5e1);
+  border-radius: 999px;
+  background: transparent;
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#rx-reviews .rx-copy-link:hover {
+  border-color: var(--rx-accent, #b8461f);
+  color: var(--rx-accent, #b8461f);
 }
 #rx-reviews .rx-title {
   margin: 0 !important;
@@ -116,8 +365,8 @@
   color: #166534;
 }
 #rx-reviews .rx-badge-info {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: var(--rx-accent-soft, #fbe7dc);
+  color: var(--rx-accent, #9a3412);
 }
 #rx-reviews .rx-badge-warn {
   background: #fef3c7;
@@ -142,7 +391,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #0284c7;
+  color: var(--rx-accent, #b8461f);
   margin-bottom: 3px;
 }
 #rx-reviews .rx-notes {
@@ -180,12 +429,13 @@
   border-color: #1e293b;
 }
 #rx-reviews .rx-btn-tq {
-  background: #0369a1;
-  border-color: #0369a1;
+  background: var(--rx-accent, #b8461f);
+  border-color: var(--rx-accent, #b8461f);
+  color: var(--rx-accent-ink, #ffffff) !important;
 }
 #rx-reviews .rx-btn-tq:hover {
-  background: #0284c7;
-  border-color: #0284c7;
+  background: var(--rx-accent-hover, #9c3a18);
+  border-color: var(--rx-accent-hover, #9c3a18);
 }
 #rx-reviews .rx-btn-ghost {
   background: #ffffff;
@@ -196,11 +446,21 @@
   background: #f1f5f9;
   border-color: #64748b;
 }
+
+/* 报告切换器 + 工具栏 + 加载态 + 点击放大 */
+#rx-reviews .rx-viewer-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
 #rx-reviews .rx-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 8px;
+  margin: 0;
 }
 #rx-reviews .rx-tab {
   appearance: none;
@@ -223,7 +483,33 @@
   border-color: #0f172a;
   color: #ffffff;
 }
+#rx-reviews .rx-viewer-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+#rx-reviews .rx-tool-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #334155 !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+#rx-reviews .rx-tool-btn:hover {
+  border-color: var(--rx-accent, #b8461f);
+  color: var(--rx-accent, #b8461f) !important;
+}
 #rx-reviews .rx-svg-wrap {
+  position: relative;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
@@ -234,6 +520,9 @@
   border: 1px solid #1e293b;
   background: #000000;
 }
+#rx-reviews .rx-svg-wrap[hidden] {
+  display: none !important;
+}
 #rx-reviews .rx-svg-wrap img {
   display: block;
   max-width: 100%;
@@ -241,148 +530,522 @@
   margin: 0 auto !important;
   border: none !important;
   box-shadow: none !important;
+  cursor: zoom-in;
+  transition: opacity 0.18s ease;
 }
-html.dark #rx-reviews {
+#rx-reviews .rx-svg-wrap.is-loading img {
+  opacity: 0.35;
+}
+#rx-reviews .rx-svg-status {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  color: #fef3c7;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+#rx-reviews .rx-svg-hint {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+/* 全屏高清报告放大灯箱 (Lightbox) */
+#rx-lightbox[hidden] {
+  display: none !important;
+}
+#rx-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(2, 6, 23, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+}
+#rx-lightbox .rx-lb-bar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.96);
+  border-bottom: 1px solid #334155;
+  color: #f8fafc;
+}
+#rx-lightbox .rx-lb-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f8fafc;
+  min-width: 0;
+}
+#rx-lightbox .rx-lb-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+#rx-lightbox .rx-lb-tab {
+  appearance: none;
+  padding: 4px 10px;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#rx-lightbox .rx-lb-tab.is-active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #0f172a;
+}
+#rx-lightbox .rx-lb-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+#rx-lightbox .rx-lb-btn {
+  appearance: none;
+  padding: 5px 10px;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #f8fafc !important;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+#rx-lightbox .rx-lb-btn:hover {
+  border-color: #f59e0b;
+}
+#rx-lightbox .rx-lb-stage {
+  flex: 1 1 auto;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+#rx-lightbox .rx-lb-stage {
+  position: relative;
+}
+#rx-lightbox .rx-lb-stage img {
+  display: block;
+  max-width: min(1240px, 100%);
+  width: auto;
+  height: auto;
+  background: #000000;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  transition: opacity 0.16s ease;
+}
+#rx-lightbox .rx-lb-stage.is-loading img {
+  opacity: 0.32;
+}
+#rx-lightbox .rx-lb-loading {
+  position: fixed;
+  top: 66px;
+  right: 20px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid #f59e0b;
+  color: #fef3c7;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+#rx-lightbox .rx-lb-loading[hidden] {
+  display: none !important;
+}
+@media (max-width: 640px) {
+  #rx-reviews .rx-card {
+    padding: 14px 14px;
+  }
+  #rx-reviews .rx-sticky-rail {
+    top: 56px;
+    padding: 6px 8px;
+  }
+  #rx-lightbox .rx-lb-stage img {
+    max-width: none;
+    width: 780px;
+  }
+}
+
+/* 复制成功轻提示 Toast */
+#rx-reviews-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #0f172a;
+  border: 1px solid var(--rx-accent, #f59e0b);
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+}
+#rx-reviews-toast[hidden] {
+  display: none !important;
+}
+
+/* Dark / rx-dark 主题完整适配 */
+html.dark #rx-reviews,
+html.rx-dark #rx-reviews {
   color: #f1f5f9;
 }
-html.dark #rx-reviews .rx-lead {
+html.dark #rx-reviews .rx-lead,
+html.rx-dark #rx-reviews .rx-lead {
   background: #1e293b;
   border-color: #334155;
   color: #cbd5e1;
 }
-html.dark #rx-reviews .rx-nav-label {
-  color: #94a3b8;
+html.dark #rx-reviews .rx-toolbar,
+html.rx-dark #rx-reviews .rx-toolbar,
+html.dark #rx-reviews .rx-compare-panel,
+html.rx-dark #rx-reviews .rx-compare-panel {
+  background: var(--rx-surface, #1e293b);
+  border-color: var(--rx-line, #334155);
 }
-html.dark #rx-reviews .rx-jump a {
-  background: #0f172a;
-  border-color: #475569;
-  color: #e2e8f0 !important;
+html.dark #rx-reviews .rx-search-input,
+html.rx-dark #rx-reviews .rx-search-input,
+html.dark #rx-reviews .rx-mode-btn,
+html.rx-dark #rx-reviews .rx-mode-btn,
+html.dark #rx-reviews .rx-chip,
+html.rx-dark #rx-reviews .rx-chip {
+  background: var(--rx-surface-2, #0f172a);
+  border-color: var(--rx-line, #475569);
+  color: var(--rx-text, #e2e8f0);
 }
-html.dark #rx-reviews .rx-jump a:hover {
-  background: #1e293b;
-  border-color: #64748b;
+html.dark #rx-reviews .rx-chip.is-active,
+html.rx-dark #rx-reviews .rx-chip.is-active,
+html.dark #rx-reviews .rx-mode-btn.is-active,
+html.rx-dark #rx-reviews .rx-mode-btn.is-active {
+  background: var(--rx-accent, #f59e0b);
+  border-color: var(--rx-accent, #f59e0b);
+  color: var(--rx-accent-ink, #0f172a);
 }
-html.dark #rx-reviews .rx-sec-head {
+html.dark #rx-reviews .rx-sticky-rail,
+html.rx-dark #rx-reviews .rx-sticky-rail {
+  background: color-mix(in srgb, var(--rx-surface, #0f172a) 90%, transparent);
+  border-color: var(--rx-line, #334155);
+}
+html.dark #rx-reviews .rx-rail-pill,
+html.rx-dark #rx-reviews .rx-rail-pill {
+  background: var(--rx-surface-2, #1e293b);
+  border-color: var(--rx-line, #475569);
+  color: var(--rx-text, #e2e8f0) !important;
+}
+html.dark #rx-reviews .rx-rail-pill.is-current,
+html.rx-dark #rx-reviews .rx-rail-pill.is-current {
+  background: var(--rx-accent, #f59e0b) !important;
+  border-color: var(--rx-accent, #f59e0b) !important;
+  color: var(--rx-accent-ink, #0f172a) !important;
+}
+html.dark #rx-reviews .rx-compare-table th,
+html.rx-dark #rx-reviews .rx-compare-table th {
+  background: var(--rx-surface-2, #0f172a);
+  color: #e2e8f0;
+}
+html.dark #rx-reviews .rx-compare-table th,
+html.rx-dark #rx-reviews .rx-compare-table th,
+html.dark #rx-reviews .rx-compare-table td,
+html.rx-dark #rx-reviews .rx-compare-table td {
   border-bottom-color: #334155;
 }
-html.dark #rx-reviews .rx-sec-head h2 {
+html.dark #rx-reviews .rx-compare-jump,
+html.rx-dark #rx-reviews .rx-compare-jump,
+html.dark #rx-reviews .rx-compare-panel > summary::after,
+html.rx-dark #rx-reviews .rx-compare-panel > summary::after {
+  color: var(--rx-accent, #fbbf24) !important;
+}
+html.dark #rx-reviews .rx-sec-head,
+html.rx-dark #rx-reviews .rx-sec-head {
+  border-bottom-color: #334155;
+}
+html.dark #rx-reviews .rx-sec-head h2,
+html.rx-dark #rx-reviews .rx-sec-head h2 {
   color: #f8fafc;
 }
-html.dark #rx-reviews .rx-sec-head span {
+html.dark #rx-reviews .rx-sec-head span,
+html.rx-dark #rx-reviews .rx-sec-head span {
   color: #94a3b8;
 }
-html.dark #rx-reviews .rx-card {
+html.dark #rx-reviews .rx-card,
+html.rx-dark #rx-reviews .rx-card {
   background: #1e293b;
   border-color: #334155;
 }
-html.dark #rx-reviews .rx-title {
+html.dark #rx-reviews .rx-title,
+html.rx-dark #rx-reviews .rx-title {
   color: #f8fafc;
 }
-html.dark #rx-reviews .rx-sub {
+html.dark #rx-reviews .rx-sub,
+html.rx-dark #rx-reviews .rx-sub,
+html.dark #rx-reviews .rx-tb-status,
+html.rx-dark #rx-reviews .rx-tb-status {
   color: #94a3b8;
 }
-html.dark #rx-reviews .rx-box {
+html.dark #rx-reviews .rx-box,
+html.rx-dark #rx-reviews .rx-box {
   background: #0f172a;
   border-color: #334155;
 }
-html.dark #rx-reviews .rx-label {
-  color: #38bdf8;
+html.dark #rx-reviews .rx-label,
+html.rx-dark #rx-reviews .rx-label {
+  color: var(--rx-accent, #fbbf24);
 }
-html.dark #rx-reviews .rx-notes {
+html.dark #rx-reviews .rx-notes,
+html.rx-dark #rx-reviews .rx-notes {
   color: #cbd5e1;
 }
-html.dark #rx-reviews .rx-badge {
+html.dark #rx-reviews .rx-badge,
+html.rx-dark #rx-reviews .rx-badge {
   background: #334155;
   color: #cbd5e1;
 }
-html.dark #rx-reviews .rx-badge-ok {
+html.dark #rx-reviews .rx-badge-ok,
+html.rx-dark #rx-reviews .rx-badge-ok {
   background: #064e3b;
   color: #6ee7b7;
 }
-html.dark #rx-reviews .rx-badge-info {
-  background: #0c4a6e;
-  color: #7dd3fc;
+html.dark #rx-reviews .rx-badge-info,
+html.rx-dark #rx-reviews .rx-badge-info {
+  background: var(--rx-accent-soft, rgba(245, 158, 11, 0.18));
+  color: var(--rx-accent, #fcd34d);
 }
-html.dark #rx-reviews .rx-badge-warn {
+html.dark #rx-reviews .rx-badge-warn,
+html.rx-dark #rx-reviews .rx-badge-warn {
   background: #78350f;
   color: #fcd34d;
 }
-html.dark #rx-reviews .rx-btn {
-  background: #38bdf8;
-  border-color: #38bdf8;
-  color: #0f172a !important;
+html.dark #rx-reviews .rx-btn,
+html.rx-dark #rx-reviews .rx-btn {
+  background: var(--rx-accent, #f59e0b);
+  border-color: var(--rx-accent, #f59e0b);
+  color: var(--rx-accent-ink, #0f172a) !important;
 }
-html.dark #rx-reviews .rx-btn:hover {
-  background: #7dd3fc;
-  border-color: #7dd3fc;
+html.dark #rx-reviews .rx-btn:hover,
+html.rx-dark #rx-reviews .rx-btn:hover {
+  background: var(--rx-accent-hover, #fbbf24);
+  border-color: var(--rx-accent-hover, #fbbf24);
 }
-html.dark #rx-reviews .rx-btn-tq {
+html.dark #rx-reviews .rx-btn-tq,
+html.rx-dark #rx-reviews .rx-btn-tq {
   background: #a78bfa;
   border-color: #a78bfa;
   color: #0f172a !important;
 }
-html.dark #rx-reviews .rx-btn-tq:hover {
+html.dark #rx-reviews .rx-btn-tq:hover,
+html.rx-dark #rx-reviews .rx-btn-tq:hover {
   background: #c4b5fd;
   border-color: #c4b5fd;
 }
-html.dark #rx-reviews .rx-btn-ghost {
+html.dark #rx-reviews .rx-btn-ghost,
+html.rx-dark #rx-reviews .rx-btn-ghost {
   background: #0f172a;
   border-color: #475569;
   color: #e2e8f0 !important;
 }
-html.dark #rx-reviews .rx-btn-ghost:hover {
+html.dark #rx-reviews .rx-btn-ghost:hover,
+html.rx-dark #rx-reviews .rx-btn-ghost:hover {
   background: #1e293b;
   border-color: #64748b;
 }
-html.dark #rx-reviews .rx-tab {
+html.dark #rx-reviews .rx-tab,
+html.rx-dark #rx-reviews .rx-tab,
+html.dark #rx-reviews .rx-tool-btn,
+html.rx-dark #rx-reviews .rx-tool-btn {
   background: #0f172a;
   border-color: #475569;
-  color: #cbd5e1;
+  color: #cbd5e1 !important;
 }
-html.dark #rx-reviews .rx-tab:hover {
+html.dark #rx-reviews .rx-tab:hover,
+html.rx-dark #rx-reviews .rx-tab:hover,
+html.dark #rx-reviews .rx-tool-btn:hover,
+html.rx-dark #rx-reviews .rx-tool-btn:hover {
   background: #334155;
-  color: #f8fafc;
+  color: #f8fafc !important;
 }
-html.dark #rx-reviews .rx-tab.is-active {
-  background: #38bdf8;
-  border-color: #38bdf8;
-  color: #0f172a;
+html.dark #rx-reviews .rx-tab.is-active,
+html.rx-dark #rx-reviews .rx-tab.is-active {
+  background: var(--rx-accent, #f59e0b);
+  border-color: var(--rx-accent, #f59e0b);
+  color: var(--rx-accent-ink, #0f172a) !important;
 }
-html.dark #rx-reviews .rx-svg-wrap {
+html.dark #rx-reviews .rx-svg-wrap,
+html.rx-dark #rx-reviews .rx-svg-wrap {
   border-color: #334155;
 }
 </style>
 
   <div class="rx-lead">
-    这里集中留档我<strong>自购在用 10 台主力 VPS 套餐</strong>的一手实测档案（区别于站内 <a href="/archives/nodeseek-merchant-reviews-2026h2">《NodeSeek 社区汇总（上卷）》</a> 与 <a href="/archives/meowvps-official-merchants-2026h2">《MeowVPS 收录汇总（下卷）》</a> 第三方档案库）。按架构分工统一采用标准测评口径：<strong>线路机执行 <code>TcpQuality (TQ) + NodeQuality (NQ)</code> 双脚本实测</strong>，<strong>落地机执行 <code>NodeQuality (NQ)</code> 全维体检</strong>，支持卡片内一键切换查看各维度原图（敏感 IP 末两段均已脱敏）。
+    这里集中留档我<strong>自购在用 10 台主力 VPS 套餐</strong>的一手实测档案（区别于站内 <a href="/archives/nodeseek-merchant-reviews-2026h2">《NodeSeek 社区汇总（上卷）》</a> 与 <a href="/archives/meowvps-official-merchants-2026h2">《MeowVPS 收录汇总（下卷）》</a> 第三方档案库）。按架构分工统一采用标准测评口径：<strong>线路机执行 <code>TcpQuality (TQ) + NodeQuality (NQ)</code> 双脚本实测</strong>，<strong>落地机执行 <code>NodeQuality (NQ)</code> 全维体检</strong>；支持按场景即时筛选、一键收起原图紧凑对比、点击任意报告全屏高清放大，以及直达商家官网或站内对应商家档案（敏感 IP 末两段均已脱敏）。
   </div>
 
-  <div class="rx-nav-group">
-    <span class="rx-nav-label">🚀 中转 / 精品线路机（TQ + NQ 双脚本实测 · 3 台）</span>
-    <nav class="rx-jump" aria-label="线路机快捷导航">
-      <a href="#dc9-gia">① 搬瓦工 · 洛杉矶 DC9 CN2 GIA</a>
-      <a href="#ppf-lax">② PPFlight · 洛杉矶三网精品优化</a>
-      <a href="#flawless-9929">③ 完美节点 · 洛杉矶三网 9929 回程</a>
-    </nav>
-    <span class="rx-nav-label">🏡 家宽 / 机房落地机（NQ 全维体检 · 7 台）</span>
-    <nav class="rx-jump" aria-label="落地机快捷导航">
-      <a href="#attvps-standard">④ ATTVPS · 洛杉矶 AT&amp;T 静态家宽（4C8G）</a>
-      <a href="#usvps24-att-pro9">⑤ 干杯Cloud · AT&amp;T 宽带 PRO-9线</a>
-      <a href="#nmcloud-hinet">⑥ NMCloud · 台湾 HiNet 家宽</a>
-      <a href="#zorocloud-sg">⑦ ZoroCloud · 新加坡 SPTel 家宽</a>
-      <a href="#novix-lax">⑧ NovixLink · 洛杉矶 LAX-BGP Lite</a>
-      <a href="#yunyou-4837">⑨ 云悠 · 洛杉矶 US4 Mini</a>
-      <a href="#taipei101-tex1">⑩ Taipei101 · 得州 TEX1 双栈</a>
-    </nav>
+  <div id="rx-reviews-toolbar" class="rx-toolbar" role="region" aria-label="测评卡片筛选与视图切换">
+    <div class="rx-tb-top">
+      <div class="rx-search-wrap">
+        <input id="rx-filter-input" class="rx-search-input" type="search" placeholder="搜商家 / ASN / 线路 / 地区 / 解锁（如 AT&amp;T、9929、HiNet、新加坡）…" aria-label="搜索在用机器测评" />
+        <button id="rx-filter-clear" class="rx-search-clear" type="button" aria-label="清空搜索" hidden>×</button>
+      </div>
+      <button id="rx-toggle-reports" class="rx-mode-btn" type="button" aria-pressed="false">🖼️ 紧凑对比（收起原图）</button>
+    </div>
+    <div id="rx-filter-chips" class="rx-chips" role="group" aria-label="按用途与纯净度筛选">
+      <button type="button" class="rx-chip is-active" data-filter="all">全部 (10)</button>
+      <button type="button" class="rx-chip" data-filter="relay">🚀 中转线路机 (3)</button>
+      <button type="button" class="rx-chip" data-filter="egress">🏡 家宽/落地机 (7)</button>
+      <button type="button" class="rx-chip" data-filter="isp5">🏠 五库满绿家宽 (5)</button>
+      <button type="button" class="rx-chip" data-filter="scam0">🛡️ Scamalytics 0 零风控 (6)</button>
+      <button type="button" class="rx-chip" data-filter="apac">🌏 亚太低延迟 (2)</button>
+    </div>
+    <div id="rx-filter-status" class="rx-tb-status" aria-live="polite">当前显示全部 10 / 10 台主力在用机器 · 点击报告图片可全屏放大查看细节</div>
   </div>
 
-  <div class="rx-sec-head">
+  <nav id="rx-sticky-rail" class="rx-sticky-rail" aria-label="10 台在用机器吸顶速跳栏">
+    <a class="rx-rail-pill is-current" href="#dc9-gia" data-target="dc9-gia">① 搬瓦工 DC9</a>
+    <a class="rx-rail-pill" href="#ppf-lax" data-target="ppf-lax">② PPFlight</a>
+    <a class="rx-rail-pill" href="#flawless-9929" data-target="flawless-9929">③ 完美节点 9929</a>
+    <a class="rx-rail-pill" href="#attvps-standard" data-target="attvps-standard">④ ATTVPS 家宽</a>
+    <a class="rx-rail-pill" href="#usvps24-att-pro9" data-target="usvps24-att-pro9">⑤ 干杯Cloud</a>
+    <a class="rx-rail-pill" href="#nmcloud-hinet" data-target="nmcloud-hinet">⑥ NMCloud 台家宽</a>
+    <a class="rx-rail-pill" href="#zorocloud-sg" data-target="zorocloud-sg">⑦ ZoroCloud 新加坡</a>
+    <a class="rx-rail-pill" href="#novix-lax" data-target="novix-lax">⑧ NovixLink</a>
+    <a class="rx-rail-pill" href="#yunyou-4837" data-target="yunyou-4837">⑨ 云悠 US4</a>
+    <a class="rx-rail-pill" href="#taipei101-tex1" data-target="taipei101-tex1">⑩ Taipei101</a>
+  </nav>
+
+  <details class="rx-compare-panel">
+    <summary>📋 10 台主力机器核心参数一屏横向对比表（定位 · 线路/ASN · 风控纯净度 · 典型选型场景）</summary>
+    <div class="rx-compare-wrap">
+      <table class="rx-compare-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>机器套餐</th>
+            <th>架构定位</th>
+            <th>核心线路 / ASN</th>
+            <th>关键实测指标</th>
+            <th>直达</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>①</td>
+            <td><strong>搬瓦工 · 洛杉矶 DC9 CN2 GIA</strong></td>
+            <td>🚀 线路主力</td>
+            <td><code>AS25820</code> · CN2 GIA / 9929 / CMIN2</td>
+            <td>晚高峰沪电单线程 <code>604.5M</code> · GB5 700/1184</td>
+            <td><a class="rx-compare-jump" href="#dc9-gia">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>②</td>
+            <td><strong>PPFlight · 洛杉矶三网精品优化</strong></td>
+            <td>🚀 线路分流</td>
+            <td><code>AS402898</code> · 三网各自顶配回程</td>
+            <td>京沪粤九节点 <code>0% 丢包</code> · Scamalytics <code>0</code></td>
+            <td><a class="rx-compare-jump" href="#ppf-lax">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>③</td>
+            <td><strong>FlawlessNode · 洛杉矶三网 9929</strong></td>
+            <td>🚀 联移专线</td>
+            <td><code>AS402665</code> · 三网强制 9929</td>
+            <td>联通/移动单线程 <code>233–276M</code> · 0% 重传</td>
+            <td><a class="rx-compare-jump" href="#flawless-9929">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>④</td>
+            <td><strong>ATTVPS · 洛杉矶 AT&amp;T 静态家宽 (4C8G)</strong></td>
+            <td>🏡 旗舰家宽</td>
+            <td><code>AS7018</code> · AT&amp;T 原生静态家宽</td>
+            <td>五库满绿家宽 · <strong>四库全 0</strong> · 7.8G 内存</td>
+            <td><a class="rx-compare-jump" href="#attvps-standard">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>⑤</td>
+            <td><strong>干杯Cloud · AT&amp;T 宽带 PRO-9线</strong></td>
+            <td>🏡 美西家宽</td>
+            <td><code>AS7018</code> · AT&amp;T 商业宽带</td>
+            <td>五库满绿家宽 · BBRv3 已调优 · 全美区解锁</td>
+            <td><a class="rx-compare-jump" href="#usvps24-att-pro9">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>⑥</td>
+            <td><strong>NMCloud · 台湾中华电信 HiNet</strong></td>
+            <td>🏡 亚太家宽</td>
+            <td><code>AS3462</code> · 台湾原生住宅宽带</td>
+            <td><strong>满绿双家宽</strong> · Scamalytics <code>0</code> · 动画疯全解</td>
+            <td><a class="rx-compare-jump" href="#nmcloud-hinet">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>⑦</td>
+            <td><strong>ZoroCloud · 新加坡 SPTel 家宽</strong></td>
+            <td>🏡 亚太家宽</td>
+            <td><code>AS139883</code> · 新加坡本土固网</td>
+            <td><strong>满绿双家宽</strong> · Scamalytics <code>1</code> · 移动 103ms</td>
+            <td><a class="rx-compare-jump" href="#zorocloud-sg">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>⑧</td>
+            <td><strong>NovixLink · 洛杉矶 LAX-BGP Lite</strong></td>
+            <td>🏡 高性价落地</td>
+            <td><code>AS174</code> · Cogent ISP 段</td>
+            <td>五库满绿家宽 · <strong>四库全 0</strong> · CAD$5.99/月</td>
+            <td><a class="rx-compare-jump" href="#novix-lax">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>⑨</td>
+            <td><strong>云悠 · 洛杉矶 US4 Mini</strong></td>
+            <td>🏡 全能解锁</td>
+            <td><code>AS2914</code> · NTT 家宽属性段</td>
+            <td>Scamalytics <code>0</code> · YouTube/Netflix/AI 无死角</td>
+            <td><a class="rx-compare-jump" href="#yunyou-4837">看卡片 ↓</a></td>
+          </tr>
+          <tr>
+            <td>⑩</td>
+            <td><strong>Taipei101 · 得州 TEX1 (4.5TB)</strong></td>
+            <td>🏡 大流量出口</td>
+            <td><code>AS59730</code> · 美中得州原生双栈</td>
+            <td>US$2.25/月 4.5TB · Scamalytics <code>0</code> · IPv4全解</td>
+            <td><a class="rx-compare-jump" href="#taipei101-tex1">看卡片 ↓</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <div id="rx-empty-state" class="rx-empty-state" hidden>
+    没有匹配当前筛选条件的机器卡片 · <button id="rx-empty-reset" class="rx-chip" type="button">重置全部筛选条件</button>
+  </div>
+
+  <div class="rx-sec-head" data-sec-role="relay">
     <h2>🚀 一、中转线路机（TQ + NQ 双脚本实测）</h2>
     <span>重点考察：京沪粤三网回程路由、TCP 大包丢包率与晚高峰单线程测速</span>
   </div>
 
   <!-- 1. DC9 -->
-  <article id="dc9-gia" class="rx-card">
+  <article id="dc9-gia" class="rx-card" data-role="relay" data-tags="relay us" data-short="① 搬瓦工 DC9">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 搬瓦工 BandwagonHost · 洛杉矶 DC9 CN2 GIA（SPECIAL 20G PROMO V5）</h3>
@@ -426,16 +1089,17 @@ html.dark #rx-reviews .rx-svg-wrap {
     <div class="rx-actions">
       <a class="rx-btn rx-btn-tq" href="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd" target="_blank" rel="noopener noreferrer">⚡ TcpQuality 完整报告 ↗</a>
       <a class="rx-btn" href="https://nodequality.com/r/i3lo1X9OoZR0A12sCCpZF9Ag6BbCg9i9" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#搬瓦工-bandwagonhost">📚 站内商家档案</a>
+      <a class="rx-btn rx-btn-ghost" href="https://bandwagonhost.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2?from=my-reviews&amp;card=dc9-gia#%E6%90%AC%E7%93%A6%E5%B7%A5bwh" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="DC9 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=ipv4" data-alt="搬瓦工 DC9 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
-      <button type="button" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=speedtest" data-alt="搬瓦工 DC9 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/KVPQAV98I.svg" data-alt="搬瓦工 DC9 Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/24F1PYCFX.svg" data-alt="搬瓦工 DC9 Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/2RU045U8A.svg" data-alt="搬瓦工 DC9 Check.Place IP质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/2WFGZ6349.svg" data-alt="搬瓦工 DC9 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=ipv4" data-alt="搬瓦工 DC9 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=speedtest" data-alt="搬瓦工 DC9 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/KVPQAV98I.svg" data-alt="搬瓦工 DC9 Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/24F1PYCFX.svg" data-alt="搬瓦工 DC9 Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/ip/2RU045U8A.svg" data-alt="搬瓦工 DC9 Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/2WFGZ6349.svg" data-alt="搬瓦工 DC9 Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://tcpquality.ibsgss.uk/r/XMeLi1GAAd.png?section=ipv4" alt="搬瓦工 DC9 TcpQuality IPv4三网回程报告" loading="lazy" />
@@ -443,7 +1107,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 2. PPFlight -->
-  <article id="ppf-lax" class="rx-card">
+  <article id="ppf-lax" class="rx-card" data-role="relay" data-tags="relay us scam0" data-short="② PPFlight">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 PPFlight · 洛杉矶三网精品优化（CN2 GIA / 9929 / CMIN2）</h3>
@@ -487,15 +1151,17 @@ html.dark #rx-reviews .rx-svg-wrap {
     <div class="rx-actions">
       <a class="rx-btn rx-btn-tq" href="https://tcpquality.ibsgss.uk/r/HymWJDfjaH" target="_blank" rel="noopener noreferrer">⚡ TcpQuality 完整报告 ↗</a>
       <a class="rx-btn" href="https://nodequality.com/r/DsoYVJpUualn1pL7iCPamxne1GHM25gx" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="https://ppflight.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2?from=my-reviews&amp;card=ppf-lax#ppflight" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="PPFlight 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=ipv4" data-alt="PPFlight 洛杉矶 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
-      <button type="button" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=speedtest" data-alt="PPFlight 洛杉矶 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/30SYJBW7G.svg" data-alt="PPFlight Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/17F9SUT8A.svg" data-alt="PPFlight Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/3PO651FZS.svg" data-alt="PPFlight Check.Place IP质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/3U3ZRCXTR.svg" data-alt="PPFlight Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=ipv4" data-alt="PPFlight 洛杉矶 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=speedtest" data-alt="PPFlight 洛杉矶 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/30SYJBW7G.svg" data-alt="PPFlight Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/17F9SUT8A.svg" data-alt="PPFlight Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/ip/3PO651FZS.svg" data-alt="PPFlight Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/3U3ZRCXTR.svg" data-alt="PPFlight Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://tcpquality.ibsgss.uk/r/HymWJDfjaH.png?section=ipv4" alt="PPFlight 洛杉矶 TcpQuality IPv4三网回程报告" loading="lazy" />
@@ -503,7 +1169,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 3. FlawlessNode 9929 -->
-  <article id="flawless-9929" class="rx-card">
+  <article id="flawless-9929" class="rx-card" data-role="relay" data-tags="relay us" data-short="③ 完美节点 9929">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 FlawlessNode（完美节点）· 洛杉矶 LAX Pro 三网 9929 回程</h3>
@@ -546,28 +1212,30 @@ html.dark #rx-reviews .rx-svg-wrap {
     <div class="rx-actions">
       <a class="rx-btn rx-btn-tq" href="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H" target="_blank" rel="noopener noreferrer">⚡ TcpQuality 完整报告 ↗</a>
       <a class="rx-btn" href="https://nodequality.com/r/g1pe4F2QV9BD2J8IpqveHgac4eDBocUr" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="https://www.flawlessnode.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2?from=my-reviews&amp;card=flawless-9929#flawlessnode" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="完美节点 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=ipv4" data-alt="FlawlessNode 9929 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
-      <button type="button" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=speedtest" data-alt="FlawlessNode 9929 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/375JKWT97.svg" data-alt="FlawlessNode 9929 Check.Place IPv4网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/31V8XYIMT.svg" data-alt="FlawlessNode 9929 Check.Place IPv4回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/18N4ZYB1V.svg" data-alt="FlawlessNode 9929 Check.Place IPv4质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/1361MPH24.svg" data-alt="FlawlessNode 9929 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=ipv4" data-alt="FlawlessNode 9929 TcpQuality IPv4三网回程报告">TQ · IPv4回程</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=speedtest" data-alt="FlawlessNode 9929 TcpQuality 单线程测速报告">TQ · 单线程测速</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/375JKWT97.svg" data-alt="FlawlessNode 9929 Check.Place IPv4网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/31V8XYIMT.svg" data-alt="FlawlessNode 9929 Check.Place IPv4回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/ip/18N4ZYB1V.svg" data-alt="FlawlessNode 9929 Check.Place IPv4质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/1361MPH24.svg" data-alt="FlawlessNode 9929 Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://tcpquality.ibsgss.uk/r/i0n6IgIC_H.png?section=ipv4" alt="FlawlessNode 9929 TcpQuality IPv4三网回程报告" loading="lazy" />
     </div>
   </article>
 
-  <div class="rx-sec-head">
+  <div class="rx-sec-head" data-sec-role="egress">
     <h2>🏡 二、家宽 / 机房落地机（NQ 全维体检）</h2>
     <span>重点考察：五大库原生住宅 ISP 属性、欺诈风控分值、AI 与流媒体解锁、配合中转出口稳定性</span>
   </div>
 
   <!-- 4. ATTVPS -->
-  <article id="attvps-standard" class="rx-card">
+  <article id="attvps-standard" class="rx-card" data-role="egress" data-tags="egress us isp5 scam0" data-short="④ ATTVPS 家宽">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 ATTVPS · 美国加州洛杉矶 AT&amp;T 静态家宽 标准版（4C8G / 50G NVMe）</h3>
@@ -611,14 +1279,15 @@ html.dark #rx-reviews .rx-svg-wrap {
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/lyqWtHWiv1kG9TLVBKv5SgaMpFidh7MN" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
       <a class="rx-btn rx-btn-ghost" href="https://Report.Check.Place/ip/SISEM2MGE.svg" target="_blank" rel="noopener noreferrer">📄 初测 IP 原图（SISEM2MGE.svg）↗</a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#attvps">📚 站内商家档案</a>
+      <a class="rx-btn rx-btn-ghost" href="https://attvps.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2?from=my-reviews&amp;card=attvps-standard#attvps" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="ATTVPS 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/7CJBJ1AWN.svg" data-alt="ATTVPS Check.Place IP质量体检报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/6N53WRQB3.svg" data-alt="ATTVPS Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3BLZMUK9K.svg" data-alt="ATTVPS Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/R9IWSFC2Z.svg" data-alt="ATTVPS Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/7CJBJ1AWN.svg" data-alt="ATTVPS Check.Place IP质量体检报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/6N53WRQB3.svg" data-alt="ATTVPS Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/3BLZMUK9K.svg" data-alt="ATTVPS Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/R9IWSFC2Z.svg" data-alt="ATTVPS Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/7CJBJ1AWN.svg" alt="ATTVPS Check.Place IP质量体检报告" loading="lazy" />
@@ -626,7 +1295,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 5. 干杯Cloud -->
-  <article id="usvps24-att-pro9" class="rx-card">
+  <article id="usvps24-att-pro9" class="rx-card" data-role="egress" data-tags="egress us isp5" data-short="⑤ 干杯Cloud">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 干杯Cloud · AT&amp;T 商业宽带 PRO-9线（美西洛杉矶 · Rosemead）</h3>
@@ -670,15 +1339,16 @@ html.dark #rx-reviews .rx-svg-wrap {
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/dHAib6K2PAHVlXEhpIYwLiOeWfsXdh5v" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
       <a class="rx-btn rx-btn-ghost" href="https://Report.Check.Place/ip/1PBAA6I6S.svg" target="_blank" rel="noopener noreferrer">📄 初测 IP 原图（1PBAA6I6S.svg）↗</a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#干杯云-usvps24">📚 站内商家档案</a>
+      <a class="rx-btn rx-btn-ghost" href="https://usvps24.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2?from=my-reviews&amp;card=usvps24-att-pro9#%E5%B9%B2%E6%9D%AF%E4%BA%91-usvps24" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="干杯Cloud 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/1PBAA6I6S.svg" data-alt="干杯Cloud Check.Place IP质量报告 (1PBAA6I6S)">初测 · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/102HNUD12.svg" data-alt="干杯Cloud NQ IP质量体检报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3J3Z4OFC1.svg" data-alt="干杯Cloud Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/2PJUALC5A.svg" data-alt="干杯Cloud Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/20WTZ0562.svg" data-alt="干杯Cloud Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/1PBAA6I6S.svg" data-alt="干杯Cloud Check.Place IP质量报告 (1PBAA6I6S)">初测 · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/ip/102HNUD12.svg" data-alt="干杯Cloud NQ IP质量体检报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/3J3Z4OFC1.svg" data-alt="干杯Cloud Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/2PJUALC5A.svg" data-alt="干杯Cloud Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/20WTZ0562.svg" data-alt="干杯Cloud Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/1PBAA6I6S.svg" alt="干杯Cloud AT&T商业宽带PRO-9线 Check.Place IP质量体检报告 (1PBAA6I6S)" loading="lazy" />
@@ -686,7 +1356,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 6. NMCloud HiNet -->
-  <article id="nmcloud-hinet" class="rx-card">
+  <article id="nmcloud-hinet" class="rx-card" data-role="egress" data-tags="egress apac isp5 scam0" data-short="⑥ NMCloud 台家宽">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇹🇼 NMCloud · 台湾中华电信 HiNet 原生家宽</h3>
@@ -727,13 +1397,15 @@ html.dark #rx-reviews .rx-svg-wrap {
 
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/DITExDDRhFOpcMQ9p5MvMANaPUIA9CX9" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="https://nmcloud.cc/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2?from=my-reviews&amp;card=nmcloud-hinet#nmcloud%E7%89%9B%E9%A9%AC%E4%BA%91" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="NMCloud HiNet 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/14K5TZIOP.svg" data-alt="NMCloud 台湾HiNet Check.Place IP质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3QCVEGI37.svg" data-alt="NMCloud 台湾HiNet Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/138916D0Z.svg" data-alt="NMCloud 台湾HiNet Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/14RB18RJC.svg" data-alt="NMCloud 台湾HiNet Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/14K5TZIOP.svg" data-alt="NMCloud 台湾HiNet Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/3QCVEGI37.svg" data-alt="NMCloud 台湾HiNet Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/138916D0Z.svg" data-alt="NMCloud 台湾HiNet Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/14RB18RJC.svg" data-alt="NMCloud 台湾HiNet Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/14K5TZIOP.svg" alt="NMCloud 台湾HiNet Check.Place IP质量报告" loading="lazy" />
@@ -741,7 +1413,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 7. ZoroCloud SG -->
-  <article id="zorocloud-sg" class="rx-card">
+  <article id="zorocloud-sg" class="rx-card" data-role="egress" data-tags="egress apac isp5" data-short="⑦ ZoroCloud 新加坡">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇸🇬 ZoroCloud · 新加坡 SPTel 原生固网家宽（SG-RES-Plus）</h3>
@@ -782,14 +1454,15 @@ html.dark #rx-reviews .rx-svg-wrap {
 
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/4b8QuQFOERa6JVJxVKWeSObHvd7cfYvU" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#zorocloud">📚 站内商家档案</a>
+      <a class="rx-btn rx-btn-ghost" href="https://my.zorocloud.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2?from=my-reviews&amp;card=zorocloud-sg#zorocloud%E7%B4%A2%E9%9A%86%E4%BA%91" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="ZoroCloud 新加坡 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/3SA3NUNKP.svg" data-alt="ZoroCloud 新加坡 Check.Place IP质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/11HNKHO0Y.svg" data-alt="ZoroCloud 新加坡 Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/17HE8RB7W.svg" data-alt="ZoroCloud 新加坡 Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/34YBJ5V1N.svg" data-alt="ZoroCloud 新加坡 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/3SA3NUNKP.svg" data-alt="ZoroCloud 新加坡 Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/11HNKHO0Y.svg" data-alt="ZoroCloud 新加坡 Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/17HE8RB7W.svg" data-alt="ZoroCloud 新加坡 Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/34YBJ5V1N.svg" data-alt="ZoroCloud 新加坡 Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/3SA3NUNKP.svg" alt="ZoroCloud 新加坡 Check.Place IP质量报告" loading="lazy" />
@@ -797,7 +1470,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 8. NovixLink LAX -->
-  <article id="novix-lax" class="rx-card">
+  <article id="novix-lax" class="rx-card" data-role="egress" data-tags="egress us isp5 scam0" data-short="⑧ NovixLink">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 NovixLink · 美国洛杉矶 LAX-BGP Lite（CAD$5.99/月）</h3>
@@ -838,13 +1511,15 @@ html.dark #rx-reviews .rx-svg-wrap {
 
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/Hl4xt8PyW4VDsl3123Bjz7yNgGlAtPMF" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="https://novixlink.com/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2?from=my-reviews&amp;card=novix-lax#novixlink%E8%AF%BA%E8%81%94%E4%B8%BB%E6%9C%BA" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="NovixLink 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/303KJKXF1.svg" data-alt="NovixLink LAX Check.Place IP质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/2DDD0LA88.svg" data-alt="NovixLink LAX Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/1TDZ225P0.svg" data-alt="NovixLink LAX Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/1AR6HP92I.svg" data-alt="NovixLink LAX Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/303KJKXF1.svg" data-alt="NovixLink LAX Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/2DDD0LA88.svg" data-alt="NovixLink LAX Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/1TDZ225P0.svg" data-alt="NovixLink LAX Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/1AR6HP92I.svg" data-alt="NovixLink LAX Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/303KJKXF1.svg" alt="NovixLink LAX Check.Place IP质量报告" loading="lazy" />
@@ -852,7 +1527,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 9. 云优 4837 -->
-  <article id="yunyou-4837" class="rx-card">
+  <article id="yunyou-4837" class="rx-card" data-role="egress" data-tags="egress us scam0" data-short="⑨ 云悠 US4">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 云悠（云优）· 美国洛杉矶 US4 Mini</h3>
@@ -893,14 +1568,15 @@ html.dark #rx-reviews .rx-svg-wrap {
 
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/E6lZhaYowb2bAEc3BZiTBYdnAGAXMhOs" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/nodeseek-merchant-reviews-2026h2#云悠-yunyoo">📚 站内商家档案</a>
+      <a class="rx-btn rx-btn-ghost" href="https://yunyoo.cc/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2?from=my-reviews&amp;card=yunyou-4837#yunyoo%E4%BA%91%E6%82%A0" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="云悠 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/3CDXLE6JS.svg" data-alt="云悠 US4 Mini Check.Place IP质量报告">NQ · IP质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3K5G2HMXE.svg" data-alt="云悠 US4 Mini Check.Place 网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/3OZCW8X9M.svg" data-alt="云悠 US4 Mini Check.Place 回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/3QBYPFWZM.svg" data-alt="云悠 US4 Mini Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/3CDXLE6JS.svg" data-alt="云悠 US4 Mini Check.Place IP质量报告">NQ · IP质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/3K5G2HMXE.svg" data-alt="云悠 US4 Mini Check.Place 网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/3OZCW8X9M.svg" data-alt="云悠 US4 Mini Check.Place 回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/3QBYPFWZM.svg" data-alt="云悠 US4 Mini Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/3CDXLE6JS.svg" alt="云悠 US4 Mini Check.Place IP质量报告" loading="lazy" />
@@ -908,7 +1584,7 @@ html.dark #rx-reviews .rx-svg-wrap {
   </article>
 
   <!-- 10. Taipei101 TEX1 -->
-  <article id="taipei101-tex1" class="rx-card">
+  <article id="taipei101-tex1" class="rx-card" data-role="egress" data-tags="egress us scam0" data-short="⑩ Taipei101">
     <div class="rx-head">
       <div>
         <h3 class="rx-title">🇺🇸 Taipei101 · 美国得克萨斯 TEX1（US$2.25/月 · 4.5TB 大流量）</h3>
@@ -949,42 +1625,552 @@ html.dark #rx-reviews .rx-svg-wrap {
 
     <div class="rx-actions">
       <a class="rx-btn" href="https://nodequality.com/r/pm5Fh4vFDStRSNVngm3KUHSAjEpMKUJn" target="_blank" rel="noopener noreferrer">📊 NodeQuality 完整报告 ↗</a>
-      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2#taipei101">📚 站内商家档案</a>
+      <a class="rx-btn rx-btn-ghost" href="https://vps.taipei/" target="_blank" rel="noopener noreferrer">🌐 商家官网 ↗</a>
+      <a class="rx-btn rx-btn-ghost" href="/archives/meowvps-official-merchants-2026h2?from=my-reviews&amp;card=taipei101-tex1#taipei101" title="跳转站内商家档案章节（支持一键返回本卡片）">📚 站内商家档案</a>
     </div>
 
     <div class="rx-tabs" role="tablist" aria-label="Taipei101 TEX1 报告切换">
-      <button type="button" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/2YVWAZPI6.svg" data-alt="Taipei101 TEX1 Check.Place IPv4质量报告">NQ · IPv4质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/ip/K7SV7C5YO.svg" data-alt="Taipei101 TEX1 Check.Place IPv6质量报告">NQ · IPv6质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/ENU06B4RE.svg" data-alt="Taipei101 TEX1 Check.Place IPv4网络质量报告">NQ · 网络质量</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/net/1S9QLDFVN.svg" data-alt="Taipei101 TEX1 Check.Place IPv4回程路由报告">NQ · 回程路由</button>
-      <button type="button" class="rx-tab" data-src="https://Report.Check.Place/hardware/2ZCHDX2AA.svg" data-alt="Taipei101 TEX1 Check.Place 硬件体检报告">NQ · 硬件体检</button>
+      <button type="button" role="tab" aria-selected="true" class="rx-tab is-active" data-src="https://Report.Check.Place/ip/2YVWAZPI6.svg" data-alt="Taipei101 TEX1 Check.Place IPv4质量报告">NQ · IPv4质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/ip/K7SV7C5YO.svg" data-alt="Taipei101 TEX1 Check.Place IPv6质量报告">NQ · IPv6质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/ENU06B4RE.svg" data-alt="Taipei101 TEX1 Check.Place IPv4网络质量报告">NQ · 网络质量</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/net/1S9QLDFVN.svg" data-alt="Taipei101 TEX1 Check.Place IPv4回程路由报告">NQ · 回程路由</button>
+      <button type="button" role="tab" aria-selected="false" class="rx-tab" data-src="https://Report.Check.Place/hardware/2ZCHDX2AA.svg" data-alt="Taipei101 TEX1 Check.Place 硬件体检报告">NQ · 硬件体检</button>
     </div>
     <div class="rx-svg-wrap">
       <img src="https://Report.Check.Place/ip/2YVWAZPI6.svg" alt="Taipei101 TEX1 Check.Place IPv4质量报告" loading="lazy" />
     </div>
   </article>
 
+<div id="rx-lightbox" role="dialog" aria-modal="true" aria-label="高清测评报告原图预览" hidden>
+  <div class="rx-lb-bar">
+    <div id="rx-lb-title" class="rx-lb-title">报告原图预览</div>
+    <div id="rx-lb-tabs" class="rx-lb-tabs" role="tablist" aria-label="全屏切换报告维度"></div>
+    <div class="rx-lb-actions">
+      <button id="rx-lb-prev" type="button" class="rx-lb-btn" title="上一张 (←)">◀</button>
+      <button id="rx-lb-next" type="button" class="rx-lb-btn" title="下一张 (→)">▶</button>
+      <a id="rx-lb-raw" class="rx-lb-btn" href="#" target="_blank" rel="noopener noreferrer">新标签打开原图 ↗</a>
+      <button id="rx-lb-close" type="button" class="rx-lb-btn">✕ 关闭</button>
+    </div>
+  </div>
+  <div id="rx-lb-stage" class="rx-lb-stage">
+    <div id="rx-lb-loading" class="rx-lb-loading" hidden>正在加载高清报告…</div>
+    <img id="rx-lb-img" src="" alt="" />
+  </div>
+</div>
+
+<div id="rx-reviews-toast" role="status" aria-live="polite" hidden></div>
+
 <script>
 (function () {
   var root = document.getElementById('rx-reviews');
   if (!root) return;
-  root.addEventListener('click', function (ev) {
-    var btn = ev.target && ev.target.closest ? ev.target.closest('.rx-tab') : null;
-    if (!btn) return;
-    var card = btn.closest('.rx-card');
-    if (!card) return;
-    var img = card.querySelector('.rx-svg-wrap img');
-    var src = btn.getAttribute('data-src');
-    var alt = btn.getAttribute('data-alt') || '';
-    if (img && src) {
-      img.setAttribute('src', src);
-      img.setAttribute('alt', alt);
+
+  var cards = Array.prototype.slice.call(root.querySelectorAll('.rx-card'));
+  var secHeads = Array.prototype.slice.call(root.querySelectorAll('.rx-sec-head'));
+  var rail = document.getElementById('rx-sticky-rail');
+  var railPills = rail ? Array.prototype.slice.call(rail.querySelectorAll('.rx-rail-pill')) : [];
+  var filterInput = document.getElementById('rx-filter-input');
+  var filterClear = document.getElementById('rx-filter-clear');
+  var filterChips = Array.prototype.slice.call(root.querySelectorAll('#rx-filter-chips .rx-chip'));
+  var filterStatus = document.getElementById('rx-filter-status');
+  var emptyState = document.getElementById('rx-empty-state');
+  var emptyReset = document.getElementById('rx-empty-reset');
+  var toggleReportsBtn = document.getElementById('rx-toggle-reports');
+  var toastEl = document.getElementById('rx-reviews-toast');
+  var toastTimer = null;
+
+  var activeFilter = 'all';
+  var compactMode = false;
+  var prefetchedCards = {};
+
+  function showToast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.hidden = true;
+    }, 2200);
+  }
+
+  // 1. 为每张卡片增强：顶栏「# 复制直达链接」按钮 + 报告查看器工具栏（放大 / 原图外链 / 单卡折叠 / 加载态）
+  cards.forEach(function (card) {
+    var cid = card.id;
+    var head = card.querySelector('.rx-head');
+    if (head) {
+      var badge = head.querySelector(':scope > .rx-badge');
+      var rightWrap = document.createElement('div');
+      rightWrap.className = 'rx-head-right';
+      if (badge) rightWrap.appendChild(badge);
+      var copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'rx-copy-link';
+      copyBtn.setAttribute('data-copy-card', cid);
+      copyBtn.title = '复制本机实测卡片直达链接';
+      copyBtn.textContent = '🔗 分享此卡';
+      rightWrap.appendChild(copyBtn);
+      head.appendChild(rightWrap);
     }
-    var tabs = card.querySelectorAll('.rx-tab');
-    for (var i = 0; i < tabs.length; i++) {
-      tabs[i].classList.toggle('is-active', tabs[i] === btn);
+
+    var tabsEl = card.querySelector('.rx-tabs');
+    var svgWrap = card.querySelector('.rx-svg-wrap');
+    var img = svgWrap ? svgWrap.querySelector('img') : null;
+    if (tabsEl && svgWrap && img) {
+      var viewerHead = document.createElement('div');
+      viewerHead.className = 'rx-viewer-head';
+      tabsEl.parentNode.insertBefore(viewerHead, tabsEl);
+      viewerHead.appendChild(tabsEl);
+
+      var tools = document.createElement('div');
+      tools.className = 'rx-viewer-tools';
+
+      var zoomBtn = document.createElement('button');
+      zoomBtn.type = 'button';
+      zoomBtn.className = 'rx-tool-btn rx-zoom-btn';
+      zoomBtn.textContent = '🔍 全屏放大';
+
+      var rawLink = document.createElement('a');
+      rawLink.className = 'rx-tool-btn rx-raw-link';
+      rawLink.href = img.getAttribute('src') || '#';
+      rawLink.target = '_blank';
+      rawLink.rel = 'noopener noreferrer';
+      rawLink.textContent = '原图 ↗';
+
+      var foldBtn = document.createElement('button');
+      foldBtn.type = 'button';
+      foldBtn.className = 'rx-tool-btn rx-fold-btn';
+      foldBtn.textContent = '收起原图';
+
+      tools.appendChild(zoomBtn);
+      tools.appendChild(rawLink);
+      tools.appendChild(foldBtn);
+      viewerHead.appendChild(tools);
+
+      var statusBadge = document.createElement('div');
+      statusBadge.className = 'rx-svg-status';
+      statusBadge.hidden = true;
+      svgWrap.appendChild(statusBadge);
+
+      var hint = document.createElement('div');
+      hint.className = 'rx-svg-hint';
+      hint.innerHTML = '<span>💡 点击上方标签秒切各维度实测图，点击图片全屏放大阅读（支持键盘 ← → 切换）</span>';
+      svgWrap.appendChild(hint);
+
+      img.addEventListener('load', function () {
+        svgWrap.classList.remove('is-loading');
+        statusBadge.hidden = true;
+      });
+      img.addEventListener('error', function () {
+        svgWrap.classList.remove('is-loading');
+        statusBadge.textContent = '⚠️ 原图加载较慢，可点右上「原图 ↗」直接打开';
+        statusBadge.hidden = false;
+      });
+
+      // 鼠标移入报告区时按需后台预热同卡片其他维度 SVG/PNG，切换 0 延迟
+      card.addEventListener('pointerenter', function () {
+        prefetchCardTabs(card);
+      }, { once: true, passive: true });
     }
   });
+
+  function prefetchCardTabs(card) {
+    if (!card || prefetchedCards[card.id]) return;
+    prefetchedCards[card.id] = true;
+    var tabs = card.querySelectorAll('.rx-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var u = tabs[i].getAttribute('data-src');
+      if (u) {
+        var pre = new Image();
+        pre.decoding = 'async';
+        pre.src = u;
+      }
+    }
+  }
+
+  function switchCardTab(card, btn) {
+    if (!card || !btn) return;
+    prefetchCardTabs(card);
+    var svgWrap = card.querySelector('.rx-svg-wrap');
+    var img = svgWrap ? svgWrap.querySelector('img') : null;
+    var statusBadge = svgWrap ? svgWrap.querySelector('.rx-svg-status') : null;
+    var rawLink = card.querySelector('.rx-raw-link');
+    var foldBtn = card.querySelector('.rx-fold-btn');
+    var src = btn.getAttribute('data-src');
+    var alt = btn.getAttribute('data-alt') || '';
+
+    if (svgWrap && svgWrap.hidden) {
+      svgWrap.hidden = false;
+      if (foldBtn) foldBtn.textContent = '收起原图';
+    }
+
+    var tabs = card.querySelectorAll('.rx-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      var active = tabs[i] === btn;
+      tabs[i].classList.toggle('is-active', active);
+      tabs[i].setAttribute('aria-selected', active ? 'true' : 'false');
+    }
+
+    if (rawLink && src) rawLink.href = src;
+    if (img && src && img.getAttribute('src') !== src) {
+      if (svgWrap) svgWrap.classList.add('is-loading');
+      if (statusBadge) {
+        statusBadge.textContent = '正在加载「' + (btn.textContent || '').trim() + '」…';
+        statusBadge.hidden = false;
+      }
+      img.setAttribute('src', src);
+      img.setAttribute('alt', alt);
+      if (img.complete && img.naturalWidth > 0) {
+        if (svgWrap) svgWrap.classList.remove('is-loading');
+        if (statusBadge) statusBadge.hidden = true;
+      }
+    }
+  }
+
+  // 2. 多维筛选 + 关键词搜索 + 紧凑模式切换
+  function applyFilters() {
+    var q = filterInput ? (filterInput.value || '').trim().toLowerCase() : '';
+    var terms = q ? q.split(/\s+/).filter(Boolean) : [];
+    if (filterClear) filterClear.hidden = !q;
+
+    var visibleCount = 0;
+    var roleCounts = { relay: 0, egress: 0 };
+
+    cards.forEach(function (card) {
+      var tags = (card.getAttribute('data-tags') || '').split(/\s+/);
+      var role = card.getAttribute('data-role') || '';
+      var matchChip = activeFilter === 'all' || tags.indexOf(activeFilter) !== -1;
+      var hay = (card.textContent || '').toLowerCase();
+      var matchQuery = !terms.length || terms.every(function (t) { return hay.indexOf(t) !== -1; });
+      var ok = matchChip && matchQuery;
+
+      card.style.display = ok ? '' : 'none';
+      if (ok) {
+        visibleCount += 1;
+        if (roleCounts[role] !== undefined) roleCounts[role] += 1;
+      }
+
+      var pill = rail ? rail.querySelector('[data-target="' + card.id + '"]') : null;
+      if (pill) pill.classList.toggle('is-filtered-out', !ok);
+    });
+
+    secHeads.forEach(function (sh) {
+      var r = sh.getAttribute('data-sec-role');
+      if (r && roleCounts[r] !== undefined) {
+        sh.style.display = roleCounts[r] > 0 ? '' : 'none';
+      }
+    });
+
+    if (emptyState) emptyState.hidden = visibleCount > 0;
+    if (filterStatus) {
+      if (activeFilter === 'all' && !q) {
+        filterStatus.textContent = '当前显示全部 10 / 10 台主力在用机器 · 点击报告图片可全屏放大查看细节';
+      } else {
+        filterStatus.textContent = '筛选结果：匹配 ' + visibleCount + ' / ' + cards.length + ' 台主力机器' + (compactMode ? '（紧凑对比模式）' : '');
+      }
+    }
+  }
+
+  function resetAllFilters() {
+    activeFilter = 'all';
+    if (filterInput) filterInput.value = '';
+    filterChips.forEach(function (c) {
+      c.classList.toggle('is-active', c.getAttribute('data-filter') === 'all');
+    });
+    applyFilters();
+  }
+
+  filterChips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      activeFilter = chip.getAttribute('data-filter') || 'all';
+      filterChips.forEach(function (c) { c.classList.toggle('is-active', c === chip); });
+      applyFilters();
+    });
+  });
+
+  if (filterInput) {
+    filterInput.addEventListener('input', applyFilters);
+  }
+  if (filterClear) {
+    filterClear.addEventListener('click', function () {
+      filterInput.value = '';
+      applyFilters();
+      filterInput.focus();
+    });
+  }
+  if (emptyReset) {
+    emptyReset.addEventListener('click', resetAllFilters);
+  }
+
+  if (toggleReportsBtn) {
+    toggleReportsBtn.addEventListener('click', function () {
+      compactMode = !compactMode;
+      toggleReportsBtn.classList.toggle('is-active', compactMode);
+      toggleReportsBtn.setAttribute('aria-pressed', compactMode ? 'true' : 'false');
+      toggleReportsBtn.textContent = compactMode ? '🖼️ 展开全部原图' : '🖼️ 紧凑对比（收起原图）';
+      cards.forEach(function (card) {
+        var wrap = card.querySelector('.rx-svg-wrap');
+        var foldBtn = card.querySelector('.rx-fold-btn');
+        if (wrap) wrap.hidden = compactMode;
+        if (foldBtn) foldBtn.textContent = compactMode ? '展开原图' : '收起原图';
+      });
+      showToast(compactMode ? '已收起全部黑底报告原图，方便上下快速对比参数' : '已展开全部测评报告原图');
+    });
+  }
+
+  // 3. 全屏高清放大灯箱（支持灯箱内直接切换同卡片各维度报告 + 键盘 ← → / Esc）
+  var lb = document.getElementById('rx-lightbox');
+  var lbTitle = document.getElementById('rx-lb-title');
+  var lbTabsWrap = document.getElementById('rx-lb-tabs');
+  var lbImg = document.getElementById('rx-lb-img');
+  var lbRaw = document.getElementById('rx-lb-raw');
+  var lbPrev = document.getElementById('rx-lb-prev');
+  var lbNext = document.getElementById('rx-lb-next');
+  var lbClose = document.getElementById('rx-lb-close');
+  var lbStage = document.getElementById('rx-lb-stage');
+  var lbState = { card: null, index: 0 };
+
+  function renderLightbox() {
+    if (!lb || !lbState.card) return;
+    var card = lbState.card;
+    var tabs = Array.prototype.slice.call(card.querySelectorAll('.rx-tab'));
+    if (!tabs.length) return;
+    var idx = ((lbState.index % tabs.length) + tabs.length) % tabs.length;
+    lbState.index = idx;
+    var activeTab = tabs[idx];
+    switchCardTab(card, activeTab);
+
+    var titleEl = card.querySelector('.rx-title');
+    var src = activeTab.getAttribute('data-src') || '';
+    var alt = activeTab.getAttribute('data-alt') || '';
+    if (lbTitle) lbTitle.textContent = (titleEl ? titleEl.textContent : '') + ' · ' + (activeTab.textContent || '').trim();
+    var lbLoading = document.getElementById('rx-lb-loading');
+    if (lbImg && src) {
+      if (lbImg.getAttribute('src') !== src) {
+        if (lbStage) lbStage.classList.add('is-loading');
+        if (lbLoading) {
+          lbLoading.textContent = '正在加载「' + (activeTab.textContent || '').trim() + '」…';
+          lbLoading.hidden = false;
+        }
+        lbImg.onload = function () {
+          if (lbStage) lbStage.classList.remove('is-loading');
+          if (lbLoading) lbLoading.hidden = true;
+        };
+        lbImg.onerror = function () {
+          if (lbStage) lbStage.classList.remove('is-loading');
+          if (lbLoading) {
+            lbLoading.textContent = '⚠️ 加载较慢，可点右上「新标签打开原图 ↗」';
+            lbLoading.hidden = false;
+          }
+        };
+        lbImg.setAttribute('src', src);
+        lbImg.setAttribute('alt', alt);
+        if (lbImg.complete && lbImg.naturalWidth > 0) {
+          if (lbStage) lbStage.classList.remove('is-loading');
+          if (lbLoading) lbLoading.hidden = true;
+        }
+      }
+    }
+    if (lbRaw) lbRaw.href = src;
+    if (lbTabsWrap) {
+      lbTabsWrap.innerHTML = '';
+      tabs.forEach(function (t, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'rx-lb-tab' + (i === idx ? ' is-active' : '');
+        b.textContent = (t.textContent || '').trim();
+        b.addEventListener('click', function () {
+          lbState.index = i;
+          renderLightbox();
+        });
+        lbTabsWrap.appendChild(b);
+      });
+    }
+  }
+
+  function openLightbox(card) {
+    if (!lb || !card) return;
+    prefetchCardTabs(card);
+    var tabs = Array.prototype.slice.call(card.querySelectorAll('.rx-tab'));
+    var activeIdx = 0;
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].classList.contains('is-active')) {
+        activeIdx = i;
+        break;
+      }
+    }
+    lbState.card = card;
+    lbState.index = activeIdx;
+    renderLightbox();
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    if (!lb || lb.hidden) return;
+    lb.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  if (lbClose) lbClose.addEventListener('click', closeLightbox);
+  if (lbPrev) lbPrev.addEventListener('click', function () { lbState.index -= 1; renderLightbox(); });
+  if (lbNext) lbNext.addEventListener('click', function () { lbState.index += 1; renderLightbox(); });
+  if (lbStage) {
+    lbStage.addEventListener('click', function (ev) {
+      if (ev.target === lbStage) closeLightbox();
+    });
+  }
+  document.addEventListener('keydown', function (ev) {
+    if (!lb || lb.hidden) return;
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      closeLightbox();
+    } else if (ev.key === 'ArrowLeft') {
+      ev.preventDefault();
+      lbState.index -= 1;
+      renderLightbox();
+    } else if (ev.key === 'ArrowRight') {
+      ev.preventDefault();
+      lbState.index += 1;
+      renderLightbox();
+    }
+  });
+
+  // 4. 事件委托：标签切换、图片放大、单卡折叠、分享链接复制、页内跳转自动解除隐藏
+  root.addEventListener('click', function (ev) {
+    var target = ev.target;
+    if (!target || !target.closest) return;
+
+    var tabBtn = target.closest('.rx-tab');
+    if (tabBtn) {
+      switchCardTab(tabBtn.closest('.rx-card'), tabBtn);
+      return;
+    }
+
+    var zoomTrigger = target.closest('.rx-zoom-btn') || target.closest('.rx-svg-wrap img');
+    if (zoomTrigger) {
+      openLightbox(zoomTrigger.closest('.rx-card'));
+      return;
+    }
+
+    var foldBtn = target.closest('.rx-fold-btn');
+    if (foldBtn) {
+      var c = foldBtn.closest('.rx-card');
+      var w = c ? c.querySelector('.rx-svg-wrap') : null;
+      if (w) {
+        w.hidden = !w.hidden;
+        foldBtn.textContent = w.hidden ? '展开原图' : '收起原图';
+      }
+      return;
+    }
+
+    var copyBtn = target.closest('.rx-copy-link');
+    if (copyBtn) {
+      var cardId = copyBtn.getAttribute('data-copy-card');
+      var url = location.origin + location.pathname + '#' + cardId;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          showToast('✓ 已复制本卡片直达链接：#' + cardId);
+        }).catch(function () {
+          location.hash = cardId;
+          showToast('已定位至 #' + cardId);
+        });
+      } else {
+        location.hash = cardId;
+        showToast('已定位至 #' + cardId);
+      }
+      return;
+    }
+
+    var jumpLink = target.closest('a[href^="#"]');
+    if (jumpLink) {
+      var hid = (jumpLink.getAttribute('href') || '').slice(1);
+      var dest = hid ? document.getElementById(hid) : null;
+      if (dest && dest.style.display === 'none') {
+        resetAllFilters();
+      }
+      if (dest) {
+        ev.preventDefault();
+        history.replaceState(null, '', '#' + hid);
+        scrollToCard(dest, false);
+      }
+    }
+  });
+
+  // 键盘无障碍左右切换卡片内 Tab
+  root.addEventListener('keydown', function (ev) {
+    var tabBtn = ev.target && ev.target.closest ? ev.target.closest('.rx-tab') : null;
+    if (!tabBtn || (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight')) return;
+    var card = tabBtn.closest('.rx-card');
+    if (!card) return;
+    var tabs = Array.prototype.slice.call(card.querySelectorAll('.rx-tab'));
+    var idx = tabs.indexOf(tabBtn);
+    if (idx < 0) return;
+    ev.preventDefault();
+    var nextIdx = ev.key === 'ArrowRight' ? (idx + 1) % tabs.length : (idx - 1 + tabs.length) % tabs.length;
+    tabs[nextIdx].focus();
+    switchCardTab(card, tabs[nextIdx]);
+  });
+
+  // 5. ScrollSpy 吸顶速跳栏联动高亮 + 跨页返回 #hash 高亮定位
+  function setActiveRailPill(cardId) {
+    if (!rail) return;
+    railPills.forEach(function (p) {
+      var active = p.getAttribute('data-target') === cardId;
+      p.classList.toggle('is-current', active);
+      if (active) {
+        var targetLeft = p.offsetLeft - Math.max(0, (rail.clientWidth - p.offsetWidth) / 2);
+        rail.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+      }
+    });
+  }
+
+  function scrollToCard(card, instant) {
+    if (!card) return;
+    cards.forEach(function (c) { c.classList.remove('is-hash-target'); });
+    card.classList.add('is-hash-target');
+    setActiveRailPill(card.id);
+    var topOffset = 118;
+    var y = Math.max(0, window.pageYOffset + card.getBoundingClientRect().top - topOffset);
+    var htmlEl = document.documentElement;
+    if (instant) {
+      var prev = htmlEl.style.scrollBehavior;
+      htmlEl.style.scrollBehavior = 'auto';
+      window.scrollTo(0, y);
+      htmlEl.style.scrollBehavior = prev;
+    } else {
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      var visible = entries.filter(function (e) { return e.isIntersecting; });
+      if (visible.length > 0) {
+        visible.sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+        setActiveRailPill(visible[0].target.id);
+      }
+    }, { rootMargin: '-130px 0px -60% 0px', threshold: 0.02 });
+    cards.forEach(function (c) { io.observe(c); });
+  }
+
+  function handleInitialHash() {
+    if (!location.hash || location.hash.length <= 1) return;
+    var raw = location.hash.slice(1);
+    try { raw = decodeURIComponent(raw); } catch (e) {}
+    var dest = document.getElementById(raw);
+    if (dest && dest.classList.contains('rx-card')) {
+      if (dest.style.display === 'none') resetAllFilters();
+      scrollToCard(dest, true);
+      setTimeout(function () { scrollToCard(dest, true); }, 150);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', handleInitialHash);
+  } else {
+    handleInitialHash();
+  }
+  window.addEventListener('hashchange', handleInitialHash);
 })();
 </script>
 </div>

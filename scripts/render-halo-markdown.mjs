@@ -9,7 +9,8 @@
  *        neither blurs them (pre:has(code) { filter: blur(10px) }) nor mounts 300+ Shadow DOM Web Components
  *      - Styled <details>/<summary> collapsible benchmark blocks
  *      - Optional progressive interactive filter + A-Z vendor jump wall + expand/collapse toolbar (--inject-toolbar)
- *        with Light & Dark (html.dark) support and colloquial nickname expansion
+ *        with Light & Dark (html.dark) support, colloquial nickname expansion, instant cross-page #hash landing,
+ *        and contextual return pill when arriving from /my-reviews
  *      - Strict 0-broken-anchor & <details> balance verification
  */
 import fs from 'node:fs';
@@ -162,6 +163,63 @@ function splitFrontmatter(md) {
 // instead of hoisting a leading <style> into discarded <head>.
 function buildScopedStyleBlock(includeToolbar) {
   const baseCss = `
+.markdown-body h2[id],
+.markdown-body h3[id] {
+  scroll-margin-top: 88px;
+}
+.markdown-body h2.vps-hash-target,
+.markdown-body h3.vps-hash-target {
+  padding: 4px 10px;
+  border-left: 4px solid var(--rx-accent, #b8461f);
+  border-radius: 4px;
+  background: var(--rx-accent-soft, #fbe7dc);
+  transition: background-color 1.2s ease;
+}
+html.dark .markdown-body h2.vps-hash-target,
+html.rx-dark .markdown-body h2.vps-hash-target,
+html.dark .markdown-body h3.vps-hash-target,
+html.rx-dark .markdown-body h3.vps-hash-target {
+  border-left-color: var(--rx-accent, #ff8577);
+  background: var(--rx-accent-soft, rgba(255, 133, 119, 0.18));
+}
+.vps-back-reviews-bar {
+  margin: 8px 0 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.vps-back-reviews-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 6px 13px;
+  border: 1.5px solid var(--rx-accent, #b8461f);
+  border-radius: 999px;
+  background: var(--rx-accent-soft, #fbe7dc);
+  color: var(--rx-text, #1f2328) !important;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none !important;
+  box-shadow: var(--rx-shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.08));
+}
+.vps-back-reviews-link:hover {
+  background: var(--rx-accent, #b8461f);
+  color: var(--rx-accent-ink, #ffffff) !important;
+}
+html.dark .vps-back-reviews-link,
+html.rx-dark .vps-back-reviews-link {
+  border-color: var(--rx-accent, #ff8577);
+  background: var(--rx-accent-soft, rgba(255, 133, 119, 0.18));
+  color: var(--rx-text, #fbf5ec) !important;
+}
+html.dark .vps-back-reviews-link:hover,
+html.rx-dark .vps-back-reviews-link:hover {
+  background: var(--rx-accent, #ff8577);
+  color: var(--rx-accent-ink, #1c1726) !important;
+}
 .markdown-body pre.vps-raw-report,
 pre.vps-raw-report {
   margin: 10px 0 14px;
@@ -251,9 +309,9 @@ html.dark .vps-review-subheading {
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 #vps-quick-toolbar .vps-tb-chip.is-active {
-  background: #0f172a;
-  border-color: #0f172a;
-  color: #ffffff;
+  background: var(--rx-accent, #0f172a);
+  border-color: var(--rx-accent, #0f172a);
+  color: var(--rx-accent-ink, #ffffff);
   font-weight: 600;
 }
 #vps-quick-toolbar #vps-filter-status {
@@ -330,9 +388,9 @@ html.dark #vps-quick-toolbar .vps-tb-chip {
   color: #cbd5e1;
 }
 html.dark #vps-quick-toolbar .vps-tb-chip.is-active {
-  background: #38bdf8;
-  border-color: #38bdf8;
-  color: #0f172a;
+  background: var(--rx-accent, #f59e0b);
+  border-color: var(--rx-accent, #f59e0b);
+  color: var(--rx-accent-ink, #0f172a);
 }
 html.dark #vps-quick-toolbar #vps-filter-status {
   color: #94a3b8;
@@ -585,6 +643,104 @@ function buildInteractiveToolbarHtml(detailsCount, vendorEntries) {
     var ds = Array.prototype.slice.call(root.querySelectorAll('details')).filter(function(d) { return d.id !== 'vps-vendor-wall'; });
     for (var i = 0; i < ds.length; i++) ds[i].open = false;
     statusEl.textContent = '已收起全部 ' + ds.length + ' 份终端测评报告原文';
+  });
+
+  // Instant cross-page #hash jump, visual highlight & contextual back-to-my-reviews bar
+  var userInteractedAfterJump = false;
+  var jumpedAtLeastOnce = false;
+  function markUserScroll() {
+    if (jumpedAtLeastOnce) userInteractedAfterJump = true;
+  }
+  window.addEventListener('wheel', markUserScroll, { passive: true });
+  window.addEventListener('touchmove', markUserScroll, { passive: true });
+
+  var CARD_LABELS = {
+    'dc9-gia': '① 搬瓦工 · 洛杉矶 DC9 CN2 GIA',
+    'ppf-lax': '② PPFlight · 洛杉矶三网精品优化',
+    'flawless-9929': '③ 完美节点 · 洛杉矶三网 9929',
+    'attvps-standard': '④ ATTVPS · 洛杉矶 AT&T 静态家宽',
+    'usvps24-att-pro9': '⑤ 干杯Cloud · AT&T 宽带 PRO-9线',
+    'nmcloud-hinet': '⑥ NMCloud · 台湾 HiNet 家宽',
+    'zorocloud-sg': '⑦ ZoroCloud · 新加坡 SPTel 家宽',
+    'novix-lax': '⑧ NovixLink · 洛杉矶 LAX-BGP Lite',
+    'yunyou-4837': '⑨ 云悠 · 洛杉矶 US4 Mini',
+    'taipei101-tex1': '⑩ Taipei101 · 得州 TEX1 双栈'
+  };
+
+  function ensureBackToReviewsBar(target) {
+    try {
+      var sp = new URLSearchParams(location.search);
+      if (sp.get('from') !== 'my-reviews') return;
+      var cardId = sp.get('card') || '';
+      var safeCard = /^[a-z0-9-]+$/i.test(cardId) ? ('#' + cardId) : '';
+      var label = CARD_LABELS[cardId] || '';
+      var existing = document.getElementById('vps-back-reviews-bar');
+      if (existing) existing.remove();
+      var bar = document.createElement('div');
+      bar.id = 'vps-back-reviews-bar';
+      bar.className = 'vps-back-reviews-bar';
+      var a = document.createElement('a');
+      a.className = 'vps-back-reviews-link';
+      a.href = '/my-reviews' + safeCard;
+      a.textContent = label
+        ? ('← 返回「我的测评」：' + label)
+        : '← 返回「我的测评」刚才查看的真机实测卡片';
+      bar.appendChild(a);
+      target.insertAdjacentElement('afterend', bar);
+    } catch (e) {}
+  }
+
+  function jumpToHashTarget(forceInstant) {
+    if (!location.hash || location.hash.length <= 1) return false;
+    var raw = location.hash.slice(1);
+    var decoded = raw;
+    try { decoded = decodeURIComponent(raw); } catch (e) {}
+    var target = document.getElementById(decoded) || document.getElementById(raw);
+    if (!target) return false;
+    var cur = target.parentElement;
+    while (cur && cur !== document.body) {
+      if (cur.tagName === 'DETAILS') cur.open = true;
+      cur = cur.parentElement;
+    }
+    var old = root.querySelectorAll('.vps-hash-target');
+    for (var i = 0; i < old.length; i++) old[i].classList.remove('vps-hash-target');
+    target.classList.add('vps-hash-target');
+    ensureBackToReviewsBar(target);
+    if (document.documentElement.scrollHeight < 1200) return false;
+    var rect = target.getBoundingClientRect();
+    var desiredY = Math.max(0, window.pageYOffset + rect.top - 88);
+    if (forceInstant) {
+      var htmlEl = document.documentElement;
+      var prev = htmlEl.style.scrollBehavior;
+      htmlEl.style.scrollBehavior = 'auto';
+      window.scrollTo(0, desiredY);
+      htmlEl.style.scrollBehavior = prev;
+    } else {
+      target.scrollIntoView({ block: 'start' });
+    }
+    jumpedAtLeastOnce = true;
+    return true;
+  }
+
+  function scheduleInitialHashJump() {
+    if (!location.hash || location.hash.length <= 1) return;
+    jumpToHashTarget(true);
+    setTimeout(function() {
+      if (!userInteractedAfterJump) jumpToHashTarget(true);
+    }, 120);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', scheduleInitialHashJump);
+  } else {
+    scheduleInitialHashJump();
+  }
+  window.addEventListener('load', function() {
+    if (!userInteractedAfterJump) scheduleInitialHashJump();
+  });
+  window.addEventListener('hashchange', function() {
+    userInteractedAfterJump = false;
+    jumpToHashTarget(true);
   });
 })();
 </script>`.trim();

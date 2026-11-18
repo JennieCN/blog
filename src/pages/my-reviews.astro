@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { svgIcon } from '../lib/icons';
 import reviewsHtml from '../../scripts/halo-pages/my-reviews.html?raw';
+
+const astroReviewsHtml = reviewsHtml.replaceAll('/archives/', '/vps/');
 ---
 <BaseLayout title="我的测评" description="自购在用 10 台主力 VPS 套餐一手实测档案：线路机 TcpQuality + NodeQuality 双脚本测速与落地机 IP 纯净度体检">
   <header class="page-head board-head" style="--c: var(--accent)">
@@ -15,5 +17,5 @@ import reviewsHtml from '../../scripts/halo-pages/my-reviews.html?raw';
     </div>
   </header>
 
-  <Fragment set:html={reviewsHtml} />
+  <Fragment set:html={astroReviewsHtml} />
 </BaseLayout>
