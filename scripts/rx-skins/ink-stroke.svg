@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100" preserveAspectRatio="none">
+  <!-- 横向飞白笔触：实心的笔肚 + 干笔拖出的丝状尾巴，用作 mask -->
+  <defs>
+    <filter id="edge" x="-5%" y="-40%" width="110%" height="180%">
+      <feTurbulence type="fractalNoise" baseFrequency=".035 .09" numOctaves="3" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="dry" x="-5%" y="-40%" width="110%" height="180%">
+      <feTurbulence type="fractalNoise" baseFrequency=".003 .22" numOctaves="3" seed="11" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  12 0 0 0 -5.4" result="m"/>
+      <feComposite in="SourceGraphic" in2="m" operator="in" result="c"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="2" result="e"/>
+      <feDisplacementMap in="c" in2="e" scale="12" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <linearGradient id="fade" x1="0" x2="1"><stop offset="0" stop-color="#000"/><stop offset=".86" stop-color="#000"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+  </defs>
+  <path filter="url(#edge)" fill="url(#fade)" d="M14 50 C 22 22 70 12 160 12 C 300 10 460 12 548 22 C 566 40 566 66 548 82 C 380 90 240 92 110 88 C 40 86 10 74 14 50 Z"/>
+  <path filter="url(#dry)" fill="#000" d="M500 16 C 540 14 580 20 598 34 C 600 54 588 72 568 80 C 550 88 520 90 500 88 Z"/>
+</svg>

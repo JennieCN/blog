@@ -1,0 +1,501 @@
+/* ==========================================================================
+   融夕的书 · CC 四套皮肤共享令牌与跨站公共控件 (rx-tokens.css)
+   皮肤枚举：pop（撞色贴纸，默认） | ink（水墨远山） | luxe（夕照毛玻璃） | plain（素色极简）
+   暗色类：html.rx-dark（与 Halo html.dark、Flarum html[data-theme="dark"] 双向同步）
+   ========================================================================== */
+
+:root[data-rx-skin] {
+  --rx-font-sans: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+  --rx-font-serif: "Songti SC", "STSong", "Noto Serif CJK SC", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  --rx-font-brush: "STXingkai", "Xingkai SC", "华文行楷", "FZShuTi", "STKaiti", "KaiTi", "Kaiti SC", "Noto Serif CJK SC", serif;
+  --rx-font-display: "Arial Black", "Helvetica Neue", system-ui, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --rx-font-mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  --rx-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --rx-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --rx-stroke: url("ink-stroke.svg");
+}
+
+/* ---------------- 1. 夕照毛玻璃 (luxe) ---------------- */
+:root[data-rx-skin="luxe"] {
+  --rx-bg: #f6f1e9;
+  --rx-surface: #fffdf9;
+  --rx-surface-2: #f2ebe0;
+  --rx-surface-3: #e9dfd0;
+  --rx-line: #e3d8c8;
+  --rx-line-strong: #cdbfab;
+  --rx-text: #2a231e;
+  --rx-text-2: #5e534a;
+  --rx-text-3: #776b60;
+  --rx-accent: #b8461f;
+  --rx-accent-hover: #9c3a18;
+  --rx-accent-ink: #ffffff;
+  --rx-accent-soft: #fbe7dc;
+  --rx-ok: #2a7444;
+  --rx-ok-bg: #e0f2e6;
+  --rx-warn: #8a5a00;
+  --rx-warn-bg: #fdf0d2;
+  --rx-danger: #b3261e;
+  --rx-code-bg: #1e1b24;
+  --rx-code-text: #f3e9dc;
+  --rx-radius: 18px;
+  --rx-radius-sm: 10px;
+  --rx-bw: 1px;
+  --rx-glass: rgba(255, 252, 247, .76);
+  --rx-glass-strong: rgba(255, 252, 247, .92);
+  --rx-hairline: rgba(90, 55, 30, .12);
+  --rx-shadow:
+    0 1px 0 rgba(255, 255, 255, .85) inset,
+    0 1px 2px rgba(70, 40, 20, .05),
+    0 10px 24px -12px rgba(90, 45, 20, .16),
+    0 28px 56px -28px rgba(130, 55, 35, .22);
+  --rx-shadow-lg:
+    0 1px 0 rgba(255, 255, 255, .9) inset,
+    0 18px 36px -14px rgba(90, 45, 20, .24),
+    0 40px 70px -30px rgba(160, 60, 40, .3);
+  --rx-dusk: linear-gradient(135deg, #cf5a2a 0%, #b8461f 48%, #9a3858 100%);
+  --rx-aurora-1: rgba(255, 170, 105, .5);
+  --rx-aurora-2: rgba(222, 96, 122, .28);
+  --rx-aurora-3: rgba(132, 98, 214, .2);
+}
+
+html.rx-dark[data-rx-skin="luxe"] {
+  --rx-bg: #15131b;
+  --rx-surface: #1d1a25;
+  --rx-surface-2: #26222f;
+  --rx-surface-3: #312c3c;
+  --rx-line: #332e3f;
+  --rx-line-strong: #4a4358;
+  --rx-text: #efe7de;
+  --rx-text-2: #c0b5aa;
+  --rx-text-3: #a39789;
+  --rx-accent: #ff9466;
+  --rx-accent-hover: #ffad88;
+  --rx-accent-ink: #24130c;
+  --rx-accent-soft: #3d2620;
+  --rx-ok: #7ed79b;
+  --rx-ok-bg: #1b3324;
+  --rx-warn: #f3c262;
+  --rx-warn-bg: #3a2e14;
+  --rx-danger: #ff8a80;
+  --rx-code-bg: #0f0d14;
+  --rx-code-text: #eee4d8;
+  --rx-glass: rgba(30, 26, 40, .68);
+  --rx-glass-strong: rgba(34, 30, 46, .88);
+  --rx-hairline: rgba(255, 255, 255, .08);
+  --rx-shadow:
+    0 1px 0 rgba(255, 255, 255, .07) inset,
+    0 12px 30px -12px rgba(0, 0, 0, .65),
+    0 30px 60px -30px rgba(0, 0, 0, .7);
+  --rx-shadow-lg:
+    0 1px 0 rgba(255, 255, 255, .1) inset,
+    0 18px 40px -14px rgba(0, 0, 0, .72),
+    0 40px 80px -30px rgba(120, 40, 60, .45);
+  --rx-dusk: linear-gradient(135deg, #ff9a66 0%, #f0784a 50%, #d2557a 100%);
+  --rx-aurora-1: rgba(255, 112, 72, .22);
+  --rx-aurora-2: rgba(178, 56, 132, .22);
+  --rx-aurora-3: rgba(72, 76, 210, .25);
+}
+
+/* ---------------- 2. 撞色贴纸 (pop，默认) ---------------- */
+:root[data-rx-skin="pop"] {
+  --rx-pop-yellow: #ffd23f;
+  --rx-pop-green: #8fdcb6;
+  --rx-bg: #fff7e8;
+  --rx-surface: #ffffff;
+  --rx-surface-2: #fff1d6;
+  --rx-surface-3: #ffe6b8;
+  --rx-line: #15121c;
+  --rx-line-strong: #15121c;
+  --rx-text: #15121c;
+  --rx-text-2: #3d3748;
+  --rx-text-3: #6a6275;
+  --rx-accent: #9a5b00;
+  --rx-accent-hover: #7a4800;
+  --rx-accent-ink: #15121c;
+  --rx-accent-soft: #fff0bf;
+  --rx-ok: #1b6b45;
+  --rx-ok-bg: #8fdcb6;
+  --rx-warn: #7a4800;
+  --rx-warn-bg: #ffd23f;
+  --rx-danger: #c62828;
+  --rx-code-bg: #15121c;
+  --rx-code-text: #fbf5ec;
+  --rx-radius: 14px;
+  --rx-radius-sm: 10px;
+  --rx-bw: 2.5px;
+  --rx-glass: #ffffff;
+  --rx-glass-strong: #ffffff;
+  --rx-hairline: #15121c;
+  --rx-shadow: 4px 4px 0 #15121c;
+  --rx-shadow-lg: 7px 7px 0 #15121c;
+  --rx-dusk: #ffd23f;
+}
+
+html.rx-dark[data-rx-skin="pop"] {
+  --rx-pop-yellow: #ffd23f;
+  --rx-pop-green: #5fbf92;
+  --rx-bg: #1a1624;
+  --rx-surface: #262033;
+  --rx-surface-2: #2f283e;
+  --rx-surface-3: #3a3150;
+  --rx-line: #050408;
+  --rx-line-strong: #ffd23f;
+  --rx-text: #fbf5ec;
+  --rx-text-2: #d8cfe2;
+  --rx-text-3: #a99fb8;
+  --rx-accent: #ffd23f;
+  --rx-accent-hover: #ffe07a;
+  --rx-accent-ink: #15121c;
+  --rx-accent-soft: #3d3416;
+  --rx-ok: #8fdcb6;
+  --rx-ok-bg: #1e3a2d;
+  --rx-warn: #ffd23f;
+  --rx-warn-bg: #3d3416;
+  --rx-danger: #ff8a80;
+  --rx-code-bg: #0d0b12;
+  --rx-code-text: #fbf5ec;
+  --rx-glass: #262033;
+  --rx-glass-strong: #262033;
+  --rx-hairline: #050408;
+  --rx-shadow: 4px 4px 0 #000000;
+  --rx-shadow-lg: 7px 7px 0 #000000;
+  --rx-dusk: #ffd23f;
+}
+
+/* ---------------- 3. 水墨远山 (ink) ---------------- */
+:root[data-rx-skin="ink"] {
+  --rx-cinnabar: #b5291c;
+  --rx-ink-jiao: #161411;
+  --rx-bg: #efe7d6;
+  --rx-surface: #f8f3e7;
+  --rx-surface-2: #e7dcc6;
+  --rx-surface-3: #d8cbb1;
+  --rx-line: #cbbd9f;
+  --rx-line-strong: #8f8268;
+  --rx-text: #161411;
+  --rx-text-2: #4a453d;
+  --rx-text-3: #6d665a;
+  --rx-accent: #b5291c;
+  --rx-accent-hover: #8e1f14;
+  --rx-accent-ink: #fbf6ea;
+  --rx-accent-soft: #f0d6cd;
+  --rx-ok: #3f5f3f;
+  --rx-ok-bg: #dfe4d4;
+  --rx-warn: #7d5714;
+  --rx-warn-bg: #ecdfc2;
+  --rx-danger: #b5291c;
+  --rx-code-bg: #1b1916;
+  --rx-code-text: #eae2d0;
+  --rx-radius: 3px;
+  --rx-radius-sm: 2px;
+  --rx-bw: 1px;
+  --rx-glass: #f8f3e7;
+  --rx-glass-strong: #f8f3e7;
+  --rx-hairline: #cbbd9f;
+  --rx-shadow: 0 2px 0 rgba(22, 20, 17, .06), 0 12px 30px -18px rgba(22, 20, 17, .45);
+  --rx-shadow-lg: 0 24px 60px -24px rgba(22, 20, 17, .6);
+  --rx-dusk: #b5291c;
+}
+
+html.rx-dark[data-rx-skin="ink"] {
+  --rx-cinnabar: #d9473a;
+  --rx-ink-jiao: #ece4d1;
+  --rx-bg: #13120f;
+  --rx-surface: #1c1a16;
+  --rx-surface-2: #26231d;
+  --rx-surface-3: #332f27;
+  --rx-line: #3a352c;
+  --rx-line-strong: #6a634f;
+  --rx-text: #ece4d1;
+  --rx-text-2: #b4ab97;
+  --rx-text-3: #958c79;
+  --rx-accent: #d9473a;
+  --rx-accent-hover: #ee6a5c;
+  --rx-accent-ink: #fbf6ea;
+  --rx-accent-soft: #3d1d18;
+  --rx-ok: #93b393;
+  --rx-ok-bg: #1e2a1f;
+  --rx-warn: #d8b066;
+  --rx-warn-bg: #30281a;
+  --rx-danger: #ee6a5c;
+  --rx-code-bg: #0b0a08;
+  --rx-code-text: #eae2d0;
+  --rx-glass: #1c1a16;
+  --rx-glass-strong: #1c1a16;
+  --rx-hairline: #3a352c;
+  --rx-shadow: 0 12px 30px -16px rgba(0, 0, 0, .8);
+  --rx-shadow-lg: 0 24px 60px -24px rgba(0, 0, 0, .9);
+  --rx-dusk: #d9473a;
+}
+
+/* ---------------- 4. 素色极简 (plain) ---------------- */
+:root[data-rx-skin="plain"] {
+  --rx-bg: #ffffff;
+  --rx-surface: #ffffff;
+  --rx-surface-2: #f6f8fa;
+  --rx-surface-3: #eff2f5;
+  --rx-line: #d1d9e0;
+  --rx-line-strong: #c3ccd5;
+  --rx-text: #1f2328;
+  --rx-text-2: #3d444d;
+  --rx-text-3: #59636e;
+  --rx-accent: #0969da;
+  --rx-accent-hover: #0550ae;
+  --rx-accent-ink: #ffffff;
+  --rx-accent-soft: #ddf4ff;
+  --rx-ok: #1a7f37;
+  --rx-ok-bg: #dafbe1;
+  --rx-warn: #9a6700;
+  --rx-warn-bg: #fff8c5;
+  --rx-danger: #d1242f;
+  --rx-code-bg: #151b23;
+  --rx-code-text: #f0f6fc;
+  --rx-radius: 6px;
+  --rx-radius-sm: 6px;
+  --rx-bw: 1px;
+  --rx-glass: #ffffff;
+  --rx-glass-strong: #ffffff;
+  --rx-hairline: #d1d9e0;
+  --rx-shadow: 0 1px 0 rgba(31, 35, 40, .04);
+  --rx-shadow-lg: 0 8px 24px rgba(66, 74, 83, .12), 0 0 0 1px #d1d9e0;
+  --rx-dusk: #1f883d;
+}
+
+html.rx-dark[data-rx-skin="plain"] {
+  --rx-bg: #0d1117;
+  --rx-surface: #0d1117;
+  --rx-surface-2: #151b23;
+  --rx-surface-3: #212830;
+  --rx-line: #3d444d;
+  --rx-line-strong: #656c76;
+  --rx-text: #f0f6fc;
+  --rx-text-2: #d1d7e0;
+  --rx-text-3: #9198a1;
+  --rx-accent: #4493f8;
+  --rx-accent-hover: #6cb6ff;
+  --rx-accent-ink: #ffffff;
+  --rx-accent-soft: rgba(56, 139, 253, .15);
+  --rx-ok: #3fb950;
+  --rx-ok-bg: rgba(46, 160, 67, .15);
+  --rx-warn: #d29922;
+  --rx-warn-bg: rgba(187, 128, 9, .15);
+  --rx-danger: #f85149;
+  --rx-code-bg: #151b23;
+  --rx-code-text: #f0f6fc;
+  --rx-glass: #0d1117;
+  --rx-glass-strong: #151b23;
+  --rx-hairline: #3d444d;
+  --rx-shadow: none;
+  --rx-shadow-lg: 0 8px 24px #010409, 0 0 0 1px #3d444d;
+  --rx-dusk: #238636;
+}
+
+/* ---------------- 公共进度条、换肤图标按钮、Toast 与彩纸粒子 ---------------- */
+#rx-read-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 1200;
+  background: var(--rx-dusk);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+:root[data-rx-skin="pop"] #rx-read-progress {
+  height: 5px;
+  border-bottom: 2px solid var(--rx-line);
+}
+:root[data-rx-skin="ink"] #rx-read-progress {
+  height: 4px;
+  background: var(--rx-accent);
+}
+:root[data-rx-skin="plain"] #rx-read-progress {
+  height: 2px;
+  background: var(--rx-accent);
+}
+
+.rx-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rx-line);
+  background: var(--rx-surface);
+  color: var(--rx-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .2s var(--rx-ease-spring), background .18s, border-color .18s, box-shadow .18s;
+}
+.rx-icon-btn:hover {
+  background: var(--rx-surface-2);
+  border-color: var(--rx-line-strong);
+}
+.rx-icon-btn svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+:root[data-rx-skin="pop"] .rx-icon-btn {
+  border: 2px solid var(--rx-line);
+  border-radius: 10px;
+  background: var(--rx-pop-yellow);
+  color: #15121c;
+  font-weight: 800;
+  box-shadow: 2px 2px 0 var(--rx-line);
+}
+html.rx-dark[data-rx-skin="pop"] .rx-icon-btn {
+  box-shadow: 2px 2px 0 #000;
+}
+:root[data-rx-skin="pop"] .rx-icon-btn:hover {
+  transform: translate(-1px, -1px);
+}
+:root[data-rx-skin="ink"] .rx-icon-btn {
+  border-radius: 2px;
+  border: 1.5px solid var(--rx-text);
+  background: var(--rx-surface);
+  font-family: var(--rx-font-serif);
+  letter-spacing: .06em;
+}
+:root[data-rx-skin="ink"] .rx-icon-btn:hover {
+  border-color: var(--rx-accent);
+  color: var(--rx-accent);
+}
+:root[data-rx-skin="plain"] .rx-icon-btn {
+  border-radius: 6px;
+  background: var(--rx-surface-2);
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .rx-icon-btn {
+    padding: 0 7px;
+    height: 30px;
+  }
+  .rx-icon-btn .rx-btn-label {
+    display: none;
+  }
+}
+
+.rx-toast-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  z-index: 1300;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0 16px;
+}
+.rx-toast {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px 9px 16px;
+  border-radius: 999px;
+  background: var(--rx-text);
+  color: var(--rx-bg);
+  box-shadow: var(--rx-shadow-lg);
+  font-size: 13.5px;
+  font-weight: 600;
+  animation: rx-toast-in .24s var(--rx-ease-out);
+}
+.rx-toast[hidden] {
+  display: none !important;
+}
+:root[data-rx-skin="pop"] .rx-toast {
+  border: 2.5px solid #15121c;
+  box-shadow: 4px 4px 0 #ffd23f;
+}
+:root[data-rx-skin="ink"] .rx-toast {
+  border-radius: 0;
+  border-left: 5px solid var(--rx-accent);
+  font-family: var(--rx-font-serif);
+}
+:root[data-rx-skin="plain"] .rx-toast {
+  border-radius: 6px;
+}
+.rx-toast-close {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  opacity: .75;
+  cursor: pointer;
+}
+.rx-toast-close:hover {
+  opacity: 1;
+}
+.rx-toast-close svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+@keyframes rx-toast-in {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1290;
+  pointer-events: none;
+  overflow: hidden;
+}
+.fx-bit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  will-change: transform, opacity;
+}
+:root[data-rx-skin="pop"] .fx-bit {
+  border: 1.5px solid #15121c;
+}
+:root[data-rx-skin="ink"] .fx-bit {
+  border-radius: 50%;
+}
+
+/* View Transition 圆形扩散保护 */
+.fx-theme-vt::view-transition-old(root),
+.fx-theme-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root[data-rx-skin="luxe"],
+  html.rx-dark[data-rx-skin="luxe"] {
+    --rx-glass: var(--rx-surface);
+    --rx-glass-strong: var(--rx-surface);
+  }
+}
